@@ -1,2 +1,1 @@
-# Painel_AJE2
-Painel Financeiro
+Abra sempre apenas o arquivo html.
