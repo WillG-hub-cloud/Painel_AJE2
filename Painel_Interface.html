@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Controle Financeiro de Projetos</title>
+
+    <!-- Links para bibliotecas e estilos externos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- NOVAS BIBLIOTECAS PARA EXPORTAÇÃO PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /* Estilos globais */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            /* Novo fundo para o painel */
+            background-color: #1a202c; /* Cor de fundo escura como fallback */
+            background-image: url('https://i.imgur.com/7XqnH0E.jpeg'); /* Imagem da arquitetura sem overlay */
+            background-size: cover; /* Garante que a imagem cubra toda a área */
+            background-attachment: fixed; /* Torna o fundo fixo (efeito parallax) */
+            background-position: center; /* Centraliza a imagem */
+            color: #052b63;
+        }
+        /* Estilo adicionado para as tabelas */
+        table {
+            font-family: 'Poppins', sans-serif;
+        }
+        /* Centraliza o texto dentro das células de cabeçalho e de dados das tabelas */
+        table th, table td {
+            /* Esta regra pode ser sobrescrita pelas classes do Tailwind,
+               por isso adicionamos text-center diretamente nas tags th e td no HTML/JS. */
+        }
+        .glass-card {
+            background: linear-gradient(135deg, rgba(240, 248, 255, 0.2) 0%, rgba(240, 248, 255, 0.3) 70%);
+            -webkit-backdrop-filter: blur(2px);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-top-left-radius: 0;
+            border-top-right-radius: 60px;
+            border-bottom-right-radius: 60px;
+            border-bottom-left-radius: 60px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .tab-button.active {
+            background-color: rgba(255, 255, 255, 0.7);
+            color: #072380;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px; /* REVERTIDO: Altura do gráfico para a versão anterior */
+            max-height: 60vh; /* REVERTIDO: Altura máxima do gráfico para a versão anterior */
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            .chart-container { height: 300px; } /* REVERTIDO: Ajuste para telas menores */
+        }
+        .message-box {
+            background: linear-gradient(to bottom right, rgba(240, 248, 255, 0.9), rgba(240, 248, 255, 0.7));
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #333333;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #map {
+            height: 600px;
+            width: 100%;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .custom-pin-icon {
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            font-size: 28px;
+            color: #FF6600;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            transform: translate(-50%, -100%);
+        }
+        .map-label-tooltip {
+            background: transparent !important;
+            color: white !important;
+            font-weight: bold !important;
+            font-size: 0.875rem !important;
+            padding: 0.25rem 0.5rem !important;
+            border-radius: 0.375rem !important;
+            box-shadow: none !important;
+            pointer-events: none !important;
+            border: none !important;
+            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+            white-space: nowrap;
+        }
+        .leaflet-tooltip.map-label-tooltip.leaflet-tooltip-bottom:before {
+            border-top-color: transparent !important;
+        }
+
+        /* Cores ajustadas */
+        .glass-card .text-gray-700 { color: #333333; }
+        .glass-card .text-gray-900 { color: #000000; }
+        .glass-card .text-blue-800 { color: #072380; }
+        .glass-card .text-blue-700 { color: #072380; }
+        .glass-card .text-slate-600 { color: #333333; }
+        .text-status-adiantado { color: #007B3D; }
+        .text-status-atrasado { color: #FF0000; }
+        .text-status-diff-green { color: #007B3D; }
+        .text-status-diff-red { color: #FF0000; }
+        #comparativeTableBody, #measurementsTableBody { background-color: transparent; }
+        #contractSelector { color: #333333; }
+
+        /* NOVO ESTILO PARA EXPORTAÇÃO PDF */
+        .pdf-export-active {
+            background-image: none !important;
+            background-color: #FFFFFF !important; /* Fundo branco para o PDF */
+            color: #000000 !important; /* Texto preto para legibilidade */
+        }
+    </style>
+</head>
+<body class="text-slate-200">
+
+    <div class="container mx-auto p-4 md:p-6 lg:p-8">
+
+        <header class="text-center mb-8 relative" id="mainHeader"> <!-- Adicionado ID para facilitar clonagem -->
+            <div class="grid grid-cols-3 items-center gap-4 mb-4">
+                <div class="flex justify-start">
+                 <img src="https://i.imgur.com/67zLDAk.png" id="logoPOE" alt="Logo POE" class="h-18 md:h-20 max-w-full object-contain"/>
+                </div>
+                <div class="flex justify-center">
+                    <img src="https://i.imgur.com/vPi0F5j.png" id="logoJundiai" alt="Logo Jundiaí" class="h-26 md:h-28 max-w-full object-contain"/>
+                </div>
+                <div class="flex justify-end">
+                      <img src="https://i.imgur.com/1JpcXBq.png" id="logoCAF" alt="Logo CAF" class="h-26 md:h-28 max-w-full object-contain"/> 
+                </div>
+            </div>
+
+            <h1 class="text-3xl md:text-4xl font-bold text-black mb-2">PROGRAMA AVANÇA JUNDIAÍ - ETAPA 2</h1>
+            <p class="text-[#052b63] mt-2 text-lg">Análise de performance de contratos de obras.</p>
+            <div class="flex flex-wrap justify-center items-center gap-4 mt-6" id="header-dynamic-images"></div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+            <div class="glass-card p-4 text-center">
+                <p class="text-sm text-gray-700">Obras em Andamento</p>
+                <p id="totalContracts" class="text-3xl font-bold" style="color: #072380;">0</p>
+            </div>
+            <div class="glass-card p-4 text-center">
+                <p class="text-sm text-gray-700">Valor Total dos Contratos</p>
+                <p id="totalContractValue" class="text-3xl font-bold" style="color: #072380;">R$ 0,00</p>
+            </div>
+            <div class="glass-card p-4 text-center">
+                <p id="sumOfLatestMonthlyMeasurements" class="text-3xl font-bold" style="color: #072380;">R$ 0</p>
+                <p class="text-sm text-gray-700">Soma das Medições no mês de Junho</p>
+            </div>
+        </div>
+
+        <div id="mapView" class="glass-card p-4 sm:p-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Selecione uma Obra no Mapa</h2>
+            <div id="map"></div>
+            <p class="text-gray-700 text-sm mt-4 text-center">Clique em um marcador no mapa para ver os detalhes financeiros do contrato.</p>
+        </div>
+
+        <div id="dashboardView" class="glass-card p-4 sm:p-6 hidden">
+            <div class="flex justify-between items-center mb-6">
+                <!-- BOTÃO "VOLTAR AO MAPA" - SERÁ OCULTADO NO PDF -->
+                <button id="backToMapButton" class="px-4 py-2 rounded-lg shadow transition-colors font-bold" style="background-color: transparent; color: #072380; border: 1px solid #072380; hover:background-color: rgba(7, 35, 128, 0.2);">
+                    &larr; Voltar ao Mapa
+                </button>
+                <div class="flex-grow ml-4">
+                    <label for="contractSelector" class="block text-sm font-semibold text-gray-700 mb-1">Selecione Outro Contrato:</label>
+                    <!-- SELECTOR DE CONTRATO - SERÁ OCULTADO NO PDF -->
+                    <select id="contractSelector" class="w-full p-3 bg-white/80 border border-slate-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-gray-900">
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex justify-start gap-2 mb-4">
+                <button id="exportChartPngButton" title="Exportar PNG" class="p-1 w-8 h-8 rounded-lg shadow transition-colors flex items-center justify-center font-bold" style="background-color: transparent; hover:background-color: rgba(0, 123, 61, 0.2);">
+                    <i class="fas fa-file-image text-2xl text-gray-800"></i>
+                </button>
+                <button id="exportTableCsvButton" title="Exportar CSV" class="p-1 w-8 h-8 rounded-lg shadow transition-colors flex items-center justify-center font-bold" style="background-color: transparent; hover:background-color: rgba(255, 102, 0, 0.2);">
+                    <i class="fas fa-file-csv text-2xl text-gray-800"></i>
+                </button>
+                <!-- NOVO BOTÃO PARA EXPORTAR PDF -->
+                <button id="exportPdfButton" title="Exportar PDF" class="p-1 w-8 h-8 rounded-lg shadow transition-colors flex items-center justify-center font-bold" style="background-color: transparent; hover:background-color: rgba(220, 53, 69, 0.2);">
+                    <i class="fas fa-file-pdf text-2xl text-gray-800"></i>
+                </button>
+            </div>
+
+            <main>
+                <div id="contractDetails" class="mb-6 border-b border-white/50 pb-6 flex flex-col items-center text-center"></div>
+
+                <div class="mb-4">
+                    <div class="bg-slate-200/50 rounded-xl p-1 inline-flex space-x-1">
+                        <!-- BOTÃO "GRÁFICO COMPARATIVO" - SERÁ OCULTADO NO PDF -->
+                        <button id="tab-chart" class="tab-button flex items-center gap-2 whitespace-nowrap py-2 px-4 rounded-lg font-bold text-sm text-slate-600 hover:bg-white/60 transition-all">
+                            Gráfico Comparativo
+                        </button>
+                        <!-- BOTÃO "TABELA DE MEDIÇÕES" - SERÁ OCULTADO NO PDF -->
+                        <button id="tab-table" class="tab-button flex items-center gap-2 whitespace-nowrap py-2 px-4 rounded-lg font-bold text-sm text-slate-600 hover:bg-white/60 transition-all">
+                           Tabela de Medições
+                        </button>
+                    </div>
+                </div>
+
+                <div id="content-chart" class="content-view mb-8"> <!-- ALTERADO: Adicionado mb-8 para espaçamento -->
+                    <p class="text-gray-700 text-sm mb-4 text-center">O gráfico abaixo ilustra a comparação mensal entre os valores acumulados 'Previsto' e 'Executado'. Passe o mouse sobre os pontos para ver detalhes, incluindo a diferença e o percentual do valor total.</p>
+                    <div class="chart-container">
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                    <div id="noChartDataMessage" class="message-box">
+                        <p class="font-semibold text-gray-700">Não há dados de gráfico disponíveis para este contrato.</p>
+                        <p class="text-sm text-gray-600">A visualização foi movida para a tabela de cronograma.</p>
+                    </div>
+                </div>
+
+                <div id="content-table" class="content-view hidden mt-8"> <!-- ALTERADO: Adicionado mt-8 para espaçamento -->
+                    <p class="text-gray-700 text-sm mb-4">Esta seção apresenta a tabela detalhada de todas as medições (ou previsões) para o contrato selecionado, exibindo os valores por período e o total acumulado.</p>
+
+                    <div id="comparativeTableContainer" class="overflow-x-auto hidden">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Medição</th>
+                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Mês</th>
+                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Previst. Mês</th>
+                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Previst. Acum.</th>
+                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Executado Mês</th>
+                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Executado Acum.</th>
+                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Diferença</th>
+                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="comparativeTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <div id="predictedScheduleTableContainer" class="overflow-x-auto hidden">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Medição</th>
+                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Período</th>
+                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Ref.</th>
+                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Valor Medição</th>
+                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Valor Acumulado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="measurementsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <footer class="text-center mt-12 text-sm text-[#CCCCCC]">
+            <p>Painel gerado com base nos dados de cada contratação.</p>
+        </footer>
+
+    </div>
+
+    <!-- Carrega o arquivo de dados dos contratos antes do script principal -->
+    <script src="Dados_Contrato.js"></script>
+
+    <script>
+        // --- VARIÁVEIS DE URL DE IMAGENS ---
+        const imageUrls = {
+            logoCAF: "https://i.imgur.com/1JpcXBq.png",
+            logoJundiai: "https://i.imgur.com/QpfUWkv.png",
+            logoPOE: "https://i.imgur.com/67zLDAk.png",
+            logoUBS: "https://i.imgur.com/syy1cBb.png",
+            logoAtleta: "https://i.imgur.com/w2G3qli.png",
+            logoEscola: "https://i.imgur.com/F9Zk9Qt.png"
+        };
+
+        // Carrega os logos quando o DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('logoCAF').src = imageUrls.logoCAF;
+            document.getElementById('logoJundiai').src = imageUrls.logoJundiai;
+            document.getElementById('logoPOE').src = imageUrls.logoPOE;
+        });
+
+        // Registra o plugin ChartDataLabels para Chart.js
+        Chart.register(ChartDataLabels);
+
+        // A variável projectData agora será carregada do arquivo "Dados_Contrato.js"
+        // Certifique-se de que "Dados_Contrato.js" esteja linkado ANTES deste script.
+
+        // Referências aos elementos do DOM
+        const mainHeader = document.getElementById('mainHeader'); // NOVA REFERÊNCIA
+        const contractSelector = document.getElementById('contractSelector');
+        const contractDetails = document.getElementById('contractDetails');
+        const noChartDataMessage = document.getElementById('noChartDataMessage'); // Revertido para ID direto
+        const chartCanvasContainer = document.querySelector('#content-chart .chart-container');
+
+        const tabChartButton = document.getElementById('tab-chart');
+        const tabTableButton = document.getElementById('tab-table');
+        const contentChart = document.getElementById('content-chart');
+        const contentTable = document.getElementById('content-table');
+
+        const comparativeTableContainer = document.getElementById('comparativeTableContainer');
+        const comparativeTableBody = document.getElementById('comparativeTableBody');
+        const predictedScheduleTableContainer = document.getElementById('predictedScheduleTableContainer');
+        const predictedScheduleTableBody = document.getElementById('measurementsTableBody');
+
+        const totalContractsSpan = document.getElementById('totalContracts');
+        const totalContractValueSpan = document.getElementById('totalContractValue');
+        const sumOfLatestMonthlyMeasurementsSpan = document.getElementById('sumOfLatestMonthlyMeasurements');
+
+        // Elementos específicos do mapa e botões de exportação
+        const mapView = document.getElementById('mapView');
+        const dashboardView = document.getElementById('dashboardView');
+        const backToMapButton = document.getElementById('backToMapButton');
+        const exportChartPngButton = document.getElementById('exportChartPngButton');
+        const exportTableCsvButton = document.getElementById('exportTableCsvButton');
+        const exportPdfButton = document.getElementById('exportPdfButton');
+
+        let map; // Variável para armazenar a instância do mapa Leaflet
+        let mainChart; // Variável para armazenar a instância do gráfico Chart.js
+
+        // Array de observações que indicam que o contrato ainda não possui medições reais (apenas previstas)
+        const contractsWithoutRealMeasurements = ["Contrato ainda não possui medições.", "Contrato ainda não foi assinado."];
+
+        /**
+         * Analisa uma string de data no formato 'DD/MM/AA' ou 'DD/MM/AAAA' e retorna um objeto Date.
+         * Tenta inferir o século para anos de 2 dígitos.
+         * @param {string} dateString - A string de data a ser analisada.
+         * @returns {Date|null} O objeto Date ou null se a string for inválida.
+         */
+        function parseDate(dateString) {
+            if (!dateString || dateString === 'N/A' || dateString.toLowerCase() === 'null') return null;
+            const parts = dateString.split('/');
+            let day = parseInt(parts[0], 10);
+            let month = parseInt(parts[1], 10) - 1; // Mês é 0-indexado no JavaScript
+            let year = parseInt(parts[2], 10);
+
+            const currentYear = new Date().getFullYear();
+            // Heurística para inferir o século para anos de 2 dígitos (ex: 25 -> 2025, 98 -> 1998)
+            if (year < 100) {
+                year = (year > (currentYear % 100) + 10) ? 1900 + year : 2000 + year;
+            }
+            return new Date(year, month, day);
+        }
+
+        /**
+         * Calcula o número total de dias entre duas datas.
+         * @param {Date} startDate - A data de início.
+         * @param {Date} endDate - A data de fim.
+         * @returns {number|null} O número de dias ou null se as datas forem inválidas.
+         */
+        function calculateTotalDays(startDate, endDate) {
+            if (!startDate || !endDate || isNaN(startDate) || isNaN(endDate)) return null;
+            let diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+            return Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Converte milissegundos para dias
+        }
+
+        /**
+         * Formata um valor numérico como moeda BRL.
+         * @param {number} value - O valor a ser formatado.
+         * @returns {string} O valor formatado como string de moeda.
+         */
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
+        }
+
+        /**
+         * Formata um valor numérico como moeda BRL e, opcionalmente, com porcentagem em relação a um total.
+         * @param {number} value - O valor a ser formatado.
+         * @param {number} totalValue - O valor total para cálculo da porcentagem.
+         * @returns {string} O valor formatado com ou sem porcentagem.
+         */
+        function formatCurrencyAndPercentage(value, totalValue) {
+            if (value === null || value === undefined || totalValue === 0) {
+                return formatCurrency(value);
+            }
+            const percentage = ((value / totalValue) * 100).toFixed(2);
+            return `${formatCurrency(value)} (${percentage}%)`;
+        }
+
+        /**
+         * Formata valores de rótulos de gráfico para exibição concisa (milhões, milhares).
+         * @param {number} value - O valor a ser formatado.
+         * @returns {string} O valor formatado para o gráfico.
+         */
+        function formatChartLabelValue(value) {
+            const absValue = Math.abs(value);
+            if (absValue >= 1000000) {
+                return `R$ ${(absValue / 1000000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} mi`;
+            } else if (absValue >= 1000) {
+                return `R$ ${(absValue / 1000).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} mil`;
+            } else {
+                return `R$ ${absValue.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+            }
+        }
+
+        /**
+         * Formata valores de resumo para exibição concisa (milhões, milhares, sem centavos).
+         * @param {number} value - O valor a ser formatado.
+         * @returns {string} O valor formatado para o resumo.
+         */
+        function formatSummaryValue(value) {
+            const absValue = Math.abs(value);
+            if (absValue >= 1000000) {
+                return `R$ ${(absValue / 1000000).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} mi`;
+            }
+            if (absValue >= 1000) {
+                return `R$ ${(absValue / 1000).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} mil`;
+            }
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value || 0);
+        }
+
+        /**
+         * Atualiza as métricas de resumo globais exibidas no cabeçalho.
+         * Calcula o total de contratos, o valor total dos contratos e a soma das últimas medições mensais.
+         */
+        function updateSummaryMetrics() {
+            if (projectData.length === 0) {
+                totalContractsSpan.textContent = 0;
+                totalContractValueSpan.textContent = formatSummaryValue(0);
+                sumOfLatestMonthlyMeasurementsSpan.textContent = formatSummaryValue(0);
+                return;
+            }
+
+            let sumOfJuneExecutedMeasurements = 0; // Renomeado para clareza
+            // Considerando o mês atual como Junho para a soma global
+            const currentMonthRef = "Jun/25";
+
+            projectData.forEach(p => {
+                const hasExecutedData = p.grafico && p.grafico.executado && p.grafico.executado.some(val => val !== null);
+
+                if (hasExecutedData && p.medicoes) {
+                    const juneMeasurement = p.medicoes.find(m => m.ref === currentMonthRef);
+                    if (juneMeasurement && juneMeasurement.valor !== null && juneMeasurement.valor !== undefined) {
+                        sumOfJuneExecutedMeasurements += juneMeasurement.valor;
+                    }
+                }
+            });
+
+            // Atualiza os elementos HTML com os valores calculados
+            totalContractsSpan.textContent = projectData.length;
+            totalContractValueSpan.textContent = formatSummaryValue(projectData.reduce((sum, p) => sum + p.valorAtual, 0));
+            sumOfLatestMonthlyMeasurementsSpan.textContent = formatSummaryValue(sumOfJuneExecutedMeasurements); // Usa o novo valor
+        }
+
+        /**
+         * Prepara os dados do gráfico para um contrato, estendendo o cronograma previsto
+         * até o final do contrato usando os dados de 'medicoes' se necessário.
+         * @param {object} contract - O objeto do contrato.
+         * @returns {object} O objeto 'grafico' preparado.
+         */
+        function prepareChartData(contract) {
+            let chartLabels = [];
+            let chartPrevisto = [];
+            let chartExecutado = [];
+            let previstoDataSets = null;
+
+            // Se o contrato já tem dados de gráfico e executado, usa-os como base
+            if (contract.grafico && contract.grafico.executado && contract.grafico.executado.some(val => val !== null)) {
+                chartLabels = [...contract.grafico.labels];
+                chartExecutado = [...contract.grafico.executado];
+
+                if (contract.grafico.previstoDataSets) {
+                    previstoDataSets = contract.grafico.previstoDataSets.map(ds => ({
+                        label: ds.label,
+                        data: [...ds.data]
+                    }));
+                } else {
+                    chartPrevisto = [...contract.grafico.previsto];
+                }
+
+                // Extender labels, previsto e executado com base em medicoes
+                // Encontra o último mês com dados de gráfico
+                const lastChartLabel = chartLabels[chartLabels.length - 1];
+                const lastMedicaoIndex = contract.medicoes.findIndex(m => m.ref === lastChartLabel);
+
+                if (lastMedicaoIndex !== -1) {
+                    for (let i = lastMedicaoIndex + 1; i < contract.medicoes.length; i++) {
+                        const medicao = contract.medicoes[i];
+                        chartLabels.push(medicao.ref);
+                        chartExecutado.push(null); // Sem dados executados futuros
+                        if (previstoDataSets) {
+                            // Extende o cronograma inicial com null, e o novo cronograma com o valor acumulado
+                            // Isso assume que o "novo cronograma" é o que continua
+                            previstoDataSets[0].data.push(null);
+                            previstoDataSets[1].data.push(medicao.acumulado);
+                        } else {
+                            chartPrevisto.push(medicao.acumulado);
+                        }
+                    }
+                }
+
+            } else {
+                // Para contratos sem dados de gráfico executado, gera o gráfico apenas com o cronograma previsto
+                contract.medicoes.forEach(m => {
+                    chartLabels.push(m.ref || `${m.medicao}º Mês`); // Use ref or "Nº Mês" as label
+                    chartPrevisto.push(m.acumulado);
+                    chartExecutado.push(null); // Não há dados executados
+                });
+            }
+
+            return {
+                labels: chartLabels,
+                previsto: chartPrevisto,
+                executado: chartExecutado,
+                previstoDataSets: previstoDataSets
+            };
+        }
+
+        /**
+         * Atualiza a visualização do painel de controle com os dados do contrato selecionado.
+         * @param {string} contractId - O ID do contrato a ser exibido.
+         * @returns {void}
+         */
+        function updateView(contractId) {
+            const data = projectData.find(p => p.id === contractId);
+            if (!data) {
+                console.error("Contrato não encontrado:", contractId);
+                return;
+            }
+
+            // Determine if there is any executed data for the chart
+            const hasExecutedChartData = data.grafico && data.grafico.executado && data.grafico.executado.some(val => val !== null);
+
+            // Garante que o valor do seletor de contrato esteja definido para o ID do contrato atual
+            contractSelector.value = contractId;
+
+            const formattedContractId = data.id.replace('CT ', '').replace(/\/(\d{2})$/, '/20$1');
+
+            let predictedDatesHtml = '';
+            // Suprime a terceira linha do resumo se não houver dados executados
+            if (hasExecutedChartData && data.predicted_start_date && data.predicted_end_date && data.predicted_start_date !== 'N/A' && data.predicted_end_date !== 'N/A') {
+                const startDate = parseDate(data.predicted_start_date);
+                const endDate = parseDate(data.predicted_end_date);
+                const durationDays = calculateTotalDays(startDate, endDate);
+
+                predictedDatesHtml = `
+                    <p class="text-xs md:text-sm text-gray-700 mt-0.5">
+                        Início Efetivo: ${data.predicted_start_date} | Fim Previsto: ${data.predicted_end_date} | Duração: ${durationDays} dias
+                    </p>
+                `;
+            }
+
+            let projectImageHtml = '';
+            // Adiciona a imagem específica do projeto ao lado das informações do contrato
+            if (data.objeto.includes("UBS")) {
+                projectImageHtml = `<img src="${imageUrls.logoUBS}" alt="UBS da Gente" class="h-20 md:h-24 object-contain ml-auto" onerror="this.onerror=null;this.src='https://placehold.co/150x80/cccccc/333333?text=UBS+da+Gente';"/>`;
+            } else if (data.objeto.includes("CECE")) {
+                projectImageHtml = `<img src="${imageUrls.logoAtleta}" alt="Atleta da Gente" class="h-18 md:h-20 object-contain ml-auto" onerror="this.onerror=null;this.src='https://placehold.co/150x80/cccccc/333333?text=Atleta+da+Gente';"/>`;
+            } else if (data.objeto.includes("EMEB")) {
+                projectImageHtml = `<img src="${imageUrls.logoEscola}" alt="Escola da Gente" class="h-20 md:h-24 object-contain ml-auto" onerror="this.onerror=null;this.src='https://placehold.co/150x80/cccccc/333333?text=Escola+da+Gente';"/>`;
+            }
+
+            // Preenche os detalhes do contrato no cabeçalho do painel
+            contractDetails.innerHTML = `
+                <div class="flex items-center justify-center flex-wrap text-center space-y-1 w-full">
+                    <div class="flex-grow">
+                        <p class="text-lg md:text-xl font-bold text-gray-900">
+                            Contrato ${formattedContractId}: ${data.objeto}
+                        </p>
+                        <p class="text-sm md:text-base text-gray-700">
+                            <span class="font-semibold">Empresa:</span> ${data.empresa} | <span class="font-semibold">Valor Atual:</span> <span class="font-bold" style="color: #072380;">${formatCurrency(data.valorAtual)}</span>
+                        </p>
+                        ${predictedDatesHtml}
+                    </div>
+                    ${projectImageHtml}
+                </div>
+                ${data.observacoes ? `<div class="mt-3 text-center w-full"><p class="text-sm text-[#333333] bg-[rgba(255,204,0,0.3)] p-2 rounded-lg inline-block"><span class="font-bold">Observação:</span> ${data.observacoes}</p></div>` : ''}
+            `;
+
+            renderTables(data, hasExecutedChartData);
+            handleTabVisibility(hasExecutedChartData);
+            renderChart(data, hasExecutedChartData);
+        }
+
+        /**
+         * Renderiza as tabelas (comparativa ou de cronograma previsto).
+         * @param {object} data - Dados do contrato.
+         * @param {boolean} hasExecutedChartData - Indica se há dados executados para o gráfico comparativo.
+         */
+        function renderTables(data, hasExecutedChartData) {
+            let tableHeadersHtml;
+            let tableRowsHtml;
+            const totalContractValueForPercentages = data.valorAtual;
+
+            if (hasExecutedChartData) {
+                // Tabela Comparativa
+                tableHeadersHtml = `
+                    <tr>
+                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Medição</th>
+                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Mês</th>
+                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Previst. Mês</th>
+                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Previst. Acum.</th>
+                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Executado Mês</th>
+                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Executado Acum.</th>
+                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Diferença</th>
+                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                    </tr>
+                `;
+                let prevPrevistoAcum = 0;
+                let prevExecutadoAcum = 0;
+
+                const preparedChartData = prepareChartData(data); // Get full chart data for table rendering
+
+                tableRowsHtml = preparedChartData.labels.map((label, index) => {
+                    let previstoAcum;
+                    if (preparedChartData.previstoDataSets) {
+                        const dsInitial = preparedChartData.previstoDataSets[0].data[index];
+                        const dsNovo = preparedChartData.previstoDataSets[1].data[index];
+                        previstoAcum = dsNovo !== null ? dsNovo : dsInitial;
+                    } else {
+                        previstoAcum = preparedChartData.previsto[index];
+                    }
+                    const executadoAcum = preparedChartData.executado[index];
+
+                    const previstoMes = (previstoAcum !== null && !isNaN(previstoAcum) && prevPrevistoAcum !== null) ? previstoAcum - prevPrevistoAcum : (previstoAcum !== null && !isNaN(previstoAcum) ? previstoAcum : null);
+                    const executadoMes = (executadoAcum !== null && !isNaN(executadoAcum) && prevExecutadoAcum !== null) ? executadoAcum - prevExecutadoAcum : (executadoAcum !== null && !isNaN(executadoAcum) ? executadoAcum : null);
+
+                    prevPrevistoAcum = previstoAcum;
+                    prevExecutadoAcum = executadoAcum;
+
+                    let diferenca = null;
+                    let status = '';
+                    let diffClass = '';
+                    let statusClass = '';
+                    let diferencaCell = ''; // New variable for difference cell content
+
+                    if (previstoAcum !== null && executadoAcum !== null) {
+                        diferenca = executadoAcum - previstoAcum;
+                        status = diferenca >= 0 ? 'Adiantado' : 'Atrasado';
+                        diffClass = diferenca < 0 ? 'text-status-diff-red' : 'text-status-diff-green';
+                        statusClass = diferenca >= 0 ? 'text-status-adiantado font-semibold' : 'text-status-atrasado font-semibold';
+                        diferencaCell = `<td class="px-5 py-3 text-sm text-gray-800 text-center ${diffClass} font-semibold">${formatCurrencyAndPercentage(diferenca, totalContractValueForPercentages)}</td>`;
+                    } else {
+                        // If no executed value, don't show difference
+                        diferencaCell = `<td class="px-5 py-3 text-sm text-gray-800 text-center"></td>`; // Empty cell
+                    }
+
+                    return `
+                        <tr class="border-b border-slate-200/50 hover:bg-white/50">
+                            <td class="px-5 py-3 text-sm font-medium text-center text-gray-900">${index + 1}</td>
+                            <td class="px-5 py-3 text-sm text-center text-gray-700">${label}</td>
+                            <td class="px-5 py-3 text-sm text-gray-800 text-center">${formatCurrency(previstoMes)}</td>
+                            <td class="px-5 py-3 text-sm text-gray-800 text-center">${formatCurrencyAndPercentage(previstoAcum, totalContractValueForPercentages)}</td>
+                            <td class="px-5 py-3 text-sm text-gray-800 text-center">${executadoMes !== null ? formatCurrency(executadoMes) : ''}</td>
+                            <td class="px-5 py-3 text-sm text-gray-800 text-center">${executadoAcum !== null ? formatCurrencyAndPercentage(executadoAcum, totalContractValueForPercentages) : ''}</td>
+                            ${diferencaCell}
+                            <td class="px-5 py-3 text-sm text-center ${statusClass}">${status}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+                comparativeTableBody.innerHTML = tableRowsHtml;
+                // REMOVIDO: comparativeTableContainer.querySelector('thead').innerHTML = tableHeadersHtml; // REMOVIDO PARA EVITAR REPETIÇÃO DO CABEÇALHO
+                comparativeTableContainer.classList.remove('hidden');
+                predictedScheduleTableContainer.classList.add('hidden'); // Esconde a tabela de cronograma previsto
+                tabTableButton.textContent = "Tabela Comparativa"; // Altera o texto da aba
+            } else {
+                // Tabela de Cronograma Previsto
+                tableHeadersHtml = `
+                    <tr>
+                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Medição</th>
+                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Período</th>
+                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Ref.</th>
+                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Valor Medição</th>
+                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Valor Acumulado</th>
+                    </tr>
+                `;
+                // REMOVIDO: predictedScheduleTableContainer.querySelector('thead').innerHTML = tableHeadersHtml; // REMOVIDO PARA EVITAR REPETIÇÃO DO CABEÇALHO
+
+                const totalContractValueForPercentages = data.valorAtual;
+
+                tableRowsHtml = data.medicoes.map((m) => {
+                    let periodDisplay = `${m.inicio} a ${m.fim}`;
+                    let refDisplay = m.ref || "-"; // Se ref for null, exibe "-"
+                    if (contractsWithoutRealMeasurements.includes(data.observacoes)) {
+                        periodDisplay = `${m.medicao}º Mês`;
+                        refDisplay = "-";
+                    }
+                    return `
+                        <tr class="border-b border-slate-200/50 hover:bg-white/50">
+                            <td class="px-5 py-3 text-sm font-medium text-center text-gray-900">${m.medicao}</td>
+                            <td class="px-5 py-3 text-sm text-center text-gray-700">${periodDisplay}</td>
+                            <td class="px-5 py-3 text-sm text-center text-gray-700">${refDisplay}</td>
+                            <td class="px-5 py-3 text-sm text-gray-800 text-center">${formatCurrency(m.valor)}</td>
+                            <td class="px-5 py-3 text-sm text-gray-800 font-semibold text-center">${formatCurrencyAndPercentage(m.acumulado, totalContractValueForPercentages)}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+                predictedScheduleTableBody.innerHTML = tableRowsHtml;
+                comparativeTableContainer.classList.add('hidden'); // Esconde a tabela comparativa
+                predictedScheduleTableContainer.classList.remove('hidden');
+                tabTableButton.textContent = "Cronograma Previsto"; // Altera o texto da aba
+            }
+        }
+
+        /**
+         * Renderiza o gráfico do contrato.
+         * @param {object} data - Dados do contrato.
+         * @param {boolean} hasExecutedChartData - Indica se há dados executados para o gráfico.
+         */
+        function renderChart(data, hasExecutedChartData) {
+            if (mainChart) mainChart.destroy(); // Destrói o gráfico existente
+
+            // Prepare chart data using the new helper function
+            const preparedChartData = prepareChartData(data);
+            const labels = preparedChartData.labels;
+            const datasets = [];
+
+            if (preparedChartData.previstoDataSets) {
+                datasets.push(
+                    {
+                        label: preparedChartData.previstoDataSets[0].label,
+                        data: preparedChartData.previstoDataSets[0].data,
+                        borderColor: 'rgba(255, 102, 0, 0.8)', borderWidth: 3, borderDash: [5, 5], fill: false, tension: 0.1,
+                        pointBackgroundColor: 'rgba(255, 102, 0, 0.6)', pointBorderColor: 'rgba(255, 102, 0, 0.6)', pointRadius: 3,
+                        datalabels: {
+                            align: (ctx) => ctx.dataIndex === 0 ? 'right' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'end'),
+                            anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'end'),
+                            offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
+                            color: '#FF6600', font: { weight: 'bold', size: 14 },
+                            formatter: (value) => formatChartLabelValue(value)
+                        },
+                        order: 2
+                    },
+                    {
+                        label: preparedChartData.previstoDataSets[1].label,
+                        data: preparedChartData.previstoDataSets[1].data,
+                        borderColor: 'rgba(0, 159, 227, 0.8)', borderWidth: 3, borderDash: [5, 5], fill: false, tension: 0.1,
+                        pointBackgroundColor: 'rgba(0, 159, 227, 0.6)', pointBorderColor: 'rgba(0, 159, 227, 0.6)', pointRadius: 3,
+                        datalabels: {
+                            align: (ctx) => ctx.dataIndex === 0 ? 'right' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'end'),
+                            anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'end'),
+                            offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
+                            color: '#009FE3', font: { weight: 'bold', size: 14 },
+                            formatter: (value) => formatChartLabelValue(value)
+                        },
+                        order: 3
+                    }
+                );
+            } else {
+                datasets.push({
+                    label: 'Previsto', data: preparedChartData.previsto,
+                    borderColor: 'rgba(255, 102, 0, 0.8)', borderWidth: 3, borderDash: [5, 5], fill: false, tension: 0.1,
+                    pointBackgroundColor: 'rgba(255, 102, 0, 0.6)', pointBorderColor: 'rgba(255, 102, 0, 0.6)', pointRadius: 3,
+                    datalabels: {
+                        align: (ctx) => ctx.dataIndex === 0 ? 'right' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'end'),
+                        anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'end'),
+                        offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
+                        color: '#FF6600', font: { weight: 'bold', size: 14 },
+                        formatter: (value) => formatChartLabelValue(value)
+                    },
+                    order: 2
+                });
+            }
+
+            // Only add executado if there is actual executed data
+            if (hasExecutedChartData) {
+                datasets.push({
+                    label: 'Executado', data: preparedChartData.executado,
+                    borderColor: 'rgba(0, 123, 61, 0.8)', backgroundColor: 'transparent', borderWidth: 3, fill: false, tension: 0.1,
+                    pointBackgroundColor: 'rgba(0, 123, 61, 0.6)', pointBorderColor: 'rgba(0, 123, 61, 0.6)', pointRadius: 3,
+                    datalabels: {
+                        align: (ctx) => ctx.dataIndex === 0 ? 'right' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'start'),
+                        anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'start'),
+                        offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
+                        color: '#007B3D', font: { weight: 'bold', size: 14 },
+                        formatter: (value) => formatChartLabelValue(value)
+                    },
+                    order: 4
+                });
+                noChartDataMessage.style.display = 'none';
+                chartCanvasContainer.classList.remove('hidden');
+                tabChartButton.classList.remove('hidden');
+            } else {
+                noChartDataMessage.style.display = 'block';
+                chartCanvasContainer.classList.add('hidden');
+                tabChartButton.classList.add('hidden');
+            }
+
+            // Only create chart if there are datasets to display
+            if (datasets.length > 0) {
+                mainChart = new Chart(document.getElementById('mainChart'), {
+                    type: 'line',
+                    data: { labels: labels, datasets: datasets },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: { color: '#333333', callback: (value) => formatCurrency(value) }, /* Alterado para exibir ticks no PDF */
+                                grid: { color: 'rgba(0,0,0,0.05)' }
+                            },
+                            x: {
+                                ticks: { color: '#333333', font: { weight: '700' } },
+                                grid: { display: false }
+                            }
+                        },
+                        plugins: {
+                            datalabels: { display: true },
+                            legend: { position: 'top', labels: { usePointStyle: true, font: { size: 12, weight: '700' }, color: '#333333' } },
+                            tooltip: {
+                                enabled: true, mode: 'index', intersect: false,
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleFont: { weight: 'bold' }, bodyFont: { size: 12, weight: 'bold' }, footerFont: { size: 12, weight: 'bold' },
+                                callbacks: {
+                                    label: (context) => {
+                                        const label = context.dataset.label || '';
+                                        const value = context.parsed.y;
+                                        const total = data.valorAtual || 0; // Use the original contract's total value
+                                        const percentage = (total !== 0) ? (value / total * 100).toFixed(2) : 0;
+                                        return `${label}: ${formatCurrency(value)} (${percentage}%)`;
+                                    },
+                                    footer: (tooltipItems) => {
+                                        // Find the 'Executado' and 'Previsto' values for the current point
+                                        const execItem = tooltipItems.find(item => item.dataset.label === 'Executado');
+                                        let previstoValue;
+
+                                        // Determine the correct 'Previsto' value based on datasets structure
+                                        if (preparedChartData.previstoDataSets) {
+                                            const initialPrevisto = preparedChartData.previstoDataSets[0].data[execItem.dataIndex];
+                                            const newPrevisto = preparedChartData.previstoDataSets[1].data[execItem.dataIndex];
+                                            previstoValue = newPrevisto !== null ? newPrevisto : initialPrevisto;
+                                        } else {
+                                            previstoValue = preparedChartData.previsto[execItem.dataIndex];
+                                        }
+
+                                        if (execItem && executadoValue != null && previstoValue != null) { // Only show difference if executed is not null
+                                            const executadoValue = execItem.parsed.y;
+                                            const diff = executadoValue - previstoValue;
+                                            const status = diff >= 0 ? 'Adiantado' : 'Atrasado';
+                                            return `\nDiferença: ${formatCurrency(diff)} (${status})`;
+                                        }
+                                        return '';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                noChartDataMessage.style.display = 'block';
+                chartCanvasContainer.classList.add('hidden');
+                tabChartButton.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Gerencia a visibilidade das abas e força a seleção da tabela se não houver dados de gráfico.
+         * @param {boolean} hasExecutedChartData - Indica se há dados executados para o gráfico.
+         */
+        function handleTabVisibility(hasExecutedChartData) {
+            if (hasExecutedChartData) {
+                tabChartButton.classList.remove('hidden'); // Mostra o botão do gráfico
+                switchToTab('chart'); // Seleciona a aba do gráfico por padrão
+            } else {
+                tabChartButton.classList.add('hidden'); // Esconde o botão do gráfico
+                switchToTab('table'); // Força a aba da tabela
+            }
+        }
+
+        /**
+         * Exibe a visualização do mapa e oculta o painel de controle.
+         */
+        function showMapView() {
+            mapView.classList.remove('hidden');
+            dashboardView.classList.add('hidden');
+            if (map) {
+                map.invalidateSize(); // Garante que o mapa seja renderizado corretamente
+            }
+        }
+
+        /**
+         * Exibe a visualização do painel de controle para um projeto específico e oculta o mapa.
+         * @param {string} projectId - O ID do projeto a ser exibido no painel.
+         */
+        function showDashboardView(projectId) {
+            mapView.classList.add('hidden');
+            dashboardView.classList.remove('hidden');
+            updateView(projectId); // Atualiza os detalhes, gráficos e tabelas do contrato
+        }
+
+        /**
+         * Alterna entre as abas do painel (gráfico ou tabela).
+         * @param {string} tabName - O nome da aba a ser exibida ('chart' ou 'table').
+         */
+        function switchToTab(tabName) {
+            // Oculta todas as seções de conteúdo e remove a classe 'active' de todos os botões de aba
+            contentChart.classList.add('hidden');
+            contentTable.classList.add('hidden');
+            tabChartButton.classList.remove('active');
+            tabTableButton.classList.remove('active');
+
+            if (tabName === 'chart') {
+                contentChart.classList.remove('hidden');
+                tabChartButton.classList.add('active');
+            } else if (tabName === 'table') {
+                contentTable.classList.remove('hidden');
+                tabTableButton.classList.add('active');
+            }
+        }
+
+        /**
+         * Exporta o gráfico atual como uma imagem PNG.
+         */
+        function exportChartAsPNG() {
+            if (mainChart) {
+                // Cria um canvas temporário com fundo branco para a exportação
+                const originalCanvas = document.getElementById('mainChart');
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = originalCanvas.width;
+                tempCanvas.height = originalCanvas.height;
+                const tempCtx = tempCanvas.getContext('2d');
+
+                // Preenche o fundo do canvas temporário com branco
+                tempCtx.fillStyle = '#FFFFFF';
+                tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+                // Desenha o conteúdo do gráfico original no canvas temporário
+                tempCtx.drawImage(originalCanvas, 0, 0);
+
+                // Exporta a imagem do canvas temporário
+                const imgUrl = tempCanvas.toDataURL('image/png');
+
+                const link = document.createElement('a');
+                link.href = imgUrl;
+                // Usa o ID do contrato selecionado no nome do arquivo
+                const contractId = contractSelector.value.replace(/\s|\//g, '_'); // Limpa o ID para o nome do arquivo
+                link.download = `grafico_contrato_${contractId}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                console.warn("Nenhum gráfico disponível para exportar.");
+            }
+        }
+
+        /**
+         * Exporta os dados da tabela visível (comparativa ou cronograma) como um arquivo CSV.
+         */
+        function exportTableAsCSV() {
+            const currentContractId = contractSelector.value;
+            const data = projectData.find(p => p.id === currentContractId);
+            if (!data) {
+                console.warn("Nenhum dado de contrato para exportar.");
+                return;
+            }
+
+            let csvContent = "";
+            let headers = [];
+            let rows = [];
+            const delimiter = ';'; // **DELIMITADOR AGORA É PONTO E VÍRGULA PARA MELHOR COMPATIBILIDADE COM EXCEL**
+
+            const hasExecutedChartData = data.grafico && data.grafico.executado && data.grafico.executado.some(val => val !== null);
+
+            // Função auxiliar para formatar números para CSV (com ponto decimal e sem separador de milhar)
+            // Agora, ela formata para o padrão numérico de planilhas Excel em português (vírgula como decimal)
+            const formatNumberForCSV = (value) => {
+                if (value === null || isNaN(value)) return '';
+                // toLocaleString para pt-BR formata com vírgula decimal e ponto de milhar
+                // remove o R$
+                return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+            };
+
+            // Função auxiliar para formatar porcentagem como número puro (com vírgula decimal)
+            const formatPercentageForCSV = (value, total) => {
+                if (value === null || isNaN(value) || total === 0) return '';
+                // Formata para 2 casas decimais e usa vírgula como separador decimal
+                return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((value / total) * 100);
+            };
+
+            // Adiciona um cabeçalho resumido ao CSV
+            const summaryHeader = [
+                `Relatório de Contrato: ${data.id} - ${data.objeto}`,
+                `Empresa: ${data.empresa}`,
+                `Valor Total do Contrato: ${formatCurrency(data.valorAtual)}`
+            ].join('\n') + '\n\n'; // Duas quebras de linha para separar do cabeçalho da tabela
+            csvContent += summaryHeader;
+
+
+            if (hasExecutedChartData) {
+                // Exportar Tabela Comparativa
+                headers = [
+                    "Medicao", "Mes",
+                    "Previsto Mes (Valor)", "Previsto Mes (%)",
+                    "Previsto Acum. (Valor)", "Previsto Acum. (%)",
+                    "Executado Mes (Valor)", "Executado Mes (%)",
+                    "Executado Acum. (Valor)", "Executado Acum. (%)",
+                    "Diferenca (Valor)", "Diferenca (%)",
+                    "Status"
+                ];
+                csvContent += headers.join(delimiter) + "\n";
+
+                let prevPrevistoAcum = 0;
+                let prevExecutadoAcum = 0;
+                const totalContractValueForPercentages = data.valorAtual;
+
+                const preparedChartData = prepareChartData(data); // Get full chart data for table rendering
+
+                preparedChartData.labels.forEach((label, index) => {
+                    let previstoAcum;
+                    if (preparedChartData.previstoDataSets) {
+                        const dsInitial = preparedChartData.previstoDataSets[0].data[index];
+                        const dsNovo = preparedChartData.previstoDataSets[1].data[index];
+                        previstoAcum = dsNovo !== null ? dsNovo : dsInitial;
+                    } else {
+                        previstoAcum = preparedChartData.previsto[index];
+                    }
+                    const executadoAcum = preparedChartData.executado[index];
+
+                    const previstoMes = (previstoAcum !== null && !isNaN(previstoAcum) && prevPrevistoAcum !== null) ? previstoAcum - prevPrevistoAcum : (previstoAcum !== null && !isNaN(previstoAcum) ? previstoAcum : null);
+                    const executadoMes = (executadoAcum !== null && !isNaN(executadoAcum) && prevExecutadoAcum !== null) ? executadoAcum - prevExecutadoAcum : (executadoAcum !== null && !isNaN(executadoAcum) ? executadoAcum : null);
+
+                    const diferenca = (previstoAcum !== null && executadoAcum !== null) ? executadoAcum - previstoAcum : null;
+                    const status = (diferenca !== null) ? (diferenca >= 0 ? 'Adiantado' : 'Atrasado') : '';
+
+                    prevPrevistoAcum = previstoAcum;
+                    prevExecutadoAcum = executadoAcum;
+
+                    rows.push([
+                        index + 1,
+                        label,
+                        formatNumberForCSV(previstoMes),
+                        formatPercentageForCSV(previstoMes, totalContractValueForPercentages),
+                        formatNumberForCSV(previstoAcum),
+                        formatPercentageForCSV(previstoAcum, totalContractValueForPercentages),
+                        formatNumberForCSV(executadoMes),
+                        formatPercentageForCSV(executadoMes, totalContractValueForPercentages),
+                        formatNumberForCSV(executadoAcum),
+                        formatPercentageForCSV(executadoAcum, totalContractValueForPercentages),
+                        // Only include difference if there's an executed value
+                        executadoAcum !== null ? formatNumberForCSV(diferenca) : '',
+                        executadoAcum !== null ? formatPercentageForCSV(diferenca, totalContractValueForPercentages) : '',
+                        status
+                    ]);
+                });
+            } else {
+                // Exportar Tabela de Cronograma Previsto
+                headers = [
+                    "Medicao", "Periodo", "Ref.",
+                    "Valor Medicao (Valor)", "Valor Medicao (%)",
+                    "Valor Acumulado (Valor)", "Valor Acumulado (%)"
+                ];
+                csvContent += headers.join(delimiter) + "\n";
+
+                const totalContractValueForPercentages = data.valorAtual;
+
+                data.medicoes.forEach((m) => {
+                    let periodDisplay = `${m.inicio} a ${m.fim}`;
+                    let refDisplay = m.ref || "-";
+                    if (contractsWithoutRealMeasurements.includes(data.observacoes)) {
+                        periodDisplay = `${m.medicao}º Mês`;
+                        refDisplay = "-";
+                    }
+                    rows.push([
+                        m.medicao,
+                        periodDisplay,
+                        refDisplay,
+                        formatNumberForCSV(m.valor),
+                        formatPercentageForCSV(m.valor, totalContractValueForPercentages),
+                        formatNumberForCSV(m.acumulado),
+                        formatPercentageForCSV(m.acumulado, totalContractValueForPercentages)
+                    ]);
+                });
+            }
+
+            // Adiciona as linhas ao CSV
+            rows.forEach(row => {
+                csvContent += row.map(cell => {
+                    // Envolve a célula em aspas duplas se contiver o delimitador, quebras de linha ou aspas
+                    if (typeof cell === 'string' && (cell.includes(delimiter) || cell.includes('\n') || cell.includes('"'))) {
+                        return `"${cell.replace(/"/g, '""')}"`;
+                    }
+                    return cell;
+                }).join(delimiter) + "\n";
+            });
+
+            // Cria um Blob com o conteúdo CSV e tipo UTF-8 BOM para Excel
+            const bom = "\uFEFF"; // Byte Order Mark for UTF-8
+            const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) { // feature detection
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                const contractId = currentContractId.replace(/\s|\//g, '_'); // Limpa o ID para o nome do arquivo
+                link.setAttribute("download", `tabela_contrato_${contractId}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        /**
+         * Exporta o conteúdo do dashboard atual como um arquivo PDF.
+         * Captura o elemento dashboardView e o converte em imagem para o PDF.
+         */
+        async function exportAsPDF() {
+            const currentContractId = contractSelector.value;
+            const data = projectData.find(p => p.id === currentContractId);
+
+            if (!data) {
+                console.warn("Nenhum dado de contrato disponível para exportar para PDF.");
+                return;
+            }
+
+            // 1. Criar um contêiner temporário oculto
+            const tempContainer = document.createElement('div');
+            tempContainer.style.position = 'absolute';
+            tempContainer.style.left = '-9999px'; // Move para fora da tela
+            tempContainer.style.width = 'auto'; // Definido para auto para renderização mais natural
+            tempContainer.style.minWidth = '800px'; // Garante uma largura mínima para o conteúdo
+            tempContainer.style.backgroundColor = '#FFFFFF'; // Fundo branco para o PDF
+            document.body.appendChild(tempContainer);
+
+            // Adiciona temporariamente a classe para estilos de exportação PDF
+            document.body.classList.add('pdf-export-active');
+
+            // 2. Clonar o cabeçalho principal (com logos) e o dashboardView
+            const clonedHeader = mainHeader.cloneNode(true);
+            const clonedDashboard = dashboardView.cloneNode(true);
+
+            // Remover elementos interativos do clone do dashboard
+            clonedDashboard.querySelector('#backToMapButton')?.remove();
+            clonedDashboard.querySelector('#contractSelector')?.closest('.flex-grow')?.remove(); // Remove o select e seu label/div pai
+            clonedDashboard.querySelector('#tab-chart')?.closest('.inline-flex')?.remove(); // Remove os botões de aba e seu contêiner
+            clonedDashboard.querySelector('#exportChartPngButton')?.remove();
+            clonedDashboard.querySelector('#exportTableCsvButton')?.remove();
+            clonedDashboard.querySelector('#exportPdfButton')?.remove(); // O próprio botão de PDF
+
+            // Garantir que o conteúdo das abas esteja visível no clone
+            clonedDashboard.querySelectorAll('.content-view.hidden').forEach(el => {
+                el.classList.remove('hidden');
+                el.style.display = 'block'; // Garante que o display seja block para renderização
+            });
+
+            // --- NOVO PASSO: Capturar e desenhar o gráfico no canvas clonado ---
+            const originalChartCanvas = document.getElementById('mainChart');
+            const clonedChartCanvas = clonedDashboard.querySelector('#mainChart');
+
+            if (originalChartCanvas && clonedChartCanvas) {
+                const chartImg = new Image();
+                chartImg.src = originalChartCanvas.toDataURL(); // Get image data from the *original* rendered chart
+                await new Promise(resolve => {
+                    chartImg.onload = () => {
+                        const ctx = clonedChartCanvas.getContext('2d');
+                        // Clear the cloned canvas before drawing
+                        ctx.clearRect(0, 0, clonedChartCanvas.width, clonedChartCanvas.height);
+                        // Set the cloned canvas dimensions to match the original for proper drawing
+                        clonedChartCanvas.width = originalChartCanvas.width;
+                        clonedChartCanvas.height = originalChartCanvas.height;
+                        ctx.drawImage(chartImg, 0, 0);
+                        resolve();
+                    };
+                    chartImg.onerror = () => {
+                        console.error("Erro ao carregar imagem do gráfico para o PDF.");
+                        resolve(); // Resolve anyway to not block the PDF generation
+                    };
+                });
+            }
+            // --- FIM NOVO PASSO ---
+
+            // Adicionar os clones ao contêiner temporário
+            tempContainer.appendChild(clonedHeader);
+            tempContainer.appendChild(clonedDashboard);
+
+            // Temporariamente ajustar a largura do contêiner da tabela para garantir que todo o conteúdo seja renderizado
+            // Isso ainda é importante para tabelas com overflow-x-auto
+            const comparativeTable = tempContainer.querySelector('#comparativeTableContainer');
+            const predictedScheduleTable = tempContainer.querySelector('#predictedScheduleTableContainer');
+            let originalComparativeWidth = '';
+            let originalPredictedWidth = '';
+
+            if (comparativeTable && !comparativeTable.classList.contains('hidden')) {
+                originalComparativeWidth = comparativeTable.style.width;
+                comparativeTable.style.width = `${comparativeTable.scrollWidth}px`; // Ajusta para a largura total do conteúdo
+            }
+            if (predictedScheduleTable && !predictedScheduleTable.classList.contains('hidden')) {
+                originalPredictedWidth = predictedScheduleTable.style.width;
+                predictedScheduleTable.style.width = `${predictedScheduleTable.scrollWidth}px`; // Ajusta para a largura total do conteúdo
+            }
+
+            // Captura o elemento como uma imagem
+            const canvas = await html2canvas(tempContainer, {
+                scale: 2, // Aumenta a escala para melhor qualidade no PDF
+                useCORS: true, // Importante para imagens de outras origens (como os logos)
+                logging: true,
+                allowTaint: true,
+                // ignoreElements já tratados pela remoção dos elementos no clone
+            });
+
+            // Reverter a largura original do contêiner da tabela
+            if (comparativeTable && !comparativeTable.classList.contains('hidden')) {
+                comparativeTable.style.width = originalComparativeWidth;
+            }
+            if (predictedScheduleTable && !predictedScheduleTable.classList.contains('hidden')) {
+                predictedScheduleTable.style.width = originalPredictedWidth;
+            }
+
+            // Remover a classe temporária do body
+            document.body.classList.remove('pdf-export-active');
+
+            // Remover o contêiner temporário
+            document.body.removeChild(tempContainer);
+
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new window.jspdf.jsPDF('p', 'mm', 'a4'); // 'p' para retrato, 'mm' para milímetros, 'a4' para tamanho de página
+
+            const imgWidth = 210; // Largura A4 em mm
+            const pageHeight = 297; // Altura A4 em mm
+            const imgHeight = canvas.height * imgWidth / canvas.width;
+            let heightLeft = imgHeight;
+
+            let position = 0;
+
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            const filename = `relatorio_contrato_${currentContractId.replace(/\s|\//g, '_')}.pdf`;
+            pdf.save(filename);
+        }
+
+
+        // Inicialização principal do aplicativo após o carregamento completo do DOM
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializa o mapa Leaflet com uma vista centralizada em Jundiaí e zoom.
+            map = L.map('map').setView([-23.17, -46.87], 12); // Posição inicial, será ajustada pelo fitBounds
+
+            // Adiciona uma camada de satélite da Esri ao mapa
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+            }).addTo(map);
+
+            // Define um ícone de pino Leaflet personalizado usando Font Awesome
+            const customPinIcon = L.divIcon({
+                className: 'custom-pin-icon',
+                html: '<i class="fa-solid fa-location-dot"></i>',
+                iconSize: [28, 28],
+                iconAnchor: [14, 28],
+                tooltipAnchor: [14, -14] // Ajusta a posição do tooltip em relação ao ícone
+            });
+
+            const bounds = []; // Para armazenar as coordenadas de todos os marcadores
+
+            // Adiciona marcadores para cada projeto no mapa
+            projectData.forEach(p => {
+                const lat = parseFloat(p.location.lat);
+                const lng = parseFloat(p.location.lng);
+
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    const marker = L.marker([lat, lng], { icon: customPinIcon })
+                        .addTo(map)
+                        .bindTooltip(`<b>${p.objeto}</b>`, {
+                            direction: 'top',
+                            permanent: true, // Tooltip sempre visível
+                            className: 'map-label-tooltip', // Classe CSS para o tooltip personalizado
+                            opacity: 0.9,
+                            offset: L.point(0, -28) // Deslocamento do tooltip
+                        });
+
+                    // Adiciona a coordenada do marcador ao array de bounds
+                    bounds.push([lat, lng]);
+
+                    // Adiciona um listener de clique ao marcador para exibir o painel de controle do projeto
+                    marker.on('click', () => {
+                        showDashboardView(p.id);
+                    });
+                } else {
+                    console.warn(`Localização inválida para o projeto ${p.id}: Latitude=${p.location.lat}, Longitude=${p.location.lng}`);
+                }
+            });
+
+            // Ajusta o mapa para incluir todos os marcadores, se houver.
+            if (bounds.length > 0) {
+                map.fitBounds(bounds);
+            } else {
+                // Se não houver marcadores, centraliza em Jundiaí com um zoom padrão.
+                map.setView([-23.17, -46.87], 12);
+            }
+
+            // Preenche o seletor de contrato (dropdown) com todos os projetos disponíveis
+            projectData.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.id;
+                option.textContent = `${p.id} - ${p.objeto}`;
+                contractSelector.appendChild(option);
+            });
+
+            // Listener de evento para mudança de seleção no dropdown do contrato
+            contractSelector.addEventListener('change', (e) => {
+                updateView(e.target.value); // Atualiza a visualização para o contrato selecionado
+                const data = projectData.find(p => p.id === e.target.value);
+                // Decide qual aba exibir com base na disponibilidade de dados do gráfico
+                const hasExecutedChartData = data.grafico && data.grafico.executado && data.grafico.executado.some(val => val !== null);
+                handleTabVisibility(hasExecutedChartData);
+            });
+
+            // Listeners de evento para os botões de aba (Gráfico e Tabela)
+            tabChartButton.addEventListener('click', () => switchToTab('chart'));
+            tabTableButton.addEventListener('click', () => switchToTab('table'));
+
+            // Listener de evento para o botão "Voltar ao Mapa"
+            backToMapButton.addEventListener('click', showMapView);
+
+            // Adiciona listeners para os novos botões de exportação
+            document.getElementById('exportChartPngButton').addEventListener('click', exportChartAsPNG);
+            document.getElementById('exportTableCsvButton').addEventListener('click', exportTableAsCSV);
+            document.getElementById('exportPdfButton').addEventListener('click', exportAsPDF);
+
+            // Inicialmente, mostra a visualização do mapa e atualiza as métricas de resumo
+            showMapView();
+            updateSummaryMetrics();
+        });
+    </script>
+</body>
+</html>
