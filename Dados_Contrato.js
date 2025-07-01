@@ -86,7 +86,7 @@ const projectData = [
                 { label: "Cronograma Inicial", data: [223098.81, 446197.62, 691408.56, 953063.11, 1526040.85, null, null, null, null, null] },
                 { label: "Cronograma Novo", data: [null, null, null, null, 865259.02, 1174071.39, 1507373.86, 1755025.46, 1995363.70, 2157299.00] }
             ],
-            executado: [147017.36, 340947.43, 419664.99, 516074.88, 893732.79, 1177420.96, 1397234.9, null, null, null]
+            executado: [147017.36, 340947.43, 419664.99, 516074.88, 893732.79, 1177420.96, 1397234.9, 1507373.86, null, null]
         },
         predicted_start_date: '07/10/2024',
         predicted_end_date: '03/09/2025',
