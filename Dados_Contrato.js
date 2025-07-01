@@ -186,7 +186,7 @@ const projectData = [
         location: { lat: -23.22526128860949, lng: -46.88200264672982 }
     },
     {
-        id: "CT XXX/25",
+        id: "CT 058/25",
         objeto: "UBS Rio Acima",
         empresa: "LBD Engenharia Ltda EPP",
         valorAtual: 4770000.00,
