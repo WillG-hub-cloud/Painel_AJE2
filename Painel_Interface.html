@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel de Controle Financeiro de Projetos</title>
 
-    <!-- Links para bibliotecas e estilos externos -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
@@ -15,7 +14,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 
-    <!-- NOVAS BIBLIOTECAS PARA EXPORTAÇÃO PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -38,12 +36,12 @@
         /* Centraliza o texto dentro das células de cabeçalho e de dados das tabelas */
         table th, table td {
             /* Esta regra pode ser sobrescrita pelas classes do Tailwind,
-               por isso adicionamos text-center diretamente nas tags th e td no HTML/JS. */
+                por isso adicionamos text-center diretamente nas tags th e td no HTML/JS. */
         }
         .glass-card {
             background: linear-gradient(135deg, rgba(240, 248, 255, 0.2) 0%, rgba(240, 248, 255, 0.3) 70%);
             -webkit-backdrop-filter: blur(2px);
-            backdrop-filter: blur(25px);
+            backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-top-left-radius: 0;
             border-top-right-radius: 60px;
@@ -135,23 +133,22 @@
 
     <div class="container mx-auto p-4 md:p-6 lg:p-8">
 
-        <header class="text-center mb-8 relative" id="mainHeader"> <!-- Adicionado ID para facilitar clonagem -->
-            <div class="grid grid-cols-3 items-center gap-4 mb-4">
+        <header class="text-center mb-8 relative" id="mainHeader"> <div class="grid grid-cols-3 items-center gap-4 mb-4">
                 <div class="flex justify-start">
-                 <img src="https://i.imgur.com/67zLDAk.png" id="logoPOE" alt="Logo POE" class="h-18 md:h-20 max-w-full object-contain"/>
+                   <img src="https://i.imgur.com/67zLDAk.png" id="logoPOE" alt="Logo POE" class="h-18 md:h-20 max-w-full object-contain"/>
                 </div>
                 <div class="flex justify-center">
                     <img src="https://i.imgur.com/vPi0F5j.png" id="logoJundiai" alt="Logo Jundiaí" class="h-26 md:h-28 max-w-full object-contain"/>
                 </div>
                 <div class="flex justify-end">
-                      <img src="https://i.imgur.com/1JpcXBq.png" id="logoCAF" alt="Logo CAF" class="h-26 md:h-28 max-w-full object-contain"/> 
+                     <img src="https://i.imgur.com/1JpcXBq.png" id="logoCAF" alt="Logo CAF" class="h-26 md:h-28 max-w-full object-contain"/> 
                 </div>
             </div>
 
             <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">PROGRAMA AVANÇA JUNDIAÍ - ETAPA 2</h1>
         	<div class="glass-card p-1.5 text-center w-fit mx-auto" style="border-top-right-radius: 100px; border-top-left-radius: 0; border-bottom-left-radius: 100px; border-bottom-right-radius: 100px;">
- 	           <p class="text-[#052b63] mt-2 text-lg font-bold">Análise de performance de contratos de obras.</p>
-	        </div>
+        	           <p class="text-[#052b63] mt-2 text-lg font-bold">Análise de performance de contratos de obras.</p>
+        	</div>
             <div class="flex flex-wrap justify-center items-center gap-4 mt-6" id="header-dynamic-images"></div>
         </header>
 
@@ -178,13 +175,11 @@
 
         <div id="dashboardView" class="glass-card p-4 sm:p-6 hidden">
             <div class="flex justify-between items-center mb-6">
-                <!-- BOTÃO "VOLTAR AO MAPA" - SERÁ OCULTADO NO PDF -->
                 <button id="backToMapButton" class="px-4 py-2 rounded-lg shadow transition-colors font-bold" style="background-color: transparent; color: #072380; border: 1px solid #072380; hover:background-color: rgba(7, 35, 128, 0.2);">
                     &larr; Voltar ao Mapa
                 </button>
                 <div class="flex-grow ml-4">
                     <label for="contractSelector" class="block text-sm font-semibold text-gray-700 mb-1">Selecione Outro Contrato:</label>
-                    <!-- SELECTOR DE CONTRATO - SERÁ OCULTADO NO PDF -->
                     <select id="contractSelector" class="w-full p-3 bg-white/80 border border-slate-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-gray-900">
                     </select>
                 </div>
@@ -197,7 +192,6 @@
                 <button id="exportTableCsvButton" title="Exportar CSV" class="p-1 w-8 h-8 rounded-lg shadow transition-colors flex items-center justify-center font-bold" style="background-color: transparent; hover:background-color: rgba(255, 102, 0, 0.2);">
                     <i class="fas fa-file-csv text-2xl text-gray-800"></i>
                 </button>
-                <!-- NOVO BOTÃO PARA EXPORTAR PDF -->
                 <button id="exportPdfButton" title="Exportar PDF" class="p-1 w-8 h-8 rounded-lg shadow transition-colors flex items-center justify-center font-bold" style="background-color: transparent; hover:background-color: rgba(220, 53, 69, 0.2);">
                     <i class="fas fa-file-pdf text-2xl text-gray-800"></i>
                 </button>
@@ -208,19 +202,16 @@
 
                 <div class="mb-4">
                     <div class="bg-slate-200/50 rounded-xl p-1 inline-flex space-x-1">
-                        <!-- BOTÃO "GRÁFICO COMPARATIVO" - SERÁ OCULTADO NO PDF -->
                         <button id="tab-chart" class="tab-button flex items-center gap-2 whitespace-nowrap py-2 px-4 rounded-lg font-bold text-sm text-slate-600 hover:bg-white/60 transition-all">
                             Gráfico Comparativo
                         </button>
-                        <!-- BOTÃO "TABELA DE MEDIÇÕES" - SERÁ OCULTADO NO PDF -->
                         <button id="tab-table" class="tab-button flex items-center gap-2 whitespace-nowrap py-2 px-4 rounded-lg font-bold text-sm text-slate-600 hover:bg-white/60 transition-all">
                            Tabela de Medições
                         </button>
                     </div>
                 </div>
 
-                <div id="content-chart" class="content-view mb-8"> <!-- ALTERADO: Adicionado mb-8 para espaçamento -->
-                    <p class="text-gray-700 text-sm mb-4 text-center">O gráfico abaixo ilustra a comparação mensal entre os valores acumulados 'Previsto' e 'Executado'. Passe o mouse sobre os pontos para ver detalhes, incluindo a diferença e o percentual do valor total.</p>
+                <div id="content-chart" class="content-view mb-8"> <p class="text-gray-700 text-sm mb-4 text-center">O gráfico abaixo ilustra a comparação mensal entre os valores acumulados 'Previsto' e 'Executado'. Passe o mouse sobre os pontos para ver detalhes, incluindo a diferença e o percentual do valor total.</p>
                     <div class="chart-container">
                         <canvas id="mainChart"></canvas>
                     </div>
@@ -230,8 +221,7 @@
                     </div>
                 </div>
 
-                <div id="content-table" class="content-view hidden mt-8"> <!-- ALTERADO: Adicionado mt-8 para espaçamento -->
-                    <p class="text-gray-700 text-sm mb-4">Esta seção apresenta a tabela detalhada de todas as medições (ou previsões) para o contrato selecionado, exibindo os valores por período e o total acumulado.</p>
+                <div id="content-table" class="content-view hidden mt-8"> <p class="text-gray-700 text-sm mb-4">Esta seção apresenta a tabela detalhada de todas as medições (ou previsões) para o contrato selecionado, exibindo os valores por período e o total acumulado.</p>
 
                     <div id="comparativeTableContainer" class="overflow-x-auto hidden">
                         <table class="min-w-full">
@@ -275,7 +265,6 @@
 
     </div>
 
-    <!-- Carrega o arquivo de dados dos contratos antes do script principal -->
     <script src="Dados_Contrato.js"></script>
 
     <script>
@@ -828,21 +817,28 @@
                                         return `${label}: ${formatCurrency(value)} (${percentage}%)`;
                                     },
                                     footer: (tooltipItems) => {
-                                        // Find the 'Executado' and 'Previsto' values for the current point
                                         const execItem = tooltipItems.find(item => item.dataset.label === 'Executado');
-                                        let previstoValue;
+                                        let previstoValue = null;
+                                        let executadoValue = null;
 
-                                        // Determine the correct 'Previsto' value based on datasets structure
+                                        // Recupera o valor 'Previsto' correto
+                                        // Use tooltipItems[0].dataIndex para garantir que o índice seja do ponto correto,
+                                        // independentemente do dataset que foi "hovered" primeiro.
                                         if (preparedChartData.previstoDataSets) {
-                                            const initialPrevisto = preparedChartData.previstoDataSets[0].data[execItem.dataIndex];
-                                            const newPrevisto = preparedChartData.previstoDataSets[1].data[execItem.dataIndex];
+                                            const initialPrevisto = preparedChartData.previstoDataSets[0].data[tooltipItems[0].dataIndex];
+                                            const newPrevisto = preparedChartData.previstoDataSets[1].data[tooltipItems[0].dataIndex];
                                             previstoValue = newPrevisto !== null ? newPrevisto : initialPrevisto;
                                         } else {
-                                            previstoValue = preparedChartData.previsto[execItem.dataIndex];
+                                            previstoValue = preparedChartData.previsto[tooltipItems[0].dataIndex];
                                         }
 
-                                        if (execItem && executadoValue != null && previstoValue != null) { // Only show difference if executed is not null
-                                            const executadoValue = execItem.parsed.y;
+                                        // Recupera o valor 'Executado' se existir
+                                        if (execItem) {
+                                            executadoValue = execItem.parsed.y;
+                                        }
+
+                                        // Somente exibe a diferença se houver valores válidos para executado e previsto
+                                        if (executadoValue !== null && previstoValue !== null && !isNaN(executadoValue) && !isNaN(previstoValue)) {
                                             const diff = executadoValue - previstoValue;
                                             const status = diff >= 0 ? 'Adiantado' : 'Atrasado';
                                             return `\nDiferença: ${formatCurrency(diff)} (${status})`;
