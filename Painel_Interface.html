@@ -39,7 +39,7 @@
                 por isso adicionamos text-center diretamente nas tags th e td no HTML/JS. */
         }
         .glass-card {
-            background: linear-gradient(135deg, rgba(191, 174, 153, 0.2) 0%, rgba(191, 174, 153, 0.3) 50%);
+            background: linear-gradient(135deg, rgba(240, 248, 255, 0.2) 0%, rgba(240, 248, 255, 0.3) 70%);
             -webkit-backdrop-filter: blur(2px);
             backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -144,12 +144,10 @@
                     <img src="https://i.imgur.com/1JpcXBq.png" id="logoCAF" alt="Logo CAF" class="h-26 md:h-28 max-w-full object-contain"/> 
                 </div>
             </div>
-
-	        <h1 class="text-3xl md:text-4xl font-bold text-white mb-2">PROGRAMA AVANÇA JUNDIAÍ - ETAPA 2</h1>
-	        <div class="glass-card p-3 text-center h-fit w-fit mx-auto" style="border-top-right-radius: 100px; border-top-left-radius: 0; border-bottom-left-radius: 100px; border-bottom-right-radius: 100px;">
-   	         <p class="text-[#052b63] text-lg font-bold">Análise de performance de contratos de obras.</p>
-	        </div>
-                </div>
+	<h1 class="text-3xl md:text-4xl font-bold text-white mb-2">PROGRAMA AVANÇA JUNDIAÍ - ETAPA 2</h1>
+	<div class="glass-card p-3 text-center h-fit w-fit mx-auto" style="border-top-right-radius: 100px; border-top-left-radius: 0; border-bottom-left-radius: 100px; border-bottom-right-radius: 100px;">
+   	 <p class="text-[#052b63] text-lg font-bold">Análise de performance de contratos de obras.</p>
+	</div>
             <div class="flex flex-wrap justify-center items-center gap-4 mt-6" id="header-dynamic-images"></div>
         </header>
 
@@ -677,7 +675,7 @@
 
                 tableRowsHtml = data.medicoes.map((m) => {
                     let periodDisplay = `${m.inicio} a ${m.fim}`;
-                    let refDisplay = m.ref || "-"; // Se ref for null, exibe "-"
+                    let refDisplay = m.ref || "-";
                     if (contractsWithoutRealMeasurements.includes(data.observacoes)) {
                         periodDisplay = `${m.medicao}º Mês`;
                         refDisplay = "-";
@@ -879,13 +877,23 @@
                                     label: (context) => {
                                         const label = context.dataset.label || '';
                                         const value = context.parsed.y;
-                                        const total = data.valorAtual || 0; // Use the original contract's total value
+                                        const total = data.valorAtual || 0; 
                                         const percentage = (total !== 0) ? (value / total * 100).toFixed(2) : 0;
+                                        // A cor do texto da label será definida por `labelTextColor`
                                         return `${label}: ${formatCurrency(value)} (${percentage}%)`;
                                     },
-                                    footer: (tooltipItems) => {
-                                        const previstoItem = tooltipItems.find(item => item.dataset.label === 'Previsto');
+                                    labelTextColor: function(context) {
+                                        const label = context.dataset.label || '';
+                                        if (label === 'Previsto' || label === 'Cronograma Inicial' || label === 'Novo Cronograma Previsto') {
+                                            return '#CC5200'; // Laranja
+                                        } else if (label === 'Executado') {
+                                            return '#007B3D'; // Verde
+                                        }
+                                        return '#FFFFFF'; // Cor padrão para outras labels
+                                    },
+                                    afterBody: (tooltipItems) => {
                                         const executadoItem = tooltipItems.find(item => item.dataset.label === 'Executado');
+                                        const previstoItem = tooltipItems.find(item => item.dataset.label === 'Previsto' || item.dataset.label === 'Cronograma Inicial' || item.dataset.label === 'Novo Cronograma Previsto');
 
                                         const previstoValue = previstoItem ? previstoItem.parsed.y : null;
                                         const executadoValue = executadoItem ? executadoItem.parsed.y : null;
@@ -893,9 +901,29 @@
                                         if (executadoValue !== null && previstoValue !== null && !isNaN(executadoValue) && !isNaN(previstoValue)) {
                                             const diff = executadoValue - previstoValue;
                                             const status = diff >= 0 ? 'Adiantado' : 'Atrasado';
-                                            return `\nDiferença: ${formatCurrency(diff)} (${status})`;
+                                            const diffColor = diff >= 0 ? '#072380' : '#FF0000'; // Azul para adiantado, vermelho para atrasado
+                                            
+                                            // Retorna a diferença como uma nova linha, com cor dinâmica.
+                                            // Chart.js aceita arrays para o retorno de afterBody para criar novas linhas.
+                                            // Para aplicar a cor, precisamos usar a formatação Rich Text.
+                                            // A cor é passada como um objeto { color: '...' } para o retorno do afterBody.
+                                            return [
+                                                {
+                                                    text: `Diferença: ${formatCurrency(diff)} (${status})`,
+                                                    // Usamos um objeto para aplicar a cor especificamente a esta linha
+                                                    // Nota: Esta é uma característica de tooltips avançados no Chart.js (Rich Text Tooltips)
+                                                    // Pode exigir `tooltip.usePointStyle: true` e `tooltip.multiKeyBackground: true` para ícones coloridos
+                                                    // ou apenas o objeto {text, color} para texto.
+                                                    font: { size: 12, weight: 'bold', family: 'Poppins' },
+                                                    color: diffColor 
+                                                }
+                                            ];
                                         }
                                         return '';
+                                    },
+                                    footer: (tooltipItems) => {
+                                        // O footer não é mais necessário aqui
+                                        return ''; 
                                     }
                                 }
                             }
