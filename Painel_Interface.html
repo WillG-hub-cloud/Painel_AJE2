@@ -23,7 +23,7 @@
             font-family: 'Montserrat', sans-serif;
             /* Novo fundo para o painel */
             background-color: #1a202c; /* Cor de fundo escura como fallback */
-            background-image: linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.7)), url('https://i.imgur.com/oWpnttn.jpeg'); /* Imagem da arquitetura com overlay */
+            background-image: linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.3)), url('https://i.imgur.com/oWpnttn.jpeg'); /* Imagem da arquitetura com overlay */
             background-size: cover; /* Garante que a imagem cubra toda a área */
             background-attachment: fixed; /* Torna o fundo fixo (efeito parallax) */
             background-position: center; /* Centraliza a imagem */
@@ -49,10 +49,58 @@
             border-bottom-left-radius: 60px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .tab-button.active {
-            background-color: rgba(255, 255, 255, 0.7);
-            color: #072380;
-        }
+    .tab-container {
+        /* A cor de fundo aqui deve ser próxima à cor predominante do seu glass-card se houver.
+           Se o glass-card é transparente/branco, podemos usar um cinza claro. */
+        background-color: rgba(240, 248, 255, 0.3); /* Uma cor de fundo base que se mistura com o glass-card */
+        border-radius: 12px;
+        padding: 4px;
+        /* Sombras internas para simular que o contêiner está "cavado" */
+        box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1), /* Sombra interna escura */
+                    inset -2px -2px 5px rgba(255, 255, 255, 0.5); /* Sombra interna clara */
+        display: inline-flex;
+        gap: 0.5rem; /* Espaço entre os botões */
+    }
+
+    /* Estilo para os botões de aba (estado não selecionado/repouso) */
+    .tab-button {
+        background-color: rgba(240, 248, 255, 0.4); /* Fundo um pouco mais opaco que o contêiner */
+        color: #072380; /* Cor do texto original */
+        border-radius: 8px;
+        padding: 0.75rem 1.25rem;
+        font-weight: 600;
+        transition: all 0.2s ease-in-out; /* Transição mais rápida e suave */
+        border: none; /* Garante que não há borda padrão */
+        /* Sombras externas para parecer que o botão está "elevado" */
+        box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.15), /* Sombra escura (lado direito/inferior) */
+                    -3px -3px 6px rgba(255, 255, 255, 0.6); /* Sombra clara (lado esquerdo/superior) */
+        outline: none; /* Remove o contorno padrão do foco */
+    }
+
+    /* Estilo para os botões de aba (estado hover) */
+    .tab-button:hover {
+        background-color: rgba(240, 248, 255, 0.5); /* Levemente mais claro no hover */
+        /* Sombras que "diminuem" para simular o botão se movendo para dentro */
+        box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1),
+                    -1px -1px 3px rgba(255, 255, 255, 0.3);
+        transform: translateY(-0.5px); /* Pequeno movimento para cima */
+    }
+
+    /* Estilo para os botões de aba (estado ativo/selecionado) */
+    .tab-button.active {
+        background-color: rgba(230, 230, 230, 0.9); /* Um cinza mais sólido e opaco para o estado pressionado */
+        color: #072380; /* Mantém a cor do texto para ativo */
+        /* Sombras internas para parecer que o botão está "pressionado" */
+        box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.2), /* Sombra interna escura */
+                    inset -3px -3px 6px rgba(255, 255, 255, 0.8); /* Sombra interna clara */
+        transform: translateY(0); /* Volta à posição original (pressionado) */
+    }
+
+    /* Ajustes para cores de texto para se adaptarem melhor, se necessário, mas mantendo as suas originais */
+    .text-gray-700 { color: #052b63; } /* Cor do body original */
+    .text-gray-900 { color: #052b63; } /* Cor do body original */
+    .text-slate-600 { color: #052b63; } /* Cor do body original */
+        
         .chart-container {
             position: relative;
             height: 400px; /* REVERTIDO: Altura do gráfico para a versão anterior */
@@ -87,7 +135,7 @@
             border: none !important;
             box-shadow: none !important;
             font-size: 28px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
             transform: translate(-50%, -100%);
         }
         /* Cores específicas para os ícones */
