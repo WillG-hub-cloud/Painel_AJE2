@@ -745,22 +745,22 @@
                     {
                         label: preparedChartData.previstoDataSets[0].label,
                         data: preparedChartData.previstoDataSets[0].data,
-                        borderColor: '#CC5200', // Laranja
+                        borderColor: '#007BFF', // Azul
                         borderWidth: 2, // Mais fina
                         borderDash: [5, 5], // Linha tracejada para previsto
                         fill: false,
                         tension: 0.4, // Curva suave
                         pointBackgroundColor: 'transparent', // Círculo vazado
-                        pointBorderColor: '#CC5200', // Borda laranja
+                        pointBorderColor: '#007BFF', // Azul
                         pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
+                        pointRadius: 3,
+                        pointHoverRadius: 4,
                         datalabels: {
                             align: (ctx) => ctx.dataIndex === 0 ? 'right' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'end'),
                             anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'end'),
                             offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
-                            color: '#CC5200',
-                            font: { weight: 'bold', size: 14, family: 'Poppins' }, // Fonte Poppins
+                            color: '#007BFF', // Azul
+                            font: { weight: 'bold', size: 13, family: 'Poppins' }, // Fonte Poppins
                             formatter: (value) => formatChartLabelValue(value)
                         },
                         order: 2 // Garante que esta linha seja desenhada antes da executada
@@ -768,7 +768,7 @@
                     {
                         label: preparedChartData.previstoDataSets[1].label,
                         data: preparedChartData.previstoDataSets[1].data,
-                        borderColor: '#CC5200', // Laranja
+                        borderColor: '#CC5200', // Borda laranja
                         borderWidth: 2, // Mais fina
                         borderDash: [5, 5], // Linha tracejada para previsto
                         fill: false,
@@ -776,14 +776,14 @@
                         pointBackgroundColor: 'transparent', // Círculo vazado
                         pointBorderColor: '#CC5200', // Borda laranja
                         pointBorderWidth: 2,
-                        pointRadius: 6,
-                        pointHoverRadius: 8,
+                        pointRadius: 3,
+                        pointHoverRadius: 4,
                         datalabels: {
                             align: (ctx) => ctx.dataIndex === 0 ? 'right' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'end'),
                             anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'end'),
                             offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
                             color: '#CC5200',
-                            font: { weight: 'bold', size: 14, family: 'Poppins' }, // Fonte Poppins
+                            font: { weight: 'bold', size: 13, family: 'Poppins' }, // Fonte Poppins
                             formatter: (value) => formatChartLabelValue(value)
                         },
                         order: 3 // Garante que esta linha seja desenhada antes da executada
@@ -794,7 +794,7 @@
                 datasets.push({
                     label: 'Previsto',
                     data: preparedChartData.previsto,
-                    borderColor: '#CC5200', // Laranja
+                    borderColor: '#CC5200', // Borda laranja
                     borderWidth: 2, // Mais fina
                     borderDash: [5, 5], // Linha tracejada para previsto
                     fill: false,
@@ -809,7 +809,7 @@
                         anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'end'),
                         offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
                         color: '#CC5200',
-                        font: { weight: 'bold', size: 14, family: 'Poppins' }, // Fonte Poppins
+                        font: { weight: 'bold', size: 13, family: 'Poppins' }, // Fonte Poppins
                         formatter: (value) => formatChartLabelValue(value)
                     },
                     order: 2
@@ -829,15 +829,15 @@
                     pointBackgroundColor: '#007B3D',
                     pointBorderColor: '#007B3D',
                     pointBorderWidth: 2,
-                    pointRadius: 6,
-                    pointHoverRadius: 8,
+                    pointRadius: 3,
+                    pointHoverRadius: 4,
                     pointStyle: 'rectRot', // Losangos
                     datalabels: {
                         align: (ctx) => ctx.dataIndex === 0 ? 'right' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'start'),
                         anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'start'),
                         offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
                         color: '#007B3D',
-                        font: { weight: 'bold', size: 14, family: 'Poppins' }, // Fonte Poppins
+                        font: { weight: 'bold', size: 13, family: 'Poppins' }, // Fonte Poppins
                         formatter: (value) => formatChartLabelValue(value)
                     },
                     order: 4
