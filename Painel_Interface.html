@@ -23,7 +23,7 @@
             font-family: 'Montserrat', sans-serif;
             /* Novo fundo para o painel */
             background-color: #1a202c; /* Cor de fundo escura como fallback */
-            background-image: url('https://i.imgur.com/oWpnttn.jpeg'); /* Imagem da arquitetura sem overlay */
+            background-image: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), url('https://i.imgur.com/oWpnttn.jpeg'); /* Imagem da arquitetura com overlay */
             background-size: cover; /* Garante que a imagem cubra toda a área */
             background-attachment: fixed; /* Torna o fundo fixo (efeito parallax) */
             background-position: center; /* Centraliza a imagem */
@@ -87,7 +87,7 @@
             border: none !important;
             box-shadow: none !important;
             font-size: 28px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
             transform: translate(-50%, -100%);
         }
         /* Cores específicas para os ícones */
@@ -102,7 +102,7 @@
         }
         .map-label-tooltip {
             background: transparent !important;
-            color: var(--map-label-text-color, white); /*Usa variável CSS para a cor do texto do tooltip. O 'white' é um fallback. */
+            color: white !important;
             font-weight: bold !important;
             font-size: 0.875rem !important;
             padding: 0.25rem 0.5rem !important;
@@ -291,9 +291,10 @@
         const projectIcons = {
             "EMEB": { type: 'fontawesome', symbol: 'fas fa-graduation-cap', name: 'Formatura', colorClass: 'emeb-icon', mapLabelColor: '#87CEEB', chartColor: '#87CEEB' }, // Azul claro
             "CECE": { type: 'fontawesome', symbol: 'fas fa-basketball-ball', name: 'Basquete', colorClass: 'cece-icon', mapLabelColor: '#ff9b4f', chartColor: '#ff9b4f' }, // Laranja
-            "UBS": { type: 'fontawesome', symbol: 'fas fa-heartbeat', name: 'Batimento', colorClass: 'ubs-icon', mapLabelColor: '#f24b4b', chartColor: '#f24b4b' }, // Vermelho
+            "UBS": { type: 'unicode', symbol: '✚', name: 'Cruz Médica', colorClass: 'ubs-icon', mapLabelColor: '#f24b4b', chartColor: '#f24b4b' }, // Vermelho
             // Icons to keep available for future use (not directly assigned to a project type here, but defined)
             "Escola": { type: 'fontawesome', symbol: 'fas fa-school', name: 'Escola' },
+            "Coracao": { type: 'fontawesome', symbol: 'fas fa-heartbeat', name: 'Batimento' },
             "Hospital": { type: 'fontawesome', symbol: 'fas fa-hospital', name: 'Hospital' },
             "Estrada": { type: 'fontawesome', symbol: 'fas fa-road', name: 'Estrada' },
             "Cruz médica": { type: 'unicode', symbol: '✚', name: 'Cruz Médica' },
@@ -301,7 +302,7 @@
             "Capacete": { type: 'fontawesome', symbol: 'fas fa-hard-hat', name: 'Capacete' },
             "Semáforo": { type: 'fontawesome', symbol: 'fas fa-traffic-light', name: 'Semáforo' },
             // Default icon if no specific match
-            "default": { type: 'fontawesome', symbol: 'fas fa-location-dot', name: 'Localização Padrão', colorClass: '', mapLabelColor: 'white', chartColor: '#072380' } // Cor padrão para o rótulo do mapa e gráfico
+            "default": { type: 'fontawesome', symbol: 'fas fa-location-dot', name: 'Localização Padrão', colorClass: '' } // Default color
         };
 
         // Carrega os logos quando o DOM estiver pronto
@@ -746,7 +747,7 @@
                         label: preparedChartData.previstoDataSets[0].label,
                         data: preparedChartData.previstoDataSets[0].data,
                         borderColor: '#007BFF', // Azul
-                        borderWidth: 2, // Mais fina
+                        borderWidth: 1, // Mais fina
                         borderDash: [5, 5], // Linha tracejada para previsto
                         fill: false,
                         tension: 0.4, // Curva suave
@@ -761,14 +762,18 @@
                             offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
                             color: '#007BFF', // Azul
                             font: { weight: 'bold', size: 13, family: 'Poppins' }, // Fonte Poppins
-                            formatter: (value) => formatChartLabelValue(value)
+                            formatter: (value) => formatChartLabelValue(value),
+                            textShadowColor: 'rgba(0, 0, 0, 0.0)', // Cor da sombra (preto com 00% de opacidade)
+                            textShadowBlur: 0,                     // Desfoque da sombra (0 pixels)
+                            textShadowOffsetX: 0,                  // Deslocamento horizontal da sombra (0 pixel para a direita)
+                            textShadowOffsetY: 0                   // Deslocamento vertical da sombra (0 pixel para baixo)
                         },
                         order: 2 // Garante que esta linha seja desenhada antes da executada
                     },
                     {
                         label: preparedChartData.previstoDataSets[1].label,
                         data: preparedChartData.previstoDataSets[1].data,
-                        borderColor: '#CC5200', // Borda laranja
+                        borderColor: '#CC5200', // Laranja
                         borderWidth: 2, // Mais fina
                         borderDash: [5, 5], // Linha tracejada para previsto
                         fill: false,
@@ -783,9 +788,13 @@
                             anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'end'),
                             offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
                             color: '#CC5200',
-                            font: { weight: 'bold', size: 13, family: 'Poppins' }, // Fonte Poppins
-                            formatter: (value) => formatChartLabelValue(value)
-                        },
+                            font: { weight: 'bold', size: 14, family: 'Poppins' }, // Fonte Poppins
+                            formatter: (value) => formatChartLabelValue(value),
+                            textShadowColor: 'rgba(0, 0, 0, 0.0)', // Cor da sombra (preto com 00% de opacidade)
+                            textShadowBlur: 0,                     // Desfoque da sombra (0 pixels)
+                            textShadowOffsetX: 0,                  // Deslocamento horizontal da sombra (0 pixel para a direita)
+                            textShadowOffsetY: 0                   // Deslocamento vertical da sombra (0 pixel para baixo)
+                      },
                         order: 3 // Garante que esta linha seja desenhada antes da executada
                     }
                 );
@@ -794,7 +803,7 @@
                 datasets.push({
                     label: 'Previsto',
                     data: preparedChartData.previsto,
-                    borderColor: '#CC5200', // Borda laranja
+                    borderColor: '#CC5200', // Laranja
                     borderWidth: 2, // Mais fina
                     borderDash: [5, 5], // Linha tracejada para previsto
                     fill: false,
@@ -802,15 +811,19 @@
                     pointBackgroundColor: 'transparent', // Círculo vazado
                     pointBorderColor: '#CC5200', // Borda laranja
                     pointBorderWidth: 2,
-                    pointRadius: 1,
-                    pointHoverRadius: 1,
+                    pointRadius: 3,
+                    pointHoverRadius: 4,
                     datalabels: {
                         align: (ctx) => ctx.dataIndex === 0 ? 'right' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'end'),
                         anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'end'),
                         offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
                         color: '#CC5200',
-                        font: { weight: 'bold', size: 13, family: 'Poppins' }, // Fonte Poppins
-                        formatter: (value) => formatChartLabelValue(value)
+                        font: { weight: 'bold', size: 14, family: 'Poppins' }, // Fonte Poppins
+                        formatter: (value) => formatChartLabelValue(value),
+                        textShadowColor: 'rgba(0, 0, 0, 0.0)', // Cor da sombra (preto com 00% de opacidade)
+                        textShadowBlur: 0,                     // Desfoque da sombra (0 pixels)
+                        textShadowOffsetX: 0,                  // Deslocamento horizontal da sombra (0 pixel para a direita)
+                        textShadowOffsetY: 0                   // Deslocamento vertical da sombra (0 pixel para baixo)
                     },
                     order: 2
                 });
@@ -837,8 +850,12 @@
                         anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'start'),
                         offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
                         color: '#007B3D',
-                        font: { weight: 'bold', size: 13, family: 'Poppins' }, // Fonte Poppins
-                        formatter: (value) => formatChartLabelValue(value)
+                        font: { weight: 'bold', size: 14, family: 'Poppins' }, // Fonte Poppins
+                        formatter: (value) => formatChartLabelValue(value),
+                        textShadowColor: 'rgba(0, 0, 0, 0.0)', // Cor da sombra (preto com 00% de opacidade)
+                        textShadowBlur: 0,                     // Desfoque da sombra (0 pixels)
+                        textShadowOffsetX: 0,                  // Deslocamento horizontal da sombra (0 pixel para a direita)
+                        textShadowOffsetY: 0                   // Deslocamento vertical da sombra (0 pixel para baixo)
                     },
                     order: 4
                 });
@@ -909,16 +926,7 @@
                                         // Retorna apenas a linha do dataset (Previsto ou Executado)
                                         return `${label}: ${formatCurrency(value)} (${((value / total) * 100).toFixed(2)}%)`;
                                     },
-                                    labelTextColor: function(context) {
-                                        const label = context.dataset.label || '';
-                                        if (label === 'Previsto' || label.includes('Cronograma')) {
-                                            return '#CC5200'; // Laranja
-                                        } else if (label === 'Executado') {
-                                            return '#007B3D'; // Verde
-                                        }
-                                        return '#990f0f'; // Padrão
-                                        },
-                                        footer: (tooltipItems) => {
+                                         footer: (tooltipItems) => {
                                             // Encontre o item "Executado" nos dataPoints do tooltip
                                             const executadoItem = tooltipItems.find(item => item.dataset.label === 'Executado');
                                             
@@ -1390,21 +1398,18 @@
                 const lng = parseFloat(p.location.lng);
 
                 if (!isNaN(lat) && !isNaN(lng)) {
+                    let iconToUse = projectIcons.default;
                     let iconColorClass = ''; // Variable to hold the color class
-                    let mapLabelColor = projectIcons.default.mapLabelColor; // ALTERAÇÃO: Obter a cor do rótulo do mapa (padrão)
 
                     if (p.objeto.includes("EMEB")) {
                         iconToUse = projectIcons.EMEB;
                         iconColorClass = iconToUse.colorClass;
-                        mapLabelColor = iconToUse.mapLabelColor; // ALTERAÇÃO: Obter a cor EMEB
                     } else if (p.objeto.includes("CECE")) {
                         iconToUse = projectIcons.CECE;
                         iconColorClass = iconToUse.colorClass;
-                        mapLabelColor = iconToUse.mapLabelColor; // ALTERAÇÃO: Obter a cor CECE
                     } else if (p.objeto.includes("UBS")) {
                         iconToUse = projectIcons.UBS;
                         iconColorClass = iconToUse.colorClass;
-                        mapLabelColor = iconToUse.mapLabelColor; // ALTERAÇÃO: Obter a cor UBS
                     }
 
                     let iconHtml;
@@ -1431,18 +1436,7 @@
                             opacity: 0.9,
                             offset: L.point(0, -10) // Deslocamento do tooltip
                         });
-                    marker.on('tooltipopen', function(e) {
-                        const tooltipElement = e.tooltip.getElement();
-                        // Define a variável CSS --map-label-text-color no elemento do tooltip
-                        tooltipElement.style.setProperty('--map-label-text-color', mapLabelColor);
-                        // Opcional: Ajustar text-shadow se a cor do texto for clara e o fundo do mapa for claro
-                        // Se você notar que o texto fica difícil de ler em fundos claros, pode ativar ou ajustar esta parte:
-                        // if (mapLabelColor === '#FFFFFF' || mapLabelColor === '#87CEEB' || mapLabelColor === '#ff9b4f') { // Cores claras
-                        //     tooltipElement.style.textShadow = '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000'; // Sombra escura
-                        // } else { // Cores escuras
-                        //     tooltipElement.style.textShadow = 'none';
-                        // }
-                    });
+
                     // Adiciona a coordenada do marcador ao array de bounds
                     bounds.push([lat, lng]);
 
