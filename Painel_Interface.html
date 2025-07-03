@@ -61,7 +61,7 @@
             background: linear-gradient(to bottom right, rgba(240, 248, 255, 0.9), rgba(240, 248, 255, 0.7));
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 0.3);
             color: #333333;
             padding: 1rem;
             margin-top: 1rem;
@@ -130,13 +130,78 @@
             background-color: #007B3DFFF !important;
             color: #000000 !important;
         }
+
+        /* Login Screen Styles */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        #login-card {
+            background: linear-gradient(135deg, rgba(240, 248, 255, 0.9) 0%, rgba(240, 248, 255, 0.8) 20%);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            text-align: center;
+            color: #052b63;
+        }
+        #password-input {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #ccc;
+            background-color: white;
+            color: #333;
+        }
+        #login-button {
+            background-color: #072380;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #login-button:hover {
+            background-color: #051a66;
+        }
+        #login-error-message {
+            color: #b80404;
+            margin-top: 1rem;
+            font-weight: bold;
+            display: none;
+        }
     </style>
 </head>
 <body class="text-slate-200">
 
-    <div class="container mx-auto p-4 md:p-6 lg:p-8">
+    <div id="login-screen">
+        <div id="login-card" class="p-8 rounded-lg shadow-xl max-w-sm w-full">
+            <h2 class="text-2xl font-bold mb-6">Acesso Restrito</h2>
+            <p class="mb-4 text-gray-700">Por favor, insira a senha para acessar o painel.</p>
+            <input type="password" id="password-input" class="w-full p-3 mb-4 border rounded-lg" placeholder="Senha" autofocus>
+            <button id="login-button" class="w-full py-3 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors">Entrar</button>
+            <p id="login-error-message" class="text-red-600 mt-4"></p>
+        </div>
+    </div>
 
-        <header class="text-center mb-8 relative" id="mainHeader"> <div class="grid grid-cols-3 items-center gap-4 mb-4">
+    <div class="container mx-auto p-4 md:p-6 lg:p-8 hidden" id="main-content">
+
+        <header class="text-center mb-8 relative" id="mainHeader">
+            <div class="grid grid-cols-3 items-center gap-4 mb-4">
                 <div class="flex justify-start">
                     <img src="https://i.imgur.com/67zLDAk.png" id="logoPOE" alt="Logo POE" class="h-18 md:h-20 max-w-full object-contain"/>
                 </div>
@@ -214,7 +279,8 @@
                     </div>
                 </div>
 
-                <div id="content-chart" class="content-view mb-8"> <p class="text-gray-700 text-sm mb-4 text-center">O gráfico abaixo ilustra a comparação mensal entre os valores acumulados 'Previsto' e 'Executado'. Passe o mouse sobre os pontos para ver detalhes, incluindo a diferença e o percentual do valor total.</p>
+                <div id="content-chart" class="content-view mb-8">
+                    <p class="text-gray-700 text-sm mb-4 text-center">O gráfico abaixo ilustra a comparação mensal entre os valores acumulados 'Previsto' e 'Executado'. Passe o mouse sobre os pontos para ver detalhes, incluindo a diferença e o percentual do valor total.</p>
                     <div class="chart-container">
                         <canvas id="mainChart"></canvas>
                     </div>
@@ -224,7 +290,8 @@
                     </div>
                 </div>
 
-                <div id="content-table" class="content-view hidden mt-8"> <p class="text-gray-700 text-sm mb-4">Esta seção apresenta a tabela detalhada de todas as medições (o previsões) para o contrato selecionado, exibindo os valores por período e o total acumulado.</p>
+                <div id="content-table" class="content-view hidden mt-8">
+                    <p class="text-gray-700 text-sm mb-4">Esta seção apresenta a tabela detalhada de todas as medições (o previsões) para o contrato selecionado, exibindo os valores por período e o total acumulado.</p>
 
                     <div id="comparativeTableContainer" class="overflow-x-auto hidden">
                         <table class="min-w-full">
@@ -297,386 +364,455 @@
             "default": { type: 'fontawesome', symbol: 'fas fa-location-dot', name: 'Localização Padrão', colorClass: '' }
         };
 
+        // --- Login Variables ---
+        const CORRECT_PASSWORD = "AVANCA!2025"; 
+        const loginScreen = document.getElementById('login-screen');
+        const passwordInput = document.getElementById('password-input');
+        const loginButton = document.getElementById('login-button');
+        const loginErrorMessage = document.getElementById('login-error-message');
+        const mainContent = document.getElementById('main-content');
+
         document.addEventListener('DOMContentLoaded', () => {
+            // Check if already authenticated (e.g., from a session storage)
+            if (sessionStorage.getItem('authenticated') === 'true') {
+                showMainContent();
+            } else {
+                loginScreen.style.display = 'flex';
+                passwordInput.focus(); // Focus on password input when login screen appears
+            }
+
+            loginButton.addEventListener('click', authenticate);
+            passwordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    authenticate();
+                }
+            });
+
             document.getElementById('logoCAF').src = imageUrls.logoCAF;
             document.getElementById('logoJundiai').src = imageUrls.logoJundiai;
             document.getElementById('logoPOE').src = imageUrls.logoPOE;
         });
 
-        Chart.register(ChartDataLabels);
-
-        const mainHeader = document.getElementById('mainHeader');
-        const contractSelector = document.getElementById('contractSelector');
-        const contractDetails = document.getElementById('contractDetails');
-        const noChartDataMessage = document.getElementById('noChartDataMessage');
-        const chartCanvasContainer = document.querySelector('#content-chart .chart-container');
-
-        const tabChartButton = document.getElementById('tab-chart');
-        const tabTableButton = document.getElementById('tab-table');
-        const contentChart = document.getElementById('content-chart');
-        const contentTable = document.getElementById('content-table');
-
-        const comparativeTableContainer = document.getElementById('comparativeTableContainer');
-        const comparativeTableBody = document.getElementById('comparativeTableBody');
-        const predictedScheduleTableContainer = document.getElementById('predictedScheduleTableContainer');
-        const predictedScheduleTableBody = document.getElementById('measurementsTableBody');
-
-        const totalContractsSpan = document.getElementById('totalContracts');
-        const totalContractValueSpan = document.getElementById('totalContractValue');
-        const sumOfLatestMonthlyMeasurementsSpan = document.getElementById('sumOfLatestMonthlyMeasurements');
-
-        const mapView = document.getElementById('mapView');
-        const dashboardView = document.getElementById('dashboardView');
-        const backToMapButton = document.getElementById('backToMapButton');
-        const exportChartPngButton = document.getElementById('exportChartPngButton');
-        const exportTableCsvButton = document.getElementById('exportTableCsvButton');
-        const exportPdfButton = document.getElementById('exportPdfButton');
-
-        let map;
-        let mainChart;
-
-        const contractsWithoutRealMeasurements = ["Contrato ainda não possui medições.", "Contrato ainda não foi assinado."];
-
-        function parseDate(dateString) {
-            if (!dateString || dateString === 'N/A' || dateString.toLowerCase() === 'null') return null;
-            const parts = dateString.split('/');
-            let day = parseInt(parts[0], 10);
-            let month = parseInt(parts[1], 10) - 1;
-            let year = parseInt(parts[2], 10);
-
-            const currentYear = new Date().getFullYear();
-            if (year < 100) {
-                year = (year > (currentYear % 100) + 10) ? 1900 + year : 2000 + year;
-            }
-            return new Date(year, month, day);
-        }
-
-        function calculateTotalDays(startDate, endDate) {
-            if (!startDate || !endDate || isNaN(startDate) || isNaN(endDate)) return null;
-            let diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-            return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        }
-
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
-        }
-
-        function formatCurrencyAndPercentage(value, totalValue) {
-            if (value === null || value === undefined || totalValue === 0) {
-                return formatCurrency(value);
-            }
-            const percentage = ((value / totalValue) * 100).toFixed(2);
-            return `${formatCurrency(value)} (${percentage}%)`;
-        }
-
-        function formatChartLabelValue(value) {
-            const absValue = Math.abs(value);
-            if (absValue >= 1000000) {
-                return `R$ ${(absValue / 1000000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} mi`;
-            } else if (absValue >= 1000) {
-                return `R$ ${(absValue / 1000).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} mil`;
+        function authenticate() {
+            const enteredPassword = passwordInput.value;
+            if (enteredPassword === CORRECT_PASSWORD) {
+                sessionStorage.setItem('authenticated', 'true');
+                showMainContent();
             } else {
-                return `R$ ${absValue.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+                loginErrorMessage.textContent = "Senha incorreta. Tente novamente.";
+                loginErrorMessage.style.display = 'block';
+                passwordInput.value = ''; // Clear password field
+                passwordInput.focus();
             }
         }
 
-        function formatSummaryValue(value) {
-            const absValue = Math.abs(value);
-            if (absValue >= 1000000) {
-                return `R$ ${(absValue / 1000000).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} mi`;
-            }
-            if (absValue >= 1000) {
-                return `R$ ${(absValue / 1000).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} mil`;
-            }
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value || 0);
-        }
+        function showMainContent() {
+            loginScreen.style.display = 'none';
+            mainContent.classList.remove('hidden');
 
-        function updateSummaryMetrics() {
-            if (projectData.length === 0) {
-                totalContractsSpan.textContent = 0;
-                totalContractValueSpan.textContent = formatSummaryValue(0);
-                sumOfLatestMonthlyMeasurementsSpan.textContent = formatSummaryValue(0);
-                return;
-            }
+            Chart.register(ChartDataLabels);
 
-            let sumOfJuneExecutedMeasurements = 0;
-            const currentMonthRef = "Jun/25";
+            const mainHeader = document.getElementById('mainHeader');
+            const contractSelector = document.getElementById('contractSelector');
+            const contractDetails = document.getElementById('contractDetails');
+            const noChartDataMessage = document.getElementById('noChartDataMessage');
+            const chartCanvasContainer = document.querySelector('#content-chart .chart-container');
 
-            projectData.forEach(p => {
-                const hasExecutedData = p.grafico && p.grafico.executado && p.grafico.executado.some(val => val !== null);
+            const tabChartButton = document.getElementById('tab-chart');
+            const tabTableButton = document.getElementById('tab-table');
+            const contentChart = document.getElementById('content-chart');
+            const contentTable = document.getElementById('content-table');
 
-                if (hasExecutedData && p.medicoes) {
-                    const juneMeasurement = p.medicoes.find(m => m.ref === currentMonthRef);
-                    if (juneMeasurement && juneMeasurement.valor !== null && juneMeasurement.valor !== undefined) {
-                        sumOfJuneExecutedMeasurements += juneMeasurement.valor;
-                    }
+            const comparativeTableContainer = document.getElementById('comparativeTableContainer');
+            const comparativeTableBody = document.getElementById('comparativeTableBody');
+            const predictedScheduleTableContainer = document.getElementById('predictedScheduleTableContainer');
+            const predictedScheduleTableBody = document.getElementById('measurementsTableBody');
+
+            const totalContractsSpan = document.getElementById('totalContracts');
+            const totalContractValueSpan = document.getElementById('totalContractValue');
+            const sumOfLatestMonthlyMeasurementsSpan = document.getElementById('sumOfLatestMonthlyMeasurements');
+
+            const mapView = document.getElementById('mapView');
+            const dashboardView = document.getElementById('dashboardView');
+            const backToMapButton = document.getElementById('backToMapButton');
+            const exportChartPngButton = document.getElementById('exportChartPngButton');
+            const exportTableCsvButton = document.getElementById('exportTableCsvButton');
+            const exportPdfButton = document.getElementById('exportPdfButton');
+
+            let map;
+            let mainChart;
+
+            const contractsWithoutRealMeasurements = ["Contrato ainda não possui medições.", "Contrato ainda não foi assinado."];
+
+            function parseDate(dateString) {
+                if (!dateString || dateString === 'N/A' || dateString.toLowerCase() === 'null') return null;
+                const parts = dateString.split('/');
+                let day = parseInt(parts[0], 10);
+                let month = parseInt(parts[1], 10) - 1;
+                let year = parseInt(parts[2], 10);
+
+                const currentYear = new Date().getFullYear();
+                if (year < 100) {
+                    year = (year > (currentYear % 100) + 10) ? 1900 + year : 2000 + year;
                 }
-            });
+                return new Date(year, month, day);
+            }
 
-            totalContractsSpan.textContent = projectData.length;
-            totalContractValueSpan.textContent = formatSummaryValue(projectData.reduce((sum, p) => sum + p.valorAtual, 0));
-            sumOfLatestMonthlyMeasurementsSpan.textContent = formatSummaryValue(sumOfJuneExecutedMeasurements);
-        }
+            function calculateTotalDays(startDate, endDate) {
+                if (!startDate || !endDate || isNaN(startDate) || isNaN(endDate)) return null;
+                let diffTime = Math.abs(endDate.getTime() - startDate.getTime());
+                return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            }
 
-        function prepareChartData(contract) {
-            let chartLabels = [];
-            let chartPrevisto = [];
-            let chartExecutado = [];
-            let previstoDataSets = null;
+            function formatCurrency(value) {
+                return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
+            }
 
-            if (contract.grafico && contract.grafico.executado && contract.grafico.executado.some(val => val !== null)) {
-                chartLabels = [...contract.grafico.labels];
-                chartExecutado = [...contract.grafico.executado];
+            function formatCurrencyAndPercentage(value, totalValue) {
+                if (value === null || value === undefined || totalValue === 0) {
+                    return formatCurrency(value);
+                }
+                const percentage = ((value / totalValue) * 100).toFixed(2);
+                return `${formatCurrency(value)} (${percentage}%)`;
+            }
 
-                if (contract.grafico.previstoDataSets) {
-                    previstoDataSets = contract.grafico.previstoDataSets.map(ds => ({
-                        label: ds.label,
-                        data: [...ds.data]
-                    }));
+            function formatChartLabelValue(value) {
+                const absValue = Math.abs(value);
+                if (absValue >= 1000000) {
+                    return `R$ ${(absValue / 1000000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} mi`;
+                } else if (absValue >= 1000) {
+                    return `R$ ${(absValue / 1000).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} mil`;
                 } else {
-                    chartPrevisto = [...contract.grafico.previsto];
+                    return `R$ ${absValue.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+                }
+            }
+
+            function formatSummaryValue(value) {
+                const absValue = Math.abs(value);
+                if (absValue >= 1000000) {
+                    return `R$ ${(absValue / 1000000).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} mi`;
+                }
+                if (absValue >= 1000) {
+                    return `R$ ${(absValue / 1000).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} mil`;
+                }
+                return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value || 0);
+            }
+
+            function updateSummaryMetrics() {
+                if (projectData.length === 0) {
+                    totalContractsSpan.textContent = 0;
+                    totalContractValueSpan.textContent = formatSummaryValue(0);
+                    sumOfLatestMonthlyMeasurementsSpan.textContent = formatSummaryValue(0);
+                    return;
                 }
 
-                const lastChartLabel = chartLabels[chartLabels.length - 1];
-                const lastMedicaoIndex = contract.medicoes.findIndex(m => m.ref === lastChartLabel);
+                let sumOfJuneExecutedMeasurements = 0;
+                const currentMonthRef = "Jun/25";
 
-                if (lastMedicaoIndex !== -1) {
-                    for (let i = lastMedicaoIndex + 1; i < contract.medicoes.length; i++) {
-                        const medicao = contract.medicoes[i];
-                        chartLabels.push(medicao.ref);
-                        chartExecutado.push(null);
-                        if (previstoDataSets) {
-                            previstoDataSets[0].data.push(null);
-                            previstoDataSets[1].data.push(medicao.acumulado);
-                        } else {
-                            chartPrevisto.push(medicao.acumulado);
+                projectData.forEach(p => {
+                    const hasExecutedData = p.grafico && p.grafico.executado && p.grafico.executado.some(val => val !== null);
+
+                    if (hasExecutedData && p.medicoes) {
+                        const juneMeasurement = p.medicoes.find(m => m.ref === currentMonthRef);
+                        if (juneMeasurement && juneMeasurement.valor !== null && juneMeasurement.valor !== undefined) {
+                            sumOfJuneExecutedMeasurements += juneMeasurement.valor;
                         }
                     }
+                });
+
+                totalContractsSpan.textContent = projectData.length;
+                totalContractValueSpan.textContent = formatSummaryValue(projectData.reduce((sum, p) => sum + p.valorAtual, 0));
+                sumOfLatestMonthlyMeasurementsSpan.textContent = formatSummaryValue(sumOfJuneExecutedMeasurements);
+            }
+
+            function prepareChartData(contract) {
+                let chartLabels = [];
+                let chartPrevisto = [];
+                let chartExecutado = [];
+                let previstoDataSets = null;
+
+                if (contract.grafico && contract.grafico.executado && contract.grafico.executado.some(val => val !== null)) {
+                    chartLabels = [...contract.grafico.labels];
+                    chartExecutado = [...contract.grafico.executado];
+
+                    if (contract.grafico.previstoDataSets) {
+                        previstoDataSets = contract.grafico.previstoDataSets.map(ds => ({
+                            label: ds.label,
+                            data: [...ds.data]
+                        }));
+                    } else {
+                        chartPrevisto = [...contract.grafico.previsto];
+                    }
+
+                    const lastChartLabel = chartLabels[chartLabels.length - 1];
+                    const lastMedicaoIndex = contract.medicoes.findIndex(m => m.ref === lastChartLabel);
+
+                    if (lastMedicaoIndex !== -1) {
+                        for (let i = lastMedicaoIndex + 1; i < contract.medicoes.length; i++) {
+                            const medicao = contract.medicoes[i];
+                            chartLabels.push(medicao.ref);
+                            chartExecutado.push(null);
+                            if (previstoDataSets) {
+                                previstoDataSets[0].data.push(null);
+                                previstoDataSets[1].data.push(medicao.acumulado);
+                            } else {
+                                chartPrevisto.push(medicao.acumulado);
+                            }
+                        }
+                    }
+
+                } else {
+                    contract.medicoes.forEach(m => {
+                        chartLabels.push(m.ref || `${m.medicao}º Mês`);
+                        chartPrevisto.push(m.acumulado);
+                        chartExecutado.push(null);
+                    });
                 }
 
-            } else {
-                contract.medicoes.forEach(m => {
-                    chartLabels.push(m.ref || `${m.medicao}º Mês`);
-                    chartPrevisto.push(m.acumulado);
-                    chartExecutado.push(null);
-                });
+                return {
+                    labels: chartLabels,
+                    previsto: chartPrevisto,
+                    executado: chartExecutado,
+                    previstoDataSets: previstoDataSets
+                };
             }
 
-            return {
-                labels: chartLabels,
-                previsto: chartPrevisto,
-                executado: chartExecutado,
-                previstoDataSets: previstoDataSets
-            };
-        }
+            function updateView(contractId) {
+                const data = projectData.find(p => p.id === contractId);
+                if (!data) {
+                    console.error("Contrato não encontrado:", contractId);
+                    return;
+                }
 
-        function updateView(contractId) {
-            const data = projectData.find(p => p.id === contractId);
-            if (!data) {
-                console.error("Contrato não encontrado:", contractId);
-                return;
-            }
+                const hasExecutedChartData = data.grafico && data.grafico.executado && data.grafico.executado.some(val => val !== null);
 
-            const hasExecutedChartData = data.grafico && data.grafico.executado && data.grafico.executado.some(val => val !== null);
+                contractSelector.value = contractId;
 
-            contractSelector.value = contractId;
+                const formattedContractId = data.id.replace('CT ', '').replace(/\/(\d{2})$/, '/20$1');
 
-            const formattedContractId = data.id.replace('CT ', '').replace(/\/(\d{2})$/, '/20$1');
+                let predictedDatesHtml = '';
+                if (hasExecutedChartData && data.predicted_start_date && data.predicted_end_date && data.predicted_start_date !== 'N/A' && data.predicted_end_date !== 'N/A') {
+                    const startDate = parseDate(data.predicted_start_date);
+                    const endDate = parseDate(data.predicted_end_date);
+                    const durationDays = calculateTotalDays(startDate, endDate);
 
-            let predictedDatesHtml = '';
-            if (hasExecutedChartData && data.predicted_start_date && data.predicted_end_date && data.predicted_start_date !== 'N/A' && data.predicted_end_date !== 'N/A') {
-                const startDate = parseDate(data.predicted_start_date);
-                const endDate = parseDate(data.predicted_end_date);
-                const durationDays = calculateTotalDays(startDate, endDate);
-
-                predictedDatesHtml = `
-                    <p class="text-xs md:text-sm text-gray-700 mt-0.5">
-                        Início Efetivo: ${data.predicted_start_date} | Fim Previsto: ${data.predicted_end_date} | Duração: ${durationDays} dias
-                    </p>
-                `;
-            }
-
-            let projectImageHtml = '';
-            if (data.objeto.includes("UBS")) {
-                projectImageHtml = `<img src="${imageUrls.logoUBS}" alt="UBS da Gente" class="h-20 md:h-24 object-contain ml-auto" onerror="this.onerror=null;this.src='https://placehold.co/150x80/cccccc/333333?text=UBS+da+Gente';"/>`;
-            } else if (data.objeto.includes("CECE")) {
-                projectImageHtml = `<img src="${imageUrls.logoAtleta}" alt="Atleta da Gente" class="h-18 md:h-20 object-contain ml-auto" onerror="this.onerror=null;this.src='https://placehold.co/150x80/cccccc/333333?text=Atleta+da+Gente';"/>`;
-            } else if (data.objeto.includes("EMEB")) {
-                projectImageHtml = `<img src="${imageUrls.logoEscola}" alt="Escola da Gente" class="h-20 md:h-24 object-contain ml-auto" onerror="this.onerror=null;this.src='https://placehold.co/150x80/cccccc/333333?text=Escola+da+Gente';"/>`;
-            }
-
-            contractDetails.innerHTML = `
-                <div class="flex items-center justify-center flex-wrap text-center space-y-1 w-full">
-                    <div class="flex-grow">
-                        <p class="text-lg md:text-xl font-bold text-gray-900">
-                            Contrato ${formattedContractId}: ${data.objeto}
+                    predictedDatesHtml = `
+                        <p class="text-xs md:text-sm text-gray-700 mt-0.5">
+                            Início Efetivo: ${data.predicted_start_date} | Fim Previsto: ${data.predicted_end_date} | Duração: ${durationDays} dias
                         </p>
-                        <p class="text-sm md:text-base text-gray-700">
-                            <span class="font-semibold">Empresa:</span> ${data.empresa} | <span class="font-semibold">Valor Atual:</span> <span class="font-bold" style="color: #072380;">${formatCurrency(data.valorAtual)}</span>
-                        </p>
-                        ${predictedDatesHtml}
-                    </div>
-                    ${projectImageHtml}
-                </div>
-                ${data.observacoes ? `<div class="mt-3 text-center w-full"><p class="text-sm text-[#333333] bg-[rgba(255,204,0,0.3)] p-2 rounded-lg inline-block"><span class="font-bold">Observação:</span> ${data.observacoes}</p></div>` : ''}
-            `;
-
-            renderTables(data, hasExecutedChartData);
-            handleTabVisibility(hasExecutedChartData);
-            renderChart(data, hasExecutedChartData);
-        }
-
-        function renderTables(data, hasExecutedChartData) {
-            let tableHeadersHtml;
-            let tableRowsHtml;
-            const totalContractValueForPercentages = data.valorAtual;
-
-            if (hasExecutedChartData) {
-                tableHeadersHtml = `
-                    <tr>
-                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Medição</th>
-                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Mês</th>
-                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Previst. Mês</th>
-                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Previst. Acum.</th>
-                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Executado Mês</th>
-                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Executado Acum.</th>
-                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Diferença</th>
-                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
-                    </tr>
-                `;
-                let prevPrevistoAcum = 0;
-                let prevExecutadoAcum = 0;
-
-                const preparedChartData = prepareChartData(data);
-
-                tableRowsHtml = preparedChartData.labels.map((label, index) => {
-                    let previstoAcum;
-                    if (preparedChartData.previstoDataSets) {
-                        const dsInitial = preparedChartData.previstoDataSets[0].data[index];
-                        const dsNovo = preparedChartData.previstoDataSets[1].data[index];
-                        previstoAcum = dsNovo !== null ? dsNovo : dsInitial;
-                    } else {
-                        previstoAcum = preparedChartData.previsto[index];
-                    }
-                    const executadoAcum = preparedChartData.executado[index];
-
-                    const previstoMes = (previstoAcum !== null && !isNaN(previstoAcum) && prevPrevistoAcum !== null) ? previstoAcum - prevPrevistoAcum : (previstoAcum !== null && !isNaN(previstoAcum) ? previstoAcum : null);
-                    const executadoMes = (executadoAcum !== null && !isNaN(executadoAcum) && prevExecutadoAcum !== null) ? executadoAcum - prevExecutadoAcum : (executadoAcum !== null && !isNaN(executadoAcum) ? executadoAcum : null);
-
-                    prevPrevistoAcum = previstoAcum;
-                    prevExecutadoAcum = executadoAcum;
-
-                    let diferenca = null;
-                    let status = '';
-                    let diffClass = '';
-                    let statusClass = '';
-                    let diferencaCell = '';
-
-                    if (previstoAcum !== null && executadoAcum !== null) {
-                        diferenca = executadoAcum - previstoAcum;
-                        status = diferenca >= 0 ? 'Adiantado' : 'Atrasado';
-                        diffClass = diferenca < 0 ? 'text-status-diff-red' : 'text-status-diff-green';
-                        statusClass = diferenca >= 0 ? 'text-status-adiantado font-semibold' : 'text-status-atrasado font-semibold';
-                        diferencaCell = `<td class="px-5 py-3 text-sm text-gray-800 text-center ${diffClass} font-semibold">${formatCurrencyAndPercentage(diferenca, totalContractValueForPercentages)}</td>`;
-                    } else {
-                        diferencaCell = `<td class="px-5 py-3 text-sm text-gray-800 text-center"></td>`;
-                    }
-
-                    return `
-                        <tr class="border-b border-slate-200/50 hover:bg-white/50">
-                            <td class="px-5 py-3 text-sm font-medium text-center text-gray-900">${index + 1}</td>
-                            <td class="px-5 py-3 text-sm text-center text-gray-700">${label}</td>
-                            <td class="px-5 py-3 text-sm text-gray-800 text-center">${formatCurrency(previstoMes)}</td>
-                            <td class="px-5 py-3 text-sm text-gray-800 text-center">${formatCurrencyAndPercentage(previstoAcum, totalContractValueForPercentages)}</td>
-                            <td class="px-5 py-3 text-sm text-gray-800 text-center">${executadoMes !== null ? formatCurrency(executadoMes) : ''}</td>
-                            <td class="px-5 py-3 text-sm text-gray-800 text-center">${executadoAcum !== null ? formatCurrencyAndPercentage(executadoAcum, totalContractValueForPercentages) : ''}</td>
-                            ${diferencaCell}
-                            <td class="px-5 py-3 text-sm text-center ${statusClass}">${status}</td>
-                        </tr>
                     `;
-                }).join('');
+                }
 
-                comparativeTableBody.innerHTML = tableRowsHtml;
-                comparativeTableContainer.classList.remove('hidden');
-                predictedScheduleTableContainer.classList.add('hidden');
-                tabTableButton.textContent = "Tabela Comparativa";
-            } else {
-                tableHeadersHtml = `
-                    <tr>
-                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Medição</th>
-                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Período</th>
-                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Ref.</th>
-                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Valor Medição</th>
-                        <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Valor Acumulado</th>
-                    </tr>
+                let projectImageHtml = '';
+                if (data.objeto.includes("UBS")) {
+                    projectImageHtml = `<img src="${imageUrls.logoUBS}" alt="UBS da Gente" class="h-20 md:h-24 object-contain ml-auto" onerror="this.onerror=null;this.src='https://placehold.co/150x80/cccccc/333333?text=UBS+da+Gente';"/>`;
+                } else if (data.objeto.includes("CECE")) {
+                    projectImageHtml = `<img src="${imageUrls.logoAtleta}" alt="Atleta da Gente" class="h-18 md:h-20 object-contain ml-auto" onerror="this.onerror=null;this.src='https://placehold.co/150x80/cccccc/333333?text=Atleta+da+Gente';"/>`;
+                } else if (data.objeto.includes("EMEB")) {
+                    projectImageHtml = `<img src="${imageUrls.logoEscola}" alt="Escola da Gente" class="h-20 md:h-24 object-contain ml-auto" onerror="this.onerror=null;this.src='https://placehold.co/150x80/cccccc/333333?text=Escola+da+Gente';"/>`;
+                }
+
+                contractDetails.innerHTML = `
+                    <div class="flex items-center justify-center flex-wrap text-center space-y-1 w-full">
+                        <div class="flex-grow">
+                            <p class="text-lg md:text-xl font-bold text-gray-900">
+                                Contrato ${formattedContractId}: ${data.objeto}
+                            </p>
+                            <p class="text-sm md:text-base text-gray-700">
+                                <span class="font-semibold">Empresa:</span> ${data.empresa} | <span class="font-semibold">Valor Atual:</span> <span class="font-bold" style="color: #072380;">${formatCurrency(data.valorAtual)}</span>
+                            </p>
+                            ${predictedDatesHtml}
+                        </div>
+                        ${projectImageHtml}
+                    </div>
+                    ${data.observacoes ? `<div class="mt-3 text-center w-full"><p class="text-sm text-[#333333] bg-[rgba(255,204,0,0.3)] p-2 rounded-lg inline-block"><span class="font-bold">Observação:</span> ${data.observacoes}</p></div>` : ''}
                 `;
 
+                renderTables(data, hasExecutedChartData);
+                handleTabVisibility(hasExecutedChartData);
+                renderChart(data, hasExecutedChartData);
+            }
+
+            function renderTables(data, hasExecutedChartData) {
+                let tableHeadersHtml;
+                let tableRowsHtml;
                 const totalContractValueForPercentages = data.valorAtual;
 
-                tableRowsHtml = data.medicoes.map((m) => {
-                    let periodDisplay = `${m.inicio} a ${m.fim}`;
-                    let refDisplay = m.ref || "-";
-                    if (contractsWithoutRealMeasurements.includes(data.observacoes)) {
-                        periodDisplay = `${m.medicao}º Mês`;
-                        refDisplay = "-";
-                    }
-                    return `
-                        <tr class="border-b border-slate-200/50 hover:bg-white/50">
-                            <td class="px-5 py-3 text-sm font-medium text-center text-gray-900">${m.medicao}</td>
-                            <td class="px-5 py-3 text-sm text-center text-gray-700">${periodDisplay}</td>
-                            <td class="px-5 py-3 text-sm text-center text-gray-700">${refDisplay}</td>
-                            <td class="px-5 py-3 text-sm text-gray-800 text-center">${formatCurrency(m.valor)}</td>
-                            <td class="px-5 py-3 text-sm text-gray-800 font-semibold text-center">${formatCurrencyAndPercentage(m.acumulado, totalContractValueForPercentages)}</td>
+                if (hasExecutedChartData) {
+                    tableHeadersHtml = `
+                        <tr>
+                            <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Medição</th>
+                            <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Mês</th>
+                            <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Previst. Mês</th>
+                            <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Previst. Acum.</th>
+                            <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Executado Mês</th>
+                            <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Executado Acum.</th>
+                            <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Diferença</th>
+                            <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
                         </tr>
                     `;
-                }).join('');
+                    let prevPrevistoAcum = 0;
+                    let prevExecutadoAcum = 0;
 
-                predictedScheduleTableBody.innerHTML = tableRowsHtml;
-                comparativeTableContainer.classList.add('hidden');
-                predictedScheduleTableContainer.classList.remove('hidden');
-                tabTableButton.textContent = "Cronograma Previsto";
+                    const preparedChartData = prepareChartData(data);
+
+                    tableRowsHtml = preparedChartData.labels.map((label, index) => {
+                        let previstoAcum;
+                        if (preparedChartData.previstoDataSets) {
+                            const dsInitial = preparedChartData.previstoDataSets[0].data[index];
+                            const dsNovo = preparedChartData.previstoDataSets[1].data[index];
+                            previstoAcum = dsNovo !== null ? dsNovo : dsInitial;
+                        } else {
+                            previstoAcum = preparedChartData.previsto[index];
+                        }
+                        const executadoAcum = preparedChartData.executado[index];
+
+                        const previstoMes = (previstoAcum !== null && !isNaN(previstoAcum) && prevPrevistoAcum !== null) ? previstoAcum - prevPrevistoAcum : (previstoAcum !== null && !isNaN(previstoAcum) ? previstoAcum : null);
+                        const executadoMes = (executadoAcum !== null && !isNaN(executadoAcum) && prevExecutadoAcum !== null) ? executadoAcum - prevExecutadoAcum : (executadoAcum !== null && !isNaN(executadoAcum) ? executadoAcum : null);
+
+                        prevPrevistoAcum = previstoAcum;
+                        prevExecutadoAcum = executadoAcum;
+
+                        let diferenca = null;
+                        let status = '';
+                        let diffClass = '';
+                        let statusClass = '';
+                        let diferencaCell = '';
+
+                        if (previstoAcum !== null && executadoAcum !== null) {
+                            diferenca = executadoAcum - previstoAcum;
+                            status = diferenca >= 0 ? 'Adiantado' : 'Atrasado';
+                            diffClass = diferenca < 0 ? 'text-status-diff-red' : 'text-status-diff-blue'; // Corrected class
+                            statusClass = diferenca >= 0 ? 'text-status-adiantado font-semibold' : 'text-status-atrasado font-semibold';
+                            diferencaCell = `<td class="px-5 py-3 text-sm text-gray-800 text-center ${diffClass} font-semibold">${formatCurrencyAndPercentage(diferenca, totalContractValueForPercentages)}</td>`;
+                        } else {
+                            diferencaCell = `<td class="px-5 py-3 text-sm text-gray-800 text-center"></td>`;
+                        }
+
+                        return `
+                            <tr class="border-b border-slate-200/50 hover:bg-white/50">
+                                <td class="px-5 py-3 text-sm font-medium text-center text-gray-900">${index + 1}</td>
+                                <td class="px-5 py-3 text-sm text-center text-gray-700">${label}</td>
+                                <td class="px-5 py-3 text-sm text-gray-800 text-center">${formatCurrency(previstoMes)}</td>
+                                <td class="px-5 py-3 text-sm text-gray-800 text-center">${formatCurrencyAndPercentage(previstoAcum, totalContractValueForPercentages)}</td>
+                                <td class="px-5 py-3 text-sm text-gray-800 text-center">${executadoMes !== null ? formatCurrency(executadoMes) : ''}</td>
+                                <td class="px-5 py-3 text-sm text-gray-800 text-center">${executadoAcum !== null ? formatCurrencyAndPercentage(executadoAcum, totalContractValueForPercentages) : ''}</td>
+                                ${diferencaCell}
+                                <td class="px-5 py-3 text-sm text-center ${statusClass}">${status}</td>
+                            </tr>
+                        `;
+                    }).join('');
+
+                    comparativeTableBody.innerHTML = tableRowsHtml;
+                    comparativeTableContainer.classList.remove('hidden');
+                    predictedScheduleTableContainer.classList.add('hidden');
+                    tabTableButton.textContent = "Tabela Comparativa";
+                } else {
+                    tableHeadersHtml = `
+                        <tr>
+                            <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Medição</th>
+                            <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Período</th>
+                            <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Ref.</th>
+                            <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Valor Medição</th>
+                            <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Valor Acumulado</th>
+                        </tr>
+                    `;
+
+                    const totalContractValueForPercentages = data.valorAtual;
+
+                    tableRowsHtml = data.medicoes.map((m) => {
+                        let periodDisplay = `${m.inicio} a ${m.fim}`;
+                        let refDisplay = m.ref || "-";
+                        if (contractsWithoutRealMeasurements.includes(data.observacoes)) {
+                            periodDisplay = `${m.medicao}º Mês`;
+                            refDisplay = "-";
+                        }
+                        return `
+                            <tr class="border-b border-slate-200/50 hover:bg-white/50">
+                                <td class="px-5 py-3 text-sm font-medium text-center text-gray-900">${m.medicao}</td>
+                                <td class="px-5 py-3 text-sm text-center text-gray-700">${periodDisplay}</td>
+                                <td class="px-5 py-3 text-sm text-center text-gray-700">${refDisplay}</td>
+                                <td class="px-5 py-3 text-sm text-gray-800 text-center">${formatCurrency(m.valor)}</td>
+                                <td class="px-5 py-3 text-sm text-gray-800 font-semibold text-center">${formatCurrencyAndPercentage(m.acumulado, totalContractValueForPercentages)}</td>
+                            </tr>
+                        `;
+                    }).join('');
+
+                    predictedScheduleTableBody.innerHTML = tableRowsHtml;
+                    comparativeTableContainer.classList.add('hidden');
+                    predictedScheduleTableContainer.classList.remove('hidden');
+                    tabTableButton.textContent = "Cronograma Previsto";
+                }
             }
-        }
 
-        function renderChart(data, hasExecutedChartData) {
-            if (mainChart) mainChart.destroy();
+            function renderChart(data, hasExecutedChartData) {
+                if (mainChart) mainChart.destroy();
 
-            const preparedChartData = prepareChartData(data);
-            const labels = preparedChartData.labels;
-            const datasets = [];
+                const preparedChartData = prepareChartData(data);
+                const labels = preparedChartData.labels;
+                const datasets = [];
 
-            if (preparedChartData.previstoDataSets) {
-                datasets.push(
-                    {
-                        label: preparedChartData.previstoDataSets[0].label,
-                        data: preparedChartData.previstoDataSets[0].data,
-                        borderColor: '#007BFF',
-                        borderWidth: 1,
-                        borderDash: [5, 5],
-                        fill: false,
-                        tension: 0.4,
-                        pointBackgroundColor: 'transparent',
-                        pointBorderColor: '#007BFF',
-                        pointBorderWidth: 2,
-                        pointRadius: 3,
-                        pointHoverRadius: 4,
-                        datalabels: {
-                            align: (ctx) => ctx.dataIndex === 0 ? 'right' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'end'),
-                            anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'end'),
-                            offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
-                            color: '#007BFF',
-                            font: { weight: 'bold', size: 13, family: 'Poppins' },
-                            formatter: (value) => formatChartLabelValue(value),
-                            textShadowColor: 'rgba(0, 0, 0, 0.0)',
-                            textShadowBlur: 0,
-                            textShadowOffsetX: 0,
-                            textShadowOffsetY: 0
+                if (preparedChartData.previstoDataSets) {
+                    datasets.push(
+                        {
+                            label: preparedChartData.previstoDataSets[0].label,
+                            data: preparedChartData.previstoDataSets[0].data,
+                            borderColor: '#007BFF',
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.4,
+                            pointBackgroundColor: 'transparent',
+                            pointBorderColor: '#007BFF',
+                            pointBorderWidth: 2,
+                            pointRadius: 3,
+                            pointHoverRadius: 4,
+                            datalabels: {
+                                align: (ctx) => ctx.dataIndex === 0 ? 'right' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'end'),
+                                anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'end'),
+                                offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
+                                color: '#007BFF',
+                                font: { weight: 'bold', size: 13, family: 'Poppins' },
+                                formatter: (value) => formatChartLabelValue(value),
+                                textShadowColor: 'rgba(0, 0, 0, 0.0)',
+                                textShadowBlur: 0,
+                                textShadowOffsetX: 0,
+                                textShadowOffsetY: 0
+                            },
+                            order: 2
                         },
-                        order: 2
-                    },
-                    {
-                        label: preparedChartData.previstoDataSets[1].label,
-                        data: preparedChartData.previstoDataSets[1].data,
+                        {
+                            label: preparedChartData.previstoDataSets[1].label,
+                            data: preparedChartData.previstoDataSets[1].data,
+                            borderColor: '#CC5200',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.4,
+                            pointBackgroundColor: 'transparent',
+                            pointBorderColor: '#CC5200',
+                            pointBorderWidth: 2,
+                            pointRadius: 3,
+                            pointHoverRadius: 4,
+                            datalabels: {
+                                align: (ctx) => ctx.dataIndex === 0 ? 'right' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'end'),
+                                anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'end'),
+                                offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
+                                color: '#CC5200',
+                                font: { weight: 'bold', size: 14, family: 'Poppins' },
+                                formatter: (value) => formatChartLabelValue(value),
+                                textShadowColor: 'rgba(0, 0, 0, 0.0)',
+                                textShadowBlur: 0,
+                                textShadowOffsetX: 0,
+                                textShadowOffsetY: 0
+                            },
+                            order: 3
+                        }
+                    );
+                } else {
+                    datasets.push({
+                        label: 'Previsto',
+                        data: preparedChartData.previsto,
                         borderColor: '#CC5200',
                         borderWidth: 2,
                         borderDash: [5, 5],
@@ -699,509 +835,480 @@
                             textShadowOffsetX: 0,
                             textShadowOffsetY: 0
                         },
-                        order: 3
-                    }
-                );
-            } else {
-                datasets.push({
-                    label: 'Previsto',
-                    data: preparedChartData.previsto,
-                    borderColor: '#CC5200',
-                    borderWidth: 2,
-                    borderDash: [5, 5],
-                    fill: false,
-                    tension: 0.4,
-                    pointBackgroundColor: 'transparent',
-                    pointBorderColor: '#CC5200',
-                    pointBorderWidth: 2,
-                    pointRadius: 3,
-                    pointHoverRadius: 4,
-                    datalabels: {
-                        align: (ctx) => ctx.dataIndex === 0 ? 'right' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'end'),
-                        anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'end'),
-                        offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
-                        color: '#CC5200',
-                        font: { weight: 'bold', size: 14, family: 'Poppins' },
-                        formatter: (value) => formatChartLabelValue(value),
-                        textShadowColor: 'rgba(0, 0, 0, 0.0)',
-                        textShadowBlur: 0,
-                        textShadowOffsetX: 0,
-                        textShadowOffsetY: 0
-                    },
-                    order: 2
-                });
-            }
+                        order: 2
+                    });
+                }
 
-            if (hasExecutedChartData) {
-                datasets.push({
-                    label: 'Executado',
-                    data: preparedChartData.executado,
-                    borderColor: '#007B3D',
-                    backgroundColor: 'transparent',
-                    borderWidth: 1.5,
-                    fill: false,
-                    tension: 0.4,
-                    pointBackgroundColor: '#007B3D',
-                    pointBorderColor: '#007B3D',
-                    pointBorderWidth: 2,
-                    pointRadius: 3,
-                    pointHoverRadius: 4,
-                    pointStyle: 'rectRot',
-                    datalabels: {
-                        align: (ctx) => ctx.dataIndex === 0 ? 'right' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'start'),
-                        anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'start'),
-                        offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
-                        color: '#007B3D',
-                        font: { weight: 'bold', size: 14, family: 'Poppins' },
-                        formatter: (value) => formatChartLabelValue(value),
-                        textShadowColor: 'rgba(0, 0, 0, 0.0)',
-                        textShadowBlur: 0,
-                        textShadowOffsetX: 0,
-                        textShadowOffsetY: 0
-                    },
-                    order: 4
-                });
-                noChartDataMessage.style.display = 'none';
-                chartCanvasContainer.classList.remove('hidden');
-                tabChartButton.classList.remove('hidden');
-            } else {
-                noChartDataMessage.style.display = 'block';
-                chartCanvasContainer.classList.add('hidden');
-                tabChartButton.classList.add('hidden');
-            }
-
-            if (datasets.length > 0) {
-                mainChart = new Chart(document.getElementById('mainChart'), {
-                    type: 'line',
-                    data: { labels: labels, datasets: datasets },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    color: '#6b7280',
-                                    callback: (value) => formatCurrency(value)
-                                },
-                                grid: {
-                                    color: 'rgba(0,0,0,0.08)',
-                                    drawBorder: false
-                                }
-                            },
-                            x: {
-                                ticks: {
-                                    color: '#6b7280',
-                                    font: { weight: '700', family: 'Poppins' }
-                                },
-                                grid: {
-                                    display: false
-                                }
-                            }
+                if (hasExecutedChartData) {
+                    datasets.push({
+                        label: 'Executado',
+                        data: preparedChartData.executado,
+                        borderColor: '#007B3D',
+                        backgroundColor: 'transparent',
+                        borderWidth: 1.5,
+                        fill: false,
+                        tension: 0.4,
+                        pointBackgroundColor: '#007B3D',
+                        pointBorderColor: '#007B3D',
+                        pointBorderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 4,
+                        pointStyle: 'rectRot',
+                        datalabels: {
+                            align: (ctx) => ctx.dataIndex === 0 ? 'right' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'start'),
+                            anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'start'),
+                            offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
+                            color: '#007B3D',
+                            font: { weight: 'bold', size: 14, family: 'Poppins' },
+                            formatter: (value) => formatChartLabelValue(value),
+                            textShadowColor: 'rgba(0, 0, 0, 0.0)',
+                            textShadowBlur: 0,
+                            textShadowOffsetX: 0,
+                            textShadowOffsetY: 0
                         },
-                        plugins: {
-                            datalabels: { display: true },
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    usePointStyle: true,
-                                    font: { size: 14, weight: '700', family: 'Poppins' },
-                                    color: '#374151',
-                                    padding: 20
+                        order: 4
+                    });
+                    noChartDataMessage.style.display = 'none';
+                    chartCanvasContainer.classList.remove('hidden');
+                    tabChartButton.classList.remove('hidden');
+                } else {
+                    noChartDataMessage.style.display = 'block';
+                    chartCanvasContainer.classList.add('hidden');
+                    tabChartButton.classList.add('hidden');
+                }
+
+                if (datasets.length > 0) {
+                    mainChart = new Chart(document.getElementById('mainChart'), {
+                        type: 'line',
+                        data: { labels: labels, datasets: datasets },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        color: '#6b7280',
+                                        callback: (value) => formatCurrency(value)
+                                    },
+                                    grid: {
+                                        color: 'rgba(0,0,0,0.08)',
+                                        drawBorder: false
+                                    }
+                                },
+                                x: {
+                                    ticks: {
+                                        color: '#6b7280',
+                                        font: { weight: '700', family: 'Poppins' }
+                                    },
+                                    grid: {
+                                        display: false
+                                    }
                                 }
                             },
-                            tooltip: {
-                                enabled: true,
-                                mode: 'index',
-                                intersect: false,
-                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                titleFont: { weight: 'bold', family: 'Poppins' },
-                                bodyFont: { size: 12, weight: 'bold', family: 'Poppins' },
-                                footerFont: { size: 12, weight: 'bold', family: 'Poppins' },
-                                callbacks: {
-                                    label: (context) => {
-                                        const label = context.dataset.label || '';
-                                        const value = context.parsed.y;
-                                        const total = data.valorAtual || 0;
-                                        return `${label}: ${formatCurrency(value)} (${((value / total) * 100).toFixed(2)}%)`;
-                                    },
-                                    footer: (tooltipItems) => {
-                                        const executadoItem = tooltipItems.find(item => item.dataset.label === 'Executado');
-                                        if (executadoItem) {
-                                            const index = executadoItem.dataIndex;
-                                            const datasetExecutado = executadoItem.dataset.data;
-                                            let previstoData = null;
-                                            const previstoDatasets = tooltipItems.filter(item => 
-                                                item.dataset.label === 'Previsto' || item.dataset.label.includes('Cronograma')
-                                            );
-                                            if (previstoDatasets.length > 0) {
-                                                const relevantPrevistoItem = previstoDatasets[previstoDatasets.length - 1];
-                                                previstoData = relevantPrevistoItem.parsed.y;
+                            plugins: {
+                                datalabels: { display: true },
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        usePointStyle: true,
+                                        font: { size: 14, weight: '700', family: 'Poppins' },
+                                        color: '#374151',
+                                        padding: 20
+                                    }
+                                },
+                                tooltip: {
+                                    enabled: true,
+                                    mode: 'index',
+                                    intersect: false,
+                                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                    titleFont: { weight: 'bold', family: 'Poppins' },
+                                    bodyFont: { size: 12, weight: 'bold', family: 'Poppins' },
+                                    footerFont: { size: 12, weight: 'bold', family: 'Poppins' },
+                                    callbacks: {
+                                        label: (context) => {
+                                            const label = context.dataset.label || '';
+                                            const value = context.parsed.y;
+                                            const total = data.valorAtual || 0;
+                                            return `${label}: ${formatCurrency(value)} (${((value / total) * 100).toFixed(2)}%)`;
+                                        },
+                                        footer: (tooltipItems) => {
+                                            const executadoItem = tooltipItems.find(item => item.dataset.label === 'Executado');
+                                            if (executadoItem) {
+                                                const index = executadoItem.dataIndex;
+                                                const datasetExecutado = executadoItem.dataset.data;
+                                                let previstoData = null;
+                                                const previstoDatasets = tooltipItems.filter(item => 
+                                                    item.dataset.label === 'Previsto' || item.dataset.label.includes('Cronograma')
+                                                );
+                                                if (previstoDatasets.length > 0) {
+                                                    const relevantPrevistoItem = previstoDatasets[previstoDatasets.length - 1];
+                                                    previstoData = relevantPrevistoItem.parsed.y;
+                                                }
+                                                const executadoAcum = datasetExecutado[index];
+                                                if (previstoData !== null && executadoAcum !== null && !isNaN(previstoData) && !isNaN(executadoAcum)) {
+                                                    const diff = executadoAcum - previstoData;
+                                                    const status = diff >= 0 ? 'Adiantado' : 'Atrasado';
+                                                    return `Diferença: ${formatCurrency(diff)} (${status})`;
+                                                }
                                             }
-                                            const executadoAcum = datasetExecutado[index];
-                                            if (previstoData !== null && executadoAcum !== null && !isNaN(previstoData) && !isNaN(executadoAcum)) {
-                                                const diff = executadoAcum - previstoData;
-                                                const status = diff >= 0 ? 'Adiantado' : 'Atrasado';
-                                                return `Diferença: ${formatCurrency(diff)} (${status})`;
+                                            return '';
+                                        },
+                                        footerTextColor: function(context) {
+                                            const executadoItem = context.tooltip.dataPoints.find(item => item.dataset.label === 'Executado');
+                                            if (executadoItem) {
+                                                const index = executadoItem.dataIndex;
+                                                const datasetExecutado = executadoItem.dataset.data;
+                                                let previstoData = null;
+                                                const previstoDatasets = context.tooltip.dataPoints.filter(item => 
+                                                    item.dataset.label === 'Previsto' || item.dataset.label.includes('Cronograma')
+                                                );
+                                                if (previstoDatasets.length > 0) {
+                                                    const relevantPrevistoItem = previstoDatasets[previstoDatasets.length - 1];
+                                                    previstoData = relevantPrevistoItem.parsed.y;
+                                                }
+                                                const executadoAcum = datasetExecutado[index];
+                                                if (previstoData !== null && executadoAcum !== null && !isNaN(previstoData) && !isNaN(executadoAcum)) {
+                                                    const diff = executadoAcum - previstoData;
+                                                    return diff >= 0 ? '#0073a1' : '#b80404';
+                                                }
                                             }
+                                            return '#970700';
                                         }
-                                        return '';
-                                    },
-                                    footerTextColor: function(context) {
-                                        const executadoItem = context.tooltip.dataPoints.find(item => item.dataset.label === 'Executado');
-                                        if (executadoItem) {
-                                            const index = executadoItem.dataIndex;
-                                            const datasetExecutado = executadoItem.dataset.data;
-                                            let previstoData = null;
-                                            const previstoDatasets = context.tooltip.dataPoints.filter(item => 
-                                                item.dataset.label === 'Previsto' || item.dataset.label.includes('Cronograma')
-                                            );
-                                            if (previstoDatasets.length > 0) {
-                                                const relevantPrevistoItem = previstoDatasets[previstoDatasets.length - 1];
-                                                previstoData = relevantPrevistoItem.parsed.y;
-                                            }
-                                            const executadoAcum = datasetExecutado[index];
-                                            if (previstoData !== null && executadoAcum !== null && !isNaN(previstoData) && !isNaN(executadoAcum)) {
-                                                const diff = executadoAcum - previstoData;
-                                                return diff >= 0 ? '#0073a1' : '#b80404';
-                                            }
-                                        }
-                                        return '#970700';
                                     }
                                 }
                             }
                         }
-                    }
+                    });
+                } else {
+                    noChartDataMessage.style.display = 'block';
+                    chartCanvasContainer.classList.add('hidden');
+                    tabChartButton.classList.add('hidden');
+                }
+            }
+
+            function handleTabVisibility(hasExecutedChartData) {
+                if (hasExecutedChartData) {
+                    tabChartButton.classList.remove('hidden');
+                    switchToTab('chart');
+                } else {
+                    tabChartButton.classList.add('hidden');
+                    switchToTab('table');
+                }
+            }
+
+            function showMapView() {
+                mapView.classList.remove('hidden');
+                dashboardView.classList.add('hidden');
+                if (map) {
+                    map.invalidateSize();
+                }
+            }
+
+            function showDashboardView(projectId) {
+                mapView.classList.add('hidden');
+                dashboardView.classList.remove('hidden');
+                updateView(projectId);
+            }
+
+            function switchToTab(tabName) {
+                contentChart.classList.add('hidden');
+                contentTable.classList.add('hidden');
+                tabChartButton.classList.remove('active');
+                tabTableButton.classList.remove('active');
+
+                if (tabName === 'chart') {
+                    contentChart.classList.remove('hidden');
+                    tabChartButton.classList.add('active');
+                } else if (tabName === 'table') {
+                    contentTable.classList.remove('hidden');
+                    tabTableButton.classList.add('active');
+                }
+            }
+
+            function exportChartAsPNG() {
+                if (mainChart) {
+                    const originalCanvas = document.getElementById('mainChart');
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = originalCanvas.width;
+                    tempCanvas.height = originalCanvas.height;
+                    const tempCtx = tempCanvas.getContext('2d');
+
+                    tempCtx.fillStyle = '#FFFFFF'; // Set background to white for PNG export
+                    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+                    tempCtx.drawImage(originalCanvas, 0, 0);
+
+                    const imgUrl = tempCanvas.toDataURL('image/png');
+
+                    const link = document.createElement('a');
+                    link.href = imgUrl;
+                    const contractId = contractSelector.value.replace(/\s|\//g, '_');
+                    link.download = `grafico_contrato_${contractId}.png`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    console.warn("Nenhum gráfico disponível para exportar.");
+                }
+            }
+
+            function exportTableAsCSV() {
+                const currentContractId = contractSelector.value;
+                const data = projectData.find(p => p.id === currentContractId);
+                if (!data) {
+                    console.warn("Nenhum dado de contrato para exportar.");
+                    return;
+                }
+
+                let csvContent = "";
+                let headers = [];
+                let rows = [];
+                const delimiter = ';';
+
+                const formatNumberForCSV = (value) => {
+                    if (value === null || isNaN(value)) return '';
+                    return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+                };
+
+                const formatPercentageForCSV = (value, total) => {
+                    if (value === null || isNaN(value) || total === 0) return '';
+                    return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((value / total) * 100);
+                };
+
+                const summaryHeader = [
+                    `Relatório de Contrato: ${data.id} - ${data.objeto}`,
+                    `Empresa: ${data.empresa}`,
+                    `Valor Total do Contrato: ${formatCurrency(data.valorAtual)}`
+                ].join('\n') + '\n\n';
+                csvContent += summaryHeader;
+
+
+                const hasExecutedChartData = data.grafico && data.grafico.executado && data.grafico.executado.some(val => val !== null);
+
+                if (hasExecutedChartData) {
+                    headers = [
+                        "Medicao", "Mes",
+                        "Previsto Mes (Valor)", "Previsto Mes (%)",
+                        "Previsto Acum. (Valor)", "Previsto Acum. (%)",
+                        "Executado Mes (Valor)", "Executado Mes (%)",
+                        "Executado Acum. (Valor)", "Executado Acum. (%)",
+                        "Diferenca (Valor)", "Diferenca (%)",
+                        "Status"
+                    ];
+                    csvContent += headers.join(delimiter) + "\n";
+
+                    let prevPrevistoAcum = 0;
+                    let prevExecutadoAcum = 0;
+                    const totalContractValueForPercentages = data.valorAtual;
+
+                    const preparedChartData = prepareChartData(data);
+
+                    preparedChartData.labels.forEach((label, index) => {
+                        let previstoAcum;
+                        if (preparedChartData.previstoDataSets) {
+                            const dsInitial = preparedChartData.previstoDataSets[0].data[index];
+                            const dsNovo = preparedChartData.previstoDataSets[1].data[index];
+                            previstoAcum = dsNovo !== null ? dsNovo : dsInitial;
+                        } else {
+                            previstoAcum = preparedChartData.previsto[index];
+                        }
+                        const executadoAcum = preparedChartData.executado[index];
+
+                        const previstoMes = (previstoAcum !== null && !isNaN(previstoAcum) && prevPrevistoAcum !== null) ? previstoAcum - prevPrevistoAcum : (previstoAcum !== null && !isNaN(previstoAcum) ? previstoAcum : null);
+                        const executadoMes = (executadoAcum !== null && !isNaN(executadoAcum) && prevExecutadoAcum !== null) ? executadoAcum - prevExecutadoAcum : (executadoAcum !== null && !isNaN(executadoAcum) ? executadoAcum : null);
+
+                        const diferenca = (previstoAcum !== null && executadoAcum !== null) ? executadoAcum - previstoAcum : null;
+                        const status = (diferenca !== null) ? (diferenca >= 0 ? 'Adiantado' : 'Atrasado') : '';
+
+                        prevPrevistoAcum = previstoAcum;
+                        prevExecutadoAcum = executadoAcum;
+
+                        rows.push([
+                            index + 1,
+                            label,
+                            formatNumberForCSV(previstoMes),
+                            formatPercentageForCSV(previstoMes, totalContractValueForPercentages),
+                            formatNumberForCSV(previstoAcum),
+                            formatPercentageForCSV(previstoAcum, totalContractValueForPercentages),
+                            formatNumberForCSV(executadoMes),
+                            formatPercentageForCSV(executadoMes, totalContractValueForPercentages),
+                            formatNumberForCSV(executadoAcum),
+                            formatPercentageForCSV(executadoAcum, totalContractValueForPercentages),
+                            executadoAcum !== null ? formatNumberForCSV(diferenca) : '',
+                            executadoAcum !== null ? formatPercentageForCSV(diferenca, totalContractValueForPercentages) : '',
+                            status
+                        ]);
+                    });
+                } else {
+                    headers = [
+                        "Medicao", "Periodo", "Ref.",
+                        "Valor Medicao (Valor)", "Valor Medicao (%)",
+                        "Valor Acumulado (Valor)", "Valor Acumulado (%)"
+                    ];
+                    csvContent += headers.join(delimiter) + "\n";
+
+                    const totalContractValueForPercentages = data.valorAtual;
+
+                    data.medicoes.forEach((m) => {
+                        let periodDisplay = `${m.inicio} a ${m.fim}`;
+                        let refDisplay = m.ref || "-";
+                        if (contractsWithoutRealMeasurements.includes(data.observacoes)) {
+                            periodDisplay = `${m.medicao}º Mês`;
+                            refDisplay = "-";
+                        }
+                        rows.push([
+                            m.medicao,
+                            periodDisplay,
+                            refDisplay,
+                            formatNumberForCSV(m.valor),
+                            formatPercentageForCSV(m.valor, totalContractValueForPercentages),
+                            formatNumberForCSV(m.acumulado),
+                            formatPercentageForCSV(m.acumulado, totalContractValueForPercentages)
+                        ]);
+                    });
+                }
+
+                rows.forEach(row => {
+                    csvContent += row.map(cell => {
+                        if (typeof cell === 'string' && (cell.includes(delimiter) || cell.includes('\n') || cell.includes('"'))) {
+                            return `"${cell.replace(/"/g, '""')}"`;
+                        }
+                        return cell;
+                    }).join(delimiter) + "\n";
                 });
-            } else {
-                noChartDataMessage.style.display = 'block';
-                chartCanvasContainer.classList.add('hidden');
-                tabChartButton.classList.add('hidden');
-            }
-        }
 
-        function handleTabVisibility(hasExecutedChartData) {
-            if (hasExecutedChartData) {
-                tabChartButton.classList.remove('hidden');
-                switchToTab('chart');
-            } else {
-                tabChartButton.classList.add('hidden');
-                switchToTab('table');
-            }
-        }
-
-        function showMapView() {
-            mapView.classList.remove('hidden');
-            dashboardView.classList.add('hidden');
-            if (map) {
-                map.invalidateSize();
-            }
-        }
-
-        function showDashboardView(projectId) {
-            mapView.classList.add('hidden');
-            dashboardView.classList.remove('hidden');
-            updateView(projectId);
-        }
-
-        function switchToTab(tabName) {
-            contentChart.classList.add('hidden');
-            contentTable.classList.add('hidden');
-            tabChartButton.classList.remove('active');
-            tabTableButton.classList.remove('active');
-
-            if (tabName === 'chart') {
-                contentChart.classList.remove('hidden');
-                tabChartButton.classList.add('active');
-            } else if (tabName === 'table') {
-                contentTable.classList.remove('hidden');
-                tabTableButton.classList.add('active');
-            }
-        }
-
-        function exportChartAsPNG() {
-            if (mainChart) {
-                const originalCanvas = document.getElementById('mainChart');
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = originalCanvas.width;
-                tempCanvas.height = originalCanvas.height;
-                const tempCtx = tempCanvas.getContext('2d');
-
-                tempCtx.fillStyle = '#007B3DFFF';
-                tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-
-                tempCtx.drawImage(originalCanvas, 0, 0);
-
-                const imgUrl = tempCanvas.toDataURL('image/png');
-
-                const link = document.createElement('a');
-                link.href = imgUrl;
-                const contractId = contractSelector.value.replace(/\s|\//g, '_');
-                link.download = `grafico_contrato_${contractId}.png`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } else {
-                console.warn("Nenhum gráfico disponível para exportar.");
-            }
-        }
-
-        function exportTableAsCSV() {
-            const currentContractId = contractSelector.value;
-            const data = projectData.find(p => p.id === currentContractId);
-            if (!data) {
-                console.warn("Nenhum dado de contrato para exportar.");
-                return;
+                const bom = "\uFEFF";
+                const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a");
+                if (link.download !== undefined) {
+                    const url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    const contractId = currentContractId.replace(/\s|\//g, '_');
+                    link.setAttribute("download", `tabela_contrato_${contractId}.csv`);
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
             }
 
-            let csvContent = "";
-            let headers = [];
-            let rows = [];
-            const delimiter = ';';
+            async function exportAsPDF() {
+                const currentContractId = contractSelector.value;
+                const data = projectData.find(p => p.id === currentContractId);
 
-            const formatNumberForCSV = (value) => {
-                if (value === null || isNaN(value)) return '';
-                return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
-            };
+                if (!data) {
+                    console.warn("Nenhum dado de contrato disponível para exportar para PDF.");
+                    return;
+                }
 
-            const formatPercentageForCSV = (value, total) => {
-                if (value === null || isNaN(value) || total === 0) return '';
-                return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format((value / total) * 100);
-            };
+                const tempContainer = document.createElement('div');
+                tempContainer.style.position = 'absolute';
+                tempContainer.style.left = '-9999px';
+                tempContainer.style.width = 'auto';
+                tempContainer.style.minWidth = '800px';
+                tempContainer.style.backgroundColor = '#FFFFFF'; // Set background for PDF export
+                document.body.appendChild(tempContainer);
 
-            const summaryHeader = [
-                `Relatório de Contrato: ${data.id} - ${data.objeto}`,
-                `Empresa: ${data.empresa}`,
-                `Valor Total do Contrato: ${formatCurrency(data.valorAtual)}`
-            ].join('\n') + '\n\n';
-            csvContent += summaryHeader;
+                document.body.classList.add('pdf-export-active');
 
+                const clonedHeader = mainHeader.cloneNode(true);
+                const clonedDashboard = dashboardView.cloneNode(true);
 
-            const hasExecutedChartData = data.grafico && data.grafico.executado && data.grafico.executado.some(val => val !== null);
+                clonedDashboard.querySelector('#backToMapButton')?.remove();
+                clonedDashboard.querySelector('#contractSelector')?.closest('.flex-grow')?.remove();
+                clonedDashboard.querySelector('#tab-chart')?.closest('.inline-flex')?.remove();
+                clonedDashboard.querySelector('#exportChartPngButton')?.remove();
+                clonedDashboard.querySelector('#exportTableCsvButton')?.remove();
+                clonedDashboard.querySelector('#exportPdfButton')?.remove();
 
-            if (hasExecutedChartData) {
-                headers = [
-                    "Medicao", "Mes",
-                    "Previsto Mes (Valor)", "Previsto Mes (%)",
-                    "Previsto Acum. (Valor)", "Previsto Acum. (%)",
-                    "Executado Mes (Valor)", "Executado Mes (%)",
-                    "Executado Acum. (Valor)", "Executado Acum. (%)",
-                    "Diferenca (Valor)", "Diferenca (%)",
-                    "Status"
-                ];
-                csvContent += headers.join(delimiter) + "\n";
-
-                let prevPrevistoAcum = 0;
-                let prevExecutadoAcum = 0;
-                const totalContractValueForPercentages = data.valorAtual;
-
-                const preparedChartData = prepareChartData(data);
-
-                preparedChartData.labels.forEach((label, index) => {
-                    let previstoAcum;
-                    if (preparedChartData.previstoDataSets) {
-                        const dsInitial = preparedChartData.previstoDataSets[0].data[index];
-                        const dsNovo = preparedChartData.previstoDataSets[1].data[index];
-                        previstoAcum = dsNovo !== null ? dsNovo : dsInitial;
-                    } else {
-                        previstoAcum = preparedChartData.previsto[index];
-                    }
-                    const executadoAcum = preparedChartData.executado[index];
-
-                    const previstoMes = (previstoAcum !== null && !isNaN(previstoAcum) && prevPrevistoAcum !== null) ? previstoAcum - prevPrevistoAcum : (previstoAcum !== null && !isNaN(previstoAcum) ? previstoAcum : null);
-                    const executadoMes = (executadoAcum !== null && !isNaN(executadoAcum) && prevExecutadoAcum !== null) ? executadoAcum - prevExecutadoAcum : (executadoAcum !== null && !isNaN(executadoAcum) ? executadoAcum : null);
-
-                    const diferenca = (previstoAcum !== null && executadoAcum !== null) ? executadoAcum - previstoAcum : null;
-                    const status = (diferenca !== null) ? (diferenca >= 0 ? 'Adiantado' : 'Atrasado') : '';
-
-                    prevPrevistoAcum = previstoAcum;
-                    prevExecutadoAcum = executadoAcum;
-
-                    rows.push([
-                        index + 1,
-                        label,
-                        formatNumberForCSV(previstoMes),
-                        formatPercentageForCSV(previstoMes, totalContractValueForPercentages),
-                        formatNumberForCSV(previstoAcum),
-                        formatPercentageForCSV(previstoAcum, totalContractValueForPercentages),
-                        formatNumberForCSV(executadoMes),
-                        formatPercentageForCSV(executadoMes, totalContractValueForPercentages),
-                        formatNumberForCSV(executadoAcum),
-                        formatPercentageForCSV(executadoAcum, totalContractValueForPercentages),
-                        executadoAcum !== null ? formatNumberForCSV(diferenca) : '',
-                        executadoAcum !== null ? formatPercentageForCSV(diferenca, totalContractValueForPercentages) : '',
-                        status
-                    ]);
+                clonedDashboard.querySelectorAll('.content-view.hidden').forEach(el => {
+                    el.classList.remove('hidden');
+                    el.style.display = 'block';
                 });
-            } else {
-                headers = [
-                    "Medicao", "Periodo", "Ref.",
-                    "Valor Medicao (Valor)", "Valor Medicao (%)",
-                    "Valor Acumulado (Valor)", "Valor Acumulado (%)"
-                ];
-                csvContent += headers.join(delimiter) + "\n";
 
-                const totalContractValueForPercentages = data.valorAtual;
+                const originalChartCanvas = document.getElementById('mainChart');
+                const clonedChartCanvas = clonedDashboard.querySelector('#mainChart');
 
-                data.medicoes.forEach((m) => {
-                    let periodDisplay = `${m.inicio} a ${m.fim}`;
-                    let refDisplay = m.ref || "-";
-                    if (contractsWithoutRealMeasurements.includes(data.observacoes)) {
-                        periodDisplay = `${m.medicao}º Mês`;
-                        refDisplay = "-";
-                    }
-                    rows.push([
-                        m.medicao,
-                        periodDisplay,
-                        refDisplay,
-                        formatNumberForCSV(m.valor),
-                        formatPercentageForCSV(m.valor, totalContractValueForPercentages),
-                        formatNumberForCSV(m.acumulado),
-                        formatPercentageForCSV(m.acumulado, totalContractValueForPercentages)
-                    ]);
+                if (originalChartCanvas && clonedChartCanvas) {
+                    const chartImg = new Image();
+                    chartImg.src = originalChartCanvas.toDataURL();
+                    await new Promise(resolve => {
+                        chartImg.onload = () => {
+                            const ctx = clonedChartCanvas.getContext('2d');
+                            ctx.clearRect(0, 0, clonedChartCanvas.width, clonedChartCanvas.height);
+                            clonedChartCanvas.width = originalChartCanvas.width;
+                            clonedChartCanvas.height = originalChartCanvas.height;
+                            ctx.drawImage(chartImg, 0, 0);
+                            resolve();
+                        };
+                        chartImg.onerror = () => {
+                            console.error("Erro ao carregar imagem do gráfico para o PDF.");
+                            resolve();
+                        };
+                    });
+                }
+
+                tempContainer.appendChild(clonedHeader);
+                tempContainer.appendChild(clonedDashboard);
+
+                const comparativeTable = tempContainer.querySelector('#comparativeTableContainer');
+                const predictedScheduleTable = tempContainer.querySelector('#predictedScheduleTableContainer');
+                let originalComparativeWidth = '';
+                let originalPredictedWidth = '';
+
+                if (comparativeTable && !comparativeTable.classList.contains('hidden')) {
+                    originalComparativeWidth = comparativeTable.style.width;
+                    comparativeTable.style.width = `${comparativeTable.scrollWidth}px`;
+                }
+                if (predictedScheduleTable && !predictedScheduleTable.classList.contains('hidden')) {
+                    originalPredictedWidth = predictedScheduleTable.style.width;
+                    predictedScheduleTable.style.width = `${predictedScheduleTable.scrollWidth}px`;
+                }
+
+                const canvas = await html2canvas(tempContainer, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: true,
+                    allowTaint: true,
                 });
-            }
 
-            rows.forEach(row => {
-                csvContent += row.map(cell => {
-                    if (typeof cell === 'string' && (cell.includes(delimiter) || cell.includes('\n') || cell.includes('"'))) {
-                        return `"${cell.replace(/"/g, '""')}"`;
-                    }
-                    return cell;
-                }).join(delimiter) + "\n";
-            });
+                if (comparativeTable && !comparativeTable.classList.contains('hidden')) {
+                    comparativeTable.style.width = originalComparativeWidth;
+                }
+                if (predictedScheduleTable && !predictedScheduleTable.classList.contains('hidden')) {
+                    predictedScheduleTable.style.width = originalPredictedWidth;
+                }
 
-            const bom = "\uFEFF";
-            const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            if (link.download !== undefined) {
-                const url = URL.createObjectURL(blob);
-                link.setAttribute("href", url);
-                const contractId = currentContractId.replace(/\s|\//g, '_');
-                link.setAttribute("download", `tabela_contrato_${contractId}.csv`);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        }
+                document.body.classList.remove('pdf-export-active');
 
-        async function exportAsPDF() {
-            const currentContractId = contractSelector.value;
-            const data = projectData.find(p => p.id === currentContractId);
+                document.body.removeChild(tempContainer);
 
-            if (!data) {
-                console.warn("Nenhum dado de contrato disponível para exportar para PDF.");
-                return;
-            }
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new window.jspdf.jsPDF('p', 'mm', 'a4');
 
-            const tempContainer = document.createElement('div');
-            tempContainer.style.position = 'absolute';
-            tempContainer.style.left = '-9999px';
-            tempContainer.style.width = 'auto';
-            tempContainer.style.minWidth = '800px';
-            tempContainer.style.backgroundColor = '#007B3DFFF';
-            document.body.appendChild(tempContainer);
+                const imgWidth = 210;
+                const pageHeight = 297;
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                let heightLeft = imgHeight;
 
-            document.body.classList.add('pdf-export-active');
+                let position = 0;
 
-            const clonedHeader = mainHeader.cloneNode(true);
-            const clonedDashboard = dashboardView.cloneNode(true);
-
-            clonedDashboard.querySelector('#backToMapButton')?.remove();
-            clonedDashboard.querySelector('#contractSelector')?.closest('.flex-grow')?.remove();
-            clonedDashboard.querySelector('#tab-chart')?.closest('.inline-flex')?.remove();
-            clonedDashboard.querySelector('#exportChartPngButton')?.remove();
-            clonedDashboard.querySelector('#exportTableCsvButton')?.remove();
-            clonedDashboard.querySelector('#exportPdfButton')?.remove();
-
-            clonedDashboard.querySelectorAll('.content-view.hidden').forEach(el => {
-                el.classList.remove('hidden');
-                el.style.display = 'block';
-            });
-
-            const originalChartCanvas = document.getElementById('mainChart');
-            const clonedChartCanvas = clonedDashboard.querySelector('#mainChart');
-
-            if (originalChartCanvas && clonedChartCanvas) {
-                const chartImg = new Image();
-                chartImg.src = originalChartCanvas.toDataURL();
-                await new Promise(resolve => {
-                    chartImg.onload = () => {
-                        const ctx = clonedChartCanvas.getContext('2d');
-                        ctx.clearRect(0, 0, clonedChartCanvas.width, clonedChartCanvas.height);
-                        clonedChartCanvas.width = originalChartCanvas.width;
-                        clonedChartCanvas.height = originalChartCanvas.height;
-                        ctx.drawImage(chartImg, 0, 0);
-                        resolve();
-                    };
-                    chartImg.onerror = () => {
-                        console.error("Erro ao carregar imagem do gráfico para o PDF.");
-                        resolve();
-                    };
-                });
-            }
-
-            tempContainer.appendChild(clonedHeader);
-            tempContainer.appendChild(clonedDashboard);
-
-            const comparativeTable = tempContainer.querySelector('#comparativeTableContainer');
-            const predictedScheduleTable = tempContainer.querySelector('#predictedScheduleTableContainer');
-            let originalComparativeWidth = '';
-            let originalPredictedWidth = '';
-
-            if (comparativeTable && !comparativeTable.classList.contains('hidden')) {
-                originalComparativeWidth = comparativeTable.style.width;
-                comparativeTable.style.width = `${comparativeTable.scrollWidth}px`;
-            }
-            if (predictedScheduleTable && !predictedScheduleTable.classList.contains('hidden')) {
-                originalPredictedWidth = predictedScheduleTable.style.width;
-                predictedScheduleTable.style.width = `${predictedScheduleTable.scrollWidth}px`;
-            }
-
-            const canvas = await html2canvas(tempContainer, {
-                scale: 2,
-                useCORS: true,
-                logging: true,
-                allowTaint: true,
-            });
-
-            if (comparativeTable && !comparativeTable.classList.contains('hidden')) {
-                comparativeTable.style.width = originalComparativeWidth;
-            }
-            if (predictedScheduleTable && !predictedScheduleTable.classList.contains('hidden')) {
-                predictedScheduleTable.style.width = originalPredictedWidth;
-            }
-
-            document.body.classList.remove('pdf-export-active');
-
-            document.body.removeChild(tempContainer);
-
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new window.jspdf.jsPDF('p', 'mm', 'a4');
-
-            const imgWidth = 210;
-            const pageHeight = 297;
-            const imgHeight = canvas.height * imgWidth / canvas.width;
-            let heightLeft = imgHeight;
-
-            let position = 0;
-
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-
-            while (heightLeft >= 0) {
-                position = heightLeft - imgHeight;
-                pdf.addPage();
                 pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
                 heightLeft -= pageHeight;
+
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                const filename = `relatorio_contrato_${currentContractId.replace(/\s|\//g, '_')}.pdf`;
+                pdf.save(filename);
             }
 
-            const filename = `relatorio_contrato_${currentContractId.replace(/\s|\//g, '_')}.pdf`;
-            pdf.save(filename);
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
+            // Initialization of the main content
             map = L.map('map').setView([-23.17, -46.87], 12);
 
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -1295,7 +1402,7 @@
 
             showMapView();
             updateSummaryMetrics();
-        });
+        }
     </script>
 </body>
 </html>
