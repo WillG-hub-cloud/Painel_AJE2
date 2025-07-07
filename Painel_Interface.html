@@ -197,7 +197,7 @@
         <div id="dashboardView" class="glass-card p-4 sm:p-6 hidden">
             <div class="flex justify-between items-center mb-6">
                 <button id="backToMapButton" class="px-4 py-2 rounded-lg shadow transition-colors font-bold" style="background-color: transparent; color: #072380; border: 1px solid #072380; hover:background-color: rgba(7, 35, 128, 0.2);">
-                    &larr; Voltar ao Mapa
+                    ← Voltar ao Mapa
                 </button>
                 <div class="flex-grow ml-4">
                     <label for="contractSelector" class="block text-sm font-semibold text-gray-700 mb-1">Selecione Outro Contrato:</label>
@@ -325,6 +325,7 @@
             const loginButton = document.getElementById('login-button');
             const loginError = document.getElementById('login-error');
 
+            // DIGITE A SENHA AQUI: AVANCA!2025
             const correctPassword = "AVANCA!2025"; // **** ALtere esta senha ****
 
             function showLoginForm() {
@@ -469,23 +470,32 @@
                         return;
                     }
 
-                    let sumOfJuneExecutedMeasurements = 0;
-                    const currentMonthRef = "Jun/25"; // Assuming this is the current month to sum
+                    let sumOfLatestMonthlyExecuted = 0; 
+                    // Considerando o mês atual como Jun/25, somamos as execuções deste mês.
+                    const currentMonthRef = "Jun/25";
 
                     projectData.forEach(p => {
                         const hasExecutedData = p.grafico && p.grafico.executado && p.grafico.executado.some(val => val !== null);
 
                         if (hasExecutedData && p.medicoes) {
-                            const juneMeasurement = p.medicoes.find(m => m.ref === currentMonthRef);
-                            if (juneMeasurement && juneMeasurement.valor !== null && juneMeasurement.valor !== undefined) {
-                                sumOfJuneExecutedMeasurements += juneMeasurement.valor;
+                            let currentMonthAccumulated = null;
+                            let previousMonthAccumulated = 0;
+
+                            // Encontrar o valor acumulado do mês atual (Jun/25)
+                            const currentMonthIndex = p.grafico.labels.indexOf(currentMonthRef);
+                            if (currentMonthIndex !== -1 && p.grafico.executado[currentMonthIndex] !== null) {
+                                currentMonthAccumulated = p.grafico.executado[currentMonthIndex];
+                                // Encontrar o valor acumulado do mês anterior
+                                if (currentMonthIndex > 0 && p.grafico.executado[currentMonthIndex - 1] !== null) {
+                                    previousMonthAccumulated = p.grafico.executado[currentMonthIndex - 1];
+                                }
+                                sumOfLatestMonthlyExecuted += (currentMonthAccumulated - previousMonthAccumulated);
                             }
                         }
                     });
-
                     totalContractsSpan.textContent = projectData.length;
                     totalContractValueSpan.textContent = formatSummaryValue(projectData.reduce((sum, p) => sum + p.valorAtual, 0));
-                    sumOfLatestMonthlyMeasurementsSpan.textContent = formatSummaryValue(sumOfJuneExecutedMeasurements);
+                    sumOfLatestMonthlyMeasurementsSpan.textContent = formatSummaryValue(sumOfLatestMonthlyExecuted);
                 }
 
                 function prepareChartData(contract) {
@@ -494,7 +504,7 @@
                     let chartExecutado = [];
                     let previstoDataSets = null;
 
-                    if (contract.grafico && contract.grafico.executado && contract.grafico.executado.some(val => val !== null)) {
+                    if (contract.grafico && contract.grafico.labels && contract.grafico.labels.length > 0) {
                         chartLabels = [...contract.grafico.labels];
                         chartExecutado = [...contract.grafico.executado];
 
@@ -506,25 +516,8 @@
                         } else {
                             chartPrevisto = [...contract.grafico.previsto];
                         }
-
-                        const lastChartLabel = chartLabels[chartLabels.length - 1];
-                        const lastMedicaoIndex = contract.medicoes.findIndex(m => m.ref === lastChartLabel);
-
-                        if (lastMedicaoIndex !== -1) {
-                            for (let i = lastMedicaoIndex + 1; i < contract.medicoes.length; i++) {
-                                const medicao = contract.medicoes[i];
-                                chartLabels.push(medicao.ref);
-                                chartExecutado.push(null);
-                                if (previstoDataSets) {
-                                    previstoDataSets[0].data.push(null);
-                                    previstoDataSets[1].data.push(medicao.acumulado);
-                                } else {
-                                    chartPrevisto.push(medicao.acumulado);
-                                }
-                            }
-                        }
-
                     } else {
+                        // Fallback: if no grafico data, build from medicoes for 'Previsto' only
                         contract.medicoes.forEach(m => {
                             chartLabels.push(m.ref || `${m.medicao}º Mês`);
                             chartPrevisto.push(m.acumulado);
@@ -554,7 +547,7 @@
                     const formattedContractId = data.id.replace('CT ', '').replace(/\/(\d{2})$/, '/20$1');
 
                     let predictedDatesHtml = '';
-                    if (hasExecutedChartData && data.predicted_start_date && data.predicted_end_date && data.predicted_start_date !== 'N/A' && data.predicted_end_date !== 'N/A') {
+                    if (data.predicted_start_date && data.predicted_end_date && data.predicted_start_date !== 'N/A' && data.predicted_end_date !== 'N/A') {
                         const startDate = parseDate(data.predicted_start_date);
                         const endDate = parseDate(data.predicted_end_date);
                         const durationDays = calculateTotalDays(startDate, endDate);
@@ -621,20 +614,21 @@
 
                         tableRowsHtml = preparedChartData.labels.map((label, index) => {
                             let previstoAcum;
-                            if (preparedChartData.previstoDataSets) {
-                                const dsInitial = preparedChartData.previstoDataSets[0].data[index];
-                                const dsNovo = preparedChartData.previstoDataSets[1].data[index];
-                                previstoAcum = dsNovo !== null ? dsNovo : dsInitial;
+                            // Determinar qual dataset previsto usar
+                            if (preparedChartData.previstoDataSets && preparedChartData.previstoDataSets[2].data[index] !== null) {
+                                previstoAcum = preparedChartData.previstoDataSets[2].data[index]; // Usa o terceiro dataset (Reajuste II) se disponível
+                            } else if (preparedChartData.previstoDataSets && preparedChartData.previstoDataSets[1].data[index] !== null) {
+                                previstoAcum = preparedChartData.previstoDataSets[1].data[index]; // Usa o segundo dataset (Reajuste I) se disponível
+                            } else if (preparedChartData.previstoDataSets && preparedChartData.previstoDataSets[0].data[index] !== null) {
+                                previstoAcum = preparedChartData.previstoDataSets[0].data[index]; // Caso contrário, usa o primeiro (Inicial)
                             } else {
-                                previstoAcum = preparedChartData.previsto[index];
+                                previstoAcum = preparedChartData.previsto[index]; // Fallback para o 'previsto' simples
                             }
+
                             const executadoAcum = preparedChartData.executado[index];
 
                             const previstoMes = (previstoAcum !== null && !isNaN(previstoAcum) && prevPrevistoAcum !== null) ? previstoAcum - prevPrevistoAcum : (previstoAcum !== null && !isNaN(previstoAcum) ? previstoAcum : null);
                             const executadoMes = (executadoAcum !== null && !isNaN(executadoAcum) && prevExecutadoAcum !== null) ? executadoAcum - prevExecutadoAcum : (executadoAcum !== null && !isNaN(executadoAcum) ? executadoAcum : null);
-
-                            prevPrevistoAcum = previstoAcum;
-                            prevExecutadoAcum = executadoAcum;
 
                             let diferenca = null;
                             let status = '';
@@ -651,6 +645,9 @@
                             } else {
                                 diferencaCell = `<td class="px-5 py-3 text-sm text-gray-800 text-center"></td>`;
                             }
+
+                            prevPrevistoAcum = previstoAcum;
+                            prevExecutadoAcum = executadoAcum;
 
                             return `
                                 <tr class="border-b border-slate-200/50 hover:bg-white/50">
@@ -720,12 +717,43 @@
                             {
                                 label: preparedChartData.previstoDataSets[0].label,
                                 data: preparedChartData.previstoDataSets[0].data,
-                                borderColor: '#007BFF',
+                                borderColor: '#9333ea', // Cor roxa para o Cronograma Inicial
                                 borderWidth: 1,
                                 borderDash: [5, 5],
                                 fill: false,
                                 tension: 0.4,
-                                pointBackgroundColor: 'transparent',
+                                pointBackgroundColor: '#9333ea',
+                                pointBorderColor: '#9333ea',
+                                pointBorderWidth: 2,
+                                pointRadius: 3,
+                                pointHoverRadius: 4,
+                                datalabels: {
+                                    align: (ctx) => ctx.dataIndex === 0.3 ? 'center' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'end'),
+                                    anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'end'),
+                                    offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
+                                    color: '#9333ea',
+                                    font: { weight: 'bold', size: 13, family: 'Poppins' },
+                                    formatter: (value) => formatChartLabelValue(value),
+                                    textShadowColor: 'rgba(0, 0, 0, 0.0)',
+                                    textShadowBlur: 0,
+                                    textShadowOffsetX: 0,
+                                    textShadowOffsetY: 0,
+                                    display: (ctx) => {
+                                        // Display label only for existing data points, not for nulls if they are within the initial data set
+                                        return ctx.dataset.data[ctx.dataIndex] !== null;
+                                    }
+                                },
+                                order: 1
+                            },
+                            {
+                                label: preparedChartData.previstoDataSets[1].label,
+                                data: preparedChartData.previstoDataSets[1].data,
+                                borderColor: '#007BFF', // Cor azul para o Cronograma Reajuste I
+                                borderWidth: 1,
+                                borderDash: [5, 5],
+                                fill: false,
+                                tension: 0.4,
+                                pointBackgroundColor: '#007BFF',
                                 pointBorderColor: '#007BFF',
                                 pointBorderWidth: 2,
                                 pointRadius: 3,
@@ -740,34 +768,42 @@
                                     textShadowColor: 'rgba(0, 0, 0, 0.0)',
                                     textShadowBlur: 0,
                                     textShadowOffsetX: 0,
-                                    textShadowOffsetY: 0
+                                    textShadowOffsetY: 0,
+                                    display: (ctx) => {
+                                        // Display label only for existing data points, not for nulls if they are within the initial data set
+                                        return ctx.dataset.data[ctx.dataIndex] !== null;
+                                    }
                                 },
                                 order: 2
                             },
                             {
-                                label: preparedChartData.previstoDataSets[1].label,
-                                data: preparedChartData.previstoDataSets[1].data,
-                                borderColor: '#CC5200',
-                                borderWidth: 2,
+                                label: preparedChartData.previstoDataSets[2].label,
+                                data: preparedChartData.previstoDataSets[2].data,
+                                borderColor: '#CC5200', // Cor laranja para o Cronograma Reajuste II
+                                borderWidth: 1,
                                 borderDash: [5, 5],
                                 fill: false,
                                 tension: 0.4,
-                                pointBackgroundColor: 'transparent',
+                                pointBackgroundColor: '#CC5200',
                                 pointBorderColor: '#CC5200',
                                 pointBorderWidth: 2,
                                 pointRadius: 3,
                                 pointHoverRadius: 4,
                                 datalabels: {
-                                    align: (ctx) => ctx.dataIndex === 0 ? 'right' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'end'),
-                                    anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'end'),
-                                    offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
-                                    color: '#CC5200',
-                                    font: { weight: 'bold', size: 14, family: 'Poppins' },
-                                    formatter: (value) => formatChartLabelValue(value),
-                                    textShadowColor: 'rgba(0, 0, 0, 0.0)',
-                                    textShadowBlur: 0,
-                                    textShadowOffsetX: 0,
-                                    textShadowOffsetY: 0
+                                        align: 'end',    // Todos os rótulos acima do ponto
+                                        anchor: 'center', // Todos os rótulos centralizados horizontalmente
+                                        offset: 8,       // Distância padrão acima do ponto
+                                        color: '#CC5200', // Cor do texto do rótulo
+                                        font: { weight: 'bold', size: 14, family: 'Poppins' },
+                                        formatter: (value) => formatChartLabelValue(value),
+                                        textShadowColor: 'rgba(0, 0, 0, 0.0)', // Sem sombra
+                                        textShadowBlur: 0,
+                                        textShadowOffsetX: 0,
+                                        textShadowOffsetY: 0,
+                                        display: (ctx) => {
+                                        // Display label only for non-null data points from the NEW schedule
+                                        return ctx.dataset.data[ctx.dataIndex] !== null;
+                                    }
                                 },
                                 order: 3
                             }
@@ -818,9 +854,9 @@
                             pointHoverRadius: 4,
                             pointStyle: 'rectRot',
                             datalabels: {
-                                align: (ctx) => ctx.dataIndex === 0 ? 'right' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'start'),
-                                anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'start'),
-                                offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
+                                align: (ctx) => ctx.dataIndex === 0 ? 'start' : (ctx.dataIndex === ctx.dataset.data.length - 0 ? 'left' : 'start'),
+                                anchor: (ctx) => ctx.dataIndex === 0 ? 'center' : (ctx.dataIndex === ctx.dataset.data.length - 0 ? 'start' : 'start'),
+                                offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 5 : 5,
                                 color: '#007B3D',
                                 font: { weight: 'bold', size: 14, family: 'Poppins' },
                                 formatter: (value) => formatChartLabelValue(value),
@@ -905,14 +941,18 @@
                                                         item.dataset.label === 'Previsto' || item.dataset.label.includes('Cronograma')
                                                     );
                                                     if (previstoDatasets.length > 0) {
-                                                        const relevantPrevistoItem = previstoDatasets[previstoDatasets.length - 1];
-                                                        previstoData = relevantPrevistoItem.parsed.y;
+                                                        // Encontrar o último valor previsto não nulo (o cronograma ativo para a data)
+                                                        for (let i = previstoDatasets.length - 1; i >= 0; i--) {
+                                                            if (previstoDatasets[i].parsed.y !== null && !isNaN(previstoDatasets[i].parsed.y)) {
+                                                                previstoData = previstoDatasets[i].parsed.y;
+                                                                break;
+                                                            }
+                                                        }
                                                     }
                                                     const executadoAcum = datasetExecutado[index];
                                                     if (previstoData !== null && executadoAcum !== null && !isNaN(previstoData) && !isNaN(executadoAcum)) {
                                                         const diff = executadoAcum - previstoData;
-                                                        const status = diff >= 0 ? 'Adiantado' : 'Atrasado';
-                                                        return `Diferença: ${formatCurrency(diff)} (${status})`;
+                                                        return `Diferença: ${formatCurrency(diff)}`;
                                                     }
                                                 }
                                                 return '';
@@ -927,8 +967,12 @@
                                                         item.dataset.label === 'Previsto' || item.dataset.label.includes('Cronograma')
                                                     );
                                                     if (previstoDatasets.length > 0) {
-                                                        const relevantPrevistoItem = previstoDatasets[previstoDatasets.length - 1];
-                                                        previstoData = relevantPrevistoItem.parsed.y;
+                                                        for (let i = previstoDatasets.length - 1; i >= 0; i--) {
+                                                            if (previstoDatasets[i].parsed.y !== null && !isNaN(previstoDatasets[i].parsed.y)) {
+                                                                previstoData = previstoDatasets[i].parsed.y;
+                                                                break;
+                                                            }
+                                                        }
                                                     }
                                                     const executadoAcum = datasetExecutado[index];
                                                     if (previstoData !== null && executadoAcum !== null && !isNaN(previstoData) && !isNaN(executadoAcum)) {
@@ -1204,7 +1248,7 @@
                         const chartTempCtx = chartTempCanvas.getContext('2d');
                         chartTempCtx.fillStyle = '#FFFFFF'; // Set white background
                         chartTempCtx.fillRect(0, 0, chartTempCanvas.width, chartTempCanvas.height);
-                        chartTempCtx.drawImage(originalChartCanvas, 0, 0);
+                        chartTempCtx.drawImage(originalCanvas, 0, 0);
 
                         const chartImg = new Image();
                         chartImg.src = chartTempCanvas.toDataURL('image/png');
@@ -1315,7 +1359,7 @@
                 map = L.map('map').setView([-23.17, -46.87], 12);
 
                 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                    attribution: 'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
                 }).addTo(map);
 
                 const bounds = [];
