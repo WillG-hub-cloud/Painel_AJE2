@@ -66,7 +66,7 @@ const projectData = [
         objeto: "UBS Rio Branco",
         empresa: "CJM Construtora Ltda",
         valorAtual: 2157299.02,
-        observacoes: "Contrato foi prorrogado, novo cronograma foi adotado a partir de abril.",
+        observacoes: "Além do novo cronograma, adotado a partir de abril, foi protocolado novo aditivo que extenderá o contrato para término em outubro",
         medicoes: [
             { medicao: 1, inicio: '07/10/24', fim: '05/11/24', ref: 'Nov/24', valor: 147017.36, acumulado: 147017.36 },
             { medicao: 2, inicio: '06/11/24', fim: '05/12/24', ref: 'Dez/24', valor: 193930.07, acumulado: 340947.43 },
