@@ -1,1457 +1,245 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Controle Financeiro de Projetos</title>
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-    <style>
-        /* Global Styles */
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: #1a202c;
-            background-image: linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.7)), url('https://i.imgur.com/oWpnttn.jpeg');
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-            color: #052b63;
-        }
-        table {
-            font-family: 'Poppins', sans-serif;
-        }
-        table th, table td {
-        }
-        .glass-card {
-            background: linear-gradient(135deg, rgba(240, 248, 255, 0.2) 0%, rgba(240, 248, 255, 0.3) 20%);
-            -webkit-backdrop-filter: blur(2px);
-            backdrop-filter: blur(1.5px);
-            border: 1px solid rgba(255, 255, 255, 0.0);
-            border-top-left-radius: 0;
-            border-top-right-radius: 60px;
-            border-bottom-right-radius: 60px;
-            border-bottom-left-radius: 60px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .tab-button.active {
-            background-color: rgba(255, 255, 255, 0.7);
-            color: #072380;
-        }
-        .chart-container {
-            position: relative;
-            height: 400px;
-            max-height: 60vh;
-            width: 100%;
-        }
-        @media (max-width: 768px) {
-            .chart-container { height: 300px; }
-        }
-        .message-box {
-            background: linear-gradient(to bottom right, rgba(240, 248, 255, 0.9), rgba(240, 248, 255, 0.7));
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #333333;
-            padding: 1rem;
-            margin-top: 1rem;
-            border-radius: 0.75rem;
-            text-align: center;
-            font-weight: 500;
-            display: none;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        #map {
-            height: 600px;
-            width: 100%;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .custom-pin-icon {
-            background-color: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
-            font-size: 26px;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
-            transform: translate(-50%, -100%);
-        }
-        .custom-pin-icon.emeb-icon {
-            color: #87CEEB;
-        }
-        .custom-pin-icon.ubs-icon {
-            color: #f24b4b;
-        }
-        .custom-pin-icon.cece-icon {
-            color: #ff9b4f;
-        }
-        .map-label-tooltip {
-            background: transparent !important;
-            color: white !important;
-            font-weight: bold !important;
-            font-size: 0.875rem !important;
-            padding: 0.25rem 0.5rem !important;
-            border-radius: 0.375rem !important;
-            box-shadow: none !important;
-            pointer-events: none !important;
-            border: none !important;
-            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
-            white-space: nowrap;
-        }
-        .leaflet-tooltip.map-label-tooltip.leaflet-tooltip-bottom:before {
-            border-top-color: transparent !important;
-        }
-
-        /* Adjusted Colors */
-        .glass-card .text-gray-700 { color: #333333; }
-        .glass-card .text-gray-900 { color: #000000; }
-        .glass-card .text-blue-800 { color: #072380; }
-        .glass-card .text-blue-700 { color: #072380; }
-        .glass-card .text-slate-600 { color: #333333; }
-        .text-status-adiantado { color: #0073a1; }
-        .text-status-atrasado { color: #b80404; }
-        .text-status-diff-blue { color: #0073a1; }
-        .text-status-diff-red { color: #b80404; }
-        #comparativeTableBody, #measurementsTableBody { background-color: transparent; }
-        #contractSelector { color: #333333; }
-
-        /* PDF Export Style */
-        .pdf-export-active {
-            background-image: none !important;
-            background-color: #007B3DFFF !important;
-            color: #000000 !important;
-        }
-
-        /* Login Screen Styles */
-        #login-container {
-            transition: opacity 0.5s ease-in-out;
-        }
-        #login-container.hidden {
-            opacity: 0;
-            pointer-events: none; /* Allows clicks to pass through when hidden */
-        }
-    </style>
-</head>
-<body class="text-slate-200">
-
-    <div id="login-container" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-90 z-50">
-        <div class="glass-card p-8 rounded-xl shadow-lg w-96 text-center">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Acesso Restrito</h2>
-            <input type="password" id="password-input" class="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800" placeholder="Digite a senha"/>
-            <button id="login-button" class="w-full bg-[#072380] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#052b63] transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">Entrar</button>
-            <p id="login-error" class="text-red-600 mt-3 hidden">Senha incorreta. Tente novamente.</p>
-        </div>
-    </div>
-
-    <div class="container mx-auto p-4 md:p-6 lg:p-8">
-
-        <header class="text-center mb-8 relative" id="mainHeader"> <div class="grid grid-cols-3 items-center gap-4 mb-4">
-                <div class="flex justify-start">
-                    <img src="https://i.imgur.com/67zLDAk.png" id="logoPOE" alt="Logo POE" class="h-18 md:h-20 max-w-full object-contain"/>
-                </div>
-                <div class="flex justify-center">
-                    <img src="https://i.imgur.com/vPi0F5j.png" id="logoJundiai" alt="Logo Jundiaí" class="h-26 md:h-28 max-w-full object-contain"/>
-                </div>
-                <div class="flex justify-end">
-                    <img src="https://i.imgur.com/1JpcXBq.png" id="logoCAF" alt="Logo CAF" class="h-26 md:h-28 max-w-full object-contain"/>    
-                </div>
-            </div>
-
-            <h1 class="text-3xl md:text-4xl font-bold mb-2" style="color: black;">PROGRAMA AVANÇA JUNDIAÍ - ETAPA 2</h1>
-            <div class="glass-card p-1.5 text-center w-fit mx-auto" style="border-top-right-radius: 100px; border-top-left-radius: 0; border-bottom-left-radius: 100px; border-bottom-right-radius: 100px;">
-                <p class="text-[#052b63] mt-2 text-lg font-bold">Análise de performance de contratos de obras.</p>
-            </div>
-            <div class="flex flex-wrap justify-center items-center gap-4 mt-6" id="header-dynamic-images"></div>
-        </header>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
-            <div class="glass-card p-4 text-center">
-                <p class="text-sm text-gray-700">Contratos de obras Andamento</p>
-                <p id="totalContracts" class="text-3xl font-bold" style="color: #072380;">0</p>
-            </div>
-            <div class="glass-card p-4 text-center">
-                <p class="text-sm text-gray-700">Valor Total dos Contratos</p>
-                <p id="totalContractValue" class="text-3xl font-bold" style="color: #072380;">R$ 0,00</p>
-            </div>
-            <div class="glass-card p-4 text-center">
-                <p id="sumOfLatestMonthlyMeasurements" class="text-3xl font-bold" style="color: #072380;">R$ 0</p>
-                <p class="text-sm text-gray-700">Soma das Medições no último mês</p>
-            </div>
-        </div>
-
-        <div id="mapView" class="glass-card p-4 sm:p-6">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Selecione uma Obra no Mapa</h2>
-            <div id="map"></div>
-            <p class="text-gray-700 text-sm mt-4 text-center">Clique em um marcador no mapa para ver os detalhes financeiros do contrato.</p>
-        </div>
-
-        <div id="dashboardView" class="glass-card p-4 sm:p-6 hidden">
-            <div class="flex justify-between items-center mb-6">
-                <button id="backToMapButton" class="px-4 py-2 rounded-lg shadow transition-colors font-bold" style="background-color: transparent; color: #072380; border: 1px solid #072380; hover:background-color: rgba(7, 35, 128, 0.2);">
-                    ← Voltar ao Mapa
-                </button>
-                <div class="flex-grow ml-4">
-                    <label for="contractSelector" class="block text-sm font-semibold text-gray-700 mb-1">Selecione Outro Contrato:</label>
-                    <select id="contractSelector" class="w-full p-3 bg-white/80 border border-slate-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-gray-900">
-                    </select>
-                </div>
-            </div>
-
-            <div class="flex justify-start gap-2 mb-4">
-                <button id="exportChartPngButton" title="Exportar PNG" class="p-1 w-8 h-8 rounded-lg shadow transition-colors flex items-center justify-center font-bold" style="background-color: transparent; hover:background-color: rgba(0, 123, 61, 0.2);">
-                    <i class="fas fa-file-image text-2xl text-gray-800"></i>
-                </button>
-                <button id="exportTableCsvButton" title="Exportar CSV" class="p-1 w-8 h-8 rounded-lg shadow transition-colors flex items-center justify-center font-bold" style="background-color: transparent; hover:background-color: rgba(255, 102, 0, 0.2);">
-                    <i class="fas fa-file-csv text-2xl text-gray-800"></i>
-                </button>
-                <button id="exportPdfButton" title="Exportar PDF" class="p-1 w-8 h-8 rounded-lg shadow transition-colors flex items-center justify-center font-bold" style="background-color: transparent; hover:background-color: rgba(220, 53, 69, 0.2);">
-                    <i class="fas fa-file-pdf text-2xl text-gray-800"></i>
-                </button>
-                <button id="exportRouteButton" title="Gerar Rota no Google Maps" class="p-1 w-8 h-8 rounded-lg shadow transition-colors flex items-center justify-center font-bold" style="background-color: transparent; hover:background-color: rgba(0, 150, 136, 0.2);">
-                    <i class="fas fa-route text-2xl text-gray-800"></i>
-                </button>
-            </div>
-
-            <main>
-                <div id="contractDetails" class="mb-6 border-b border-white/50 pb-6 flex flex-col items-center text-center"></div>
-
-                <div class="mb-4">
-                    <div class="bg-slate-200/50 rounded-xl p-1 inline-flex space-x-1">
-                        <button id="tab-chart" class="tab-button flex items-center gap-2 whitespace-nowrap py-2 px-4 rounded-lg font-bold text-sm text-slate-600 hover:bg-white/60 transition-all">
-                            Gráfico Comparativo
-                        </button>
-                        <button id="tab-table" class="tab-button flex items-center gap-2 whitespace-nowrap py-2 px-4 rounded-lg font-bold text-sm text-slate-600 hover:bg-white/60 transition-all">
-                           Tabela de Medições
-                        </button>
-                    </div>
-                </div>
-
-                <div id="content-chart" class="content-view mb-8"> <p class="text-gray-700 text-sm mb-4 text-center">O gráfico abaixo ilustra a comparação mensal entre os valores acumulados 'Previsto' e 'Executado'. Passe o mouse sobre os pontos para ver detalhes, incluindo a diferença e o percentual do valor total.</p>
-                    <div class="chart-container">
-                        <canvas id="mainChart"></canvas>
-                    </div>
-                    <div id="noChartDataMessage" class="message-box">
-                        <p class="font-semibold text-gray-700">Não há dados de gráfico disponíveis para este contrato.</p>
-                        <p class="text-sm text-gray-600">A visualização foi movida para a tabela de cronograma.</p>
-                    </div>
-                </div>
-
-                <div id="content-table" class="content-view hidden mt-8"> <p class="text-gray-700 text-sm mb-4">Esta seção apresenta a tabela detalhada de todas as medições (o previsões) para o contrato selecionado, exibindo os valores por período e o total acumulado.</p>
-
-                    <div id="comparativeTableContainer" class="overflow-x-auto hidden">
-                        <table class="min-w-full">
-                            <thead>
-                                <tr>
-                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Medição</th>
-                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Mês</th>
-                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Previst. Mês</th>
-                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Previst. Acum.</th>
-                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Executado Mês</th>
-                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Executado Acum.</th>
-                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Diferença</th>
-                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="comparativeTableBody"></tbody>
-                        </table>
-                    </div>
-
-                    <div id="predictedScheduleTableContainer" class="overflow-x-auto hidden">
-                        <table class="min-w-full">
-                            <thead>
-                                <tr>
-                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Medição</th>
-                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Período</th>
-                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Ref.</th>
-                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Valor Medição</th>
-                                    <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Valor Acumulado</th>
-                                </tr>
-                            </thead>
-                            <tbody id="measurementsTableBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </main>
-        </div>
-
-        <footer class="text-center mt-12 text-sm text-[#CCCCCC]">
-            <p>Painel gerado com base nos dados de cada contratação.</p>
-        </footer>
-
-    </div>
-
-    <script src="Dados_Contrato.js"></script>
-
-    <script>
-        // --- Image URLs ---
-        const imageUrls = {
-            logoCAF: "https://i.imgur.com/1JpcXBq.png",
-            logoJundiai: "https://i.imgur.com/QpfUWkv.png",
-            logoPOE: "https://i.imgur.com/67zLDAk.png",
-            logoUBS: "https://i.imgur.com/syy1cBb.png",
-            logoAtleta: "https://i.imgur.com/w2G3qli.png",
-            logoEscola: "https://i.imgur.com/F9Zk9Qt.png"
-        };
-
-        // Project Icons Map
-        const projectIcons = {
-            "EMEB": { type: 'unicode', symbol: '🎓', name: 'Formatura', colorClass: 'emeb-icon', mapLabelColor: '#87CEEB', chartColor: '#87CEEB' }, // Emoji para Educação/Formatura
-            "CECE": { type: 'unicode', symbol: '🏀', name: 'Basquete', colorClass: 'cece-icon', mapLabelColor: '#ff9b4f', chartColor: '#ff9b4f' }, // Emoji para Ginásio/Basquete
-            "UBS": { type: 'unicode', symbol: '🏥', name: 'Hospital', colorClass: 'ubs-icon', mapLabelColor: '#f24b4b', chartColor: '#f24b4b' }, // Emoji para Saúde/Unidade de Saúde
-            "Escola": { type: 'fontawesome', symbol: 'fas fa-school', name: 'Escola' },
-            "Coracao": { type: 'fontawesome', symbol: 'fas fa-heartbeat', name: 'Batimento' },
-            "Hospital": { type: 'fontawesome', symbol: 'fas fa-hospital', name: 'Hospital' },
-            "Estrada": { type: 'fontawesome', symbol: 'fas fa-road', name: 'Estrada' },
-            "Cruz médica": { type: 'unicode', symbol: '✚', name: 'Cruz Médica' },
-            "Árvore": { type: 'fontawesome', symbol: 'fas fa-tree', name: 'Árvore' },
-            "Capacete": { type: 'fontawesome', symbol: 'fas fa-hard-hat', name: 'Capacete' },
-            "Semáforo": { type: 'fontawesome', symbol: 'fas fa-traffic-light', name: 'Semáforo' },
-            "default": { type: 'fontawesome', symbol: 'fas fa-location-dot', name: 'Localização Padrão', colorClass: '' }
-        };
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- Login Logic ---
-            const loginContainer = document.getElementById('login-container');
-            const passwordInput = document.getElementById('password-input');
-            const loginButton = document.getElementById('login-button');
-            const loginError = document.getElementById('login-error');
-
-            // DIGITE A SENHA AQUI: AVANCA!2025
-            const correctPassword = "AVANCA!2025"; // **** ALtere esta senha ****
-
-            function showLoginForm() {
-                loginContainer.classList.remove('hidden');
-                passwordInput.focus();
-            }
-
-            function hideLoginForm() {
-                loginContainer.classList.add('hidden');
-                // Remove the login form from the DOM after hiding, to ensure it doesn't interfere
-                // loginContainer.remove(); // Optional: uncomment if you want to completely remove it
-            }
-
-            loginButton.addEventListener('click', () => {
-                if (passwordInput.value === correctPassword) {
-                    hideLoginForm();
-                    passwordInput.value = ''; // Clear input
-                    initializeDashboard(); // Initialize the main dashboard after login
-                } else {
-                    loginError.classList.remove('hidden');
-                    passwordInput.value = ''; // Clear input on error
-                    passwordInput.focus();
-                }
-            });
-
-            passwordInput.addEventListener('keypress', (event) => {
-                if (event.key === 'Enter') {
-                    loginButton.click();
-                }
-            });
-
-            // Initially show the login form
-            showLoginForm();
-
-            // --- End Login Logic ---
-
-
-            // The rest of your existing dashboard initialization code goes into this function
-            function initializeDashboard() {
-                document.getElementById('logoCAF').src = imageUrls.logoCAF;
-                document.getElementById('logoJundiai').src = imageUrls.logoJundiai;
-                document.getElementById('logoPOE').src = imageUrls.logoPOE;
-
-                Chart.register(ChartDataLabels);
-
-                const mainHeader = document.getElementById('mainHeader');
-                const contractSelector = document.getElementById('contractSelector');
-                const contractDetails = document.getElementById('contractDetails');
-                const noChartDataMessage = document.getElementById('noChartDataMessage');
-                const chartCanvasContainer = document.querySelector('#content-chart .chart-container');
-
-                const tabChartButton = document.getElementById('tab-chart');
-                const tabTableButton = document.getElementById('tab-table');
-                const contentChart = document.getElementById('content-chart');
-                const contentTable = document.getElementById('content-table');
-
-                const comparativeTableContainer = document.getElementById('comparativeTableContainer');
-                const comparativeTableBody = document.getElementById('comparativeTableBody');
-                const predictedScheduleTableContainer = document.getElementById('predictedScheduleTableContainer');
-                const predictedScheduleTableBody = document.getElementById('measurementsTableBody');
-
-                const totalContractsSpan = document.getElementById('totalContracts');
-                const totalContractValueSpan = document.getElementById('totalContractValue');
-                const sumOfLatestMonthlyMeasurementsSpan = document.getElementById('sumOfLatestMonthlyMeasurements');
-
-                const mapView = document.getElementById('mapView');
-                const dashboardView = document.getElementById('dashboardView');
-                const backToMapButton = document.getElementById('backToMapButton');
-                const exportChartPngButton = document.getElementById('exportChartPngButton');
-                const exportTableCsvButton = document.getElementById('exportTableCsvButton');
-                const exportPdfButton = document.getElementById('exportPdfButton');
-                const exportRouteButton = document.getElementById('exportRouteButton'); // Novo botão
-
-                // Define a localização da Prefeitura Municipal de Jundiaí usando o endereço fornecido
-                // Coordenadas obtidas através de pesquisa no Google Maps para: Av. da Liberdade, S/N - Jardim Botânico, Jundiaí - SP, 13214-900
-                const prefeituraJundiaiLocation = "-23.170850, -46.900323"; // Latitude e Longitude da Prefeitura de Jundiaí
-
-                let map;
-                let mainChart;
-
-                const contractsWithoutRealMeasurements = ["Contrato ainda não possui medições.", "Contrato ainda não foi assinado."];
-
-                function parseDate(dateString) {
-                    if (!dateString || dateString === 'N/A' || dateString.toLowerCase() === 'null') return null;
-                    const parts = dateString.split('/');
-                    let day = parseInt(parts[0], 10);
-                    let month = parseInt(parts[1], 10) - 1;
-                    let year = parseInt(parts[2], 10);
-
-                    const currentYear = new Date().getFullYear();
-                    if (year < 100) {
-                        year = (year > (currentYear % 100) + 10) ? 1900 + year : 2000 + year;
-                    }
-                    return new Date(year, month, day);
-                }
-
-                function calculateTotalDays(startDate, endDate) {
-                    if (!startDate || !endDate || isNaN(startDate) || isNaN(endDate)) return null;
-                    let diffTime = Math.abs(endDate.getTime() - startDate.getTime());
-                    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                }
-
-                function formatCurrency(value) {
-                    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
-                }
-
-                function formatCurrencyAndPercentage(value, totalValue) {
-                    if (value === null || value === undefined || totalValue === 0) {
-                        return formatCurrency(value);
-                    }
-                    const percentage = ((value / totalValue) * 100).toFixed(2);
-                    return `${formatCurrency(value)} (${percentage}%)`;
-                }
-
-                function formatChartLabelValue(value) {
-                    const absValue = Math.abs(value);
-                    if (absValue >= 1000000) {
-                        return `R$ ${(absValue / 1000000).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} mi`;
-                    } else if (absValue >= 1000) {
-                        return `R$ ${(absValue / 1000).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} mil`;
-                    } else {
-                        return `R$ ${absValue.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-                    }
-                }
-
-                function formatSummaryValue(value) {
-                    const absValue = Math.abs(value);
-                    if (absValue >= 1000000) {
-                        return `R$ ${(absValue / 1000000).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} mi`;
-                    }
-                    if (absValue >= 1000) {
-                        return `R$ ${(absValue / 1000).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} mil`;
-                    }
-                    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value || 0);
-                }
-
-                function updateSummaryMetrics() {
-                    if (projectData.length === 0) {
-                        totalContractsSpan.textContent = 0;
-                        totalContractValueSpan.textContent = formatSummaryValue(0);
-                        sumOfLatestMonthlyMeasurementsSpan.textContent = formatSummaryValue(0);
-                        return;
-                    }
-
-                    let sumOfLatestMonthlyExecuted = 0; 
-                    // Considerando o mês atual como Jun/25, somamos as execuções deste mês.
-                    const currentMonthRef = "Jun/25";
-
-                    projectData.forEach(p => {
-                        const hasExecutedData = p.grafico && p.grafico.executado && p.grafico.executado.some(val => val !== null);
-
-                        if (hasExecutedData && p.medicoes) {
-                            let currentMonthAccumulated = null;
-                            let previousMonthAccumulated = 0;
-
-                            // Encontrar o valor acumulado do mês atual (Jun/25)
-                            const currentMonthIndex = p.grafico.labels.indexOf(currentMonthRef);
-                            if (currentMonthIndex !== -1 && p.grafico.executado[currentMonthIndex] !== null) {
-                                currentMonthAccumulated = p.grafico.executado[currentMonthIndex];
-                                // Encontrar o valor acumulado do mês anterior
-                                if (currentMonthIndex > 0 && p.grafico.executado[currentMonthIndex - 1] !== null) {
-                                    previousMonthAccumulated = p.grafico.executado[currentMonthIndex - 1];
-                                }
-                                sumOfLatestMonthlyExecuted += (currentMonthAccumulated - previousMonthAccumulated);
-                            }
-                        }
-                    });
-                    totalContractsSpan.textContent = projectData.length;
-                    totalContractValueSpan.textContent = formatSummaryValue(projectData.reduce((sum, p) => sum + p.valorAtual, 0));
-                    sumOfLatestMonthlyMeasurementsSpan.textContent = formatSummaryValue(sumOfLatestMonthlyExecuted);
-                }
-
-                function prepareChartData(contract) {
-                    let chartLabels = [];
-                    let chartPrevisto = [];
-                    let chartExecutado = [];
-                    let previstoDataSets = null;
-
-                    if (contract.grafico && contract.grafico.labels && contract.grafico.labels.length > 0) {
-                        chartLabels = [...contract.grafico.labels];
-                        chartExecutado = [...contract.grafico.executado];
-
-                        if (contract.grafico.previstoDataSets) {
-                            previstoDataSets = contract.grafico.previstoDataSets.map(ds => ({
-                                label: ds.label,
-                                data: [...ds.data]
-                            }));
-                        } else {
-                            chartPrevisto = [...contract.grafico.previsto];
-                        }
-                    } else {
-                        // Fallback: if no grafico data, build from medicoes for 'Previsto' only
-                        contract.medicoes.forEach(m => {
-                            chartLabels.push(m.ref || `${m.medicao}º Mês`);
-                            chartPrevisto.push(m.acumulado);
-                            chartExecutado.push(null);
-                        });
-                    }
-
-                    return {
-                        labels: chartLabels,
-                        previsto: chartPrevisto,
-                        executado: chartExecutado,
-                        previstoDataSets: previstoDataSets
-                    };
-                }
-
-                function updateView(contractId) {
-                    const data = projectData.find(p => p.id === contractId);
-                    if (!data) {
-                        console.error("Contrato não encontrado:", contractId);
-                        return;
-                    }
-
-                    const hasExecutedChartData = data.grafico && data.grafico.executado && data.grafico.executado.some(val => val !== null);
-
-                    contractSelector.value = contractId;
-
-                    const formattedContractId = data.id.replace('CT ', '').replace(/\/(\d{2})$/, '/20$1');
-
-                    let predictedDatesHtml = '';
-                    if (data.predicted_start_date && data.predicted_end_date && data.predicted_start_date !== 'N/A' && data.predicted_end_date !== 'N/A') {
-                        const startDate = parseDate(data.predicted_start_date);
-                        const endDate = parseDate(data.predicted_end_date);
-                        const durationDays = calculateTotalDays(startDate, endDate);
-
-                        predictedDatesHtml = `
-                            <p class="text-xs md:text-sm text-gray-700 mt-0.5">
-                                Início Efetivo: ${data.predicted_start_date} | Fim Previsto: ${data.predicted_end_date} | Duração: ${durationDays} dias
-                            </p>
-                        `;
-                    }
-
-                    let projectImageHtml = '';
-                    if (data.objeto.includes("UBS")) {
-                        projectImageHtml = `<img src="${imageUrls.logoUBS}" alt="UBS da Gente" class="h-20 md:h-24 object-contain ml-auto" onerror="this.onerror=null;this.src='https://placehold.co/150x80/cccccc/333333?text=UBS+da+Gente';"/>`;
-                    } else if (data.objeto.includes("CECE")) {
-                        projectImageHtml = `<img src="${imageUrls.logoAtleta}" alt="Atleta da Gente" class="h-18 md:h-20 object-contain ml-auto" onerror="this.onerror=null;this.src='https://placehold.co/150x80/cccccc/333333?text=Atleta+da+Gente';"/>`;
-                    } else if (data.objeto.includes("EMEB")) {
-                        projectImageHtml = `<img src="${imageUrls.logoEscola}" alt="Escola da Gente" class="h-20 md:h-24 object-contain ml-auto" onerror="this.onerror=null;this.src='https://placehold.co/150x80/cccccc/333333?text=Escola+da+Gente';"/>`;
-                    }
-
-                    contractDetails.innerHTML = `
-                        <div class="flex items-center justify-center flex-wrap text-center space-y-1 w-full">
-                            <div class="flex-grow">
-                                <p class="text-lg md:text-xl font-bold text-gray-900">
-                                    Contrato ${formattedContractId}: ${data.objeto}
-                                </p>
-                                <p class="text-sm md:text-base text-gray-700">
-                                    <span class="font-semibold">Empresa:</span> ${data.empresa} | <span class="font-semibold">Valor Atual:</span> <span class="font-bold" style="color: #072380;">${formatCurrency(data.valorAtual)}</span>
-                                </p>
-                                ${predictedDatesHtml}
-                            </div>
-                            ${projectImageHtml}
-                        </div>
-                        ${data.observacoes ? `<div class="mt-3 text-center w-full"><p class="text-sm text-[#333333] bg-[rgba(255,204,0,0.3)] p-2 rounded-lg inline-block"><span class="font-bold">Observação:</span> ${data.observacoes}</p></div>` : ''}
-                    `;
-
-                    renderTables(data, hasExecutedChartData);
-                    handleTabVisibility(hasExecutedChartData);
-                    renderChart(data, hasExecutedChartData);
-                }
-
-                function renderTables(data, hasExecutedChartData) {
-                    let tableHeadersHtml;
-                    let tableRowsHtml;
-                    const totalContractValueForPercentages = data.valorAtual;
-
-                    if (hasExecutedChartData) {
-                        tableHeadersHtml = `
-                            <tr>
-                                <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Medição</th>
-                                <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Mês</th>
-                                <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Previst. Mês</th>
-                                <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Previst. Acum.</th>
-                                <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Executado Mês</th>
-                                <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Executado Acum.</th>
-                                <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Diferença</th>
-                                <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
-                            </tr>
-                        `;
-                        let prevPrevistoAcum = 0;
-                        let prevExecutadoAcum = 0;
-
-                        const preparedChartData = prepareChartData(data);
-
-                        tableRowsHtml = preparedChartData.labels.map((label, index) => {
-                            let previstoAcum;
-                            // Determinar qual dataset previsto usar
-                            if (preparedChartData.previstoDataSets && preparedChartData.previstoDataSets[2].data[index] !== null) {
-                                previstoAcum = preparedChartData.previstoDataSets[2].data[index]; // Usa o terceiro dataset (Reajuste II) se disponível
-                            } else if (preparedChartData.previstoDataSets && preparedChartData.previstoDataSets[1].data[index] !== null) {
-                                previstoAcum = preparedChartData.previstoDataSets[1].data[index]; // Usa o segundo dataset (Reajuste I) se disponível
-                            } else if (preparedChartData.previstoDataSets && preparedChartData.previstoDataSets[0].data[index] !== null) {
-                                previstoAcum = preparedChartData.previstoDataSets[0].data[index]; // Caso contrário, usa o primeiro (Inicial)
-                            } else {
-                                previstoAcum = preparedChartData.previsto[index]; // Fallback para o 'previsto' simples
-                            }
-
-                            const executadoAcum = preparedChartData.executado[index];
-
-                            const previstoMes = (previstoAcum !== null && !isNaN(previstoAcum) && prevPrevistoAcum !== null) ? previstoAcum - prevPrevistoAcum : (previstoAcum !== null && !isNaN(previstoAcum) ? previstoAcum : null);
-                            const executadoMes = (executadoAcum !== null && !isNaN(executadoAcum) && prevExecutadoAcum !== null) ? executadoAcum - prevExecutadoAcum : (executadoAcum !== null && !isNaN(executadoAcum) ? executadoAcum : null);
-
-                            let diferenca = null;
-                            let status = '';
-                            let diffClass = '';
-                            let statusClass = '';
-                            let diferencaCell = '';
-
-                            if (previstoAcum !== null && executadoAcum !== null) {
-                                diferenca = executadoAcum - previstoAcum;
-                                status = diferenca >= 0 ? 'Adiantado' : 'Atrasado';
-                                diffClass = diferenca < 0 ? 'text-status-diff-red' : 'text-status-diff-blue'; // Changed to text-status-diff-blue for positive difference
-                                statusClass = diferenca >= 0 ? 'text-status-adiantado font-semibold' : 'text-status-atrasado font-semibold';
-                                diferencaCell = `<td class="px-5 py-3 text-sm text-gray-800 text-center ${diffClass} font-semibold">${formatCurrencyAndPercentage(diferenca, totalContractValueForPercentages)}</td>`;
-                            } else {
-                                diferencaCell = `<td class="px-5 py-3 text-sm text-gray-800 text-center"></td>`;
-                            }
-
-                            prevPrevistoAcum = previstoAcum;
-                            prevExecutadoAcum = executadoAcum;
-
-                            return `
-                                <tr class="border-b border-slate-200/50 hover:bg-white/50">
-                                    <td class="px-5 py-3 text-sm font-medium text-center text-gray-900">${index + 1}</td>
-                                    <td class="px-5 py-3 text-sm text-center text-gray-700">${label}</td>
-                                    <td class="px-5 py-3 text-sm text-gray-800 text-center">${formatCurrency(previstoMes)}</td>
-                                    <td class="px-5 py-3 text-sm text-gray-800 text-center">${formatCurrencyAndPercentage(previstoAcum, totalContractValueForPercentages)}</td>
-                                    <td class="px-5 py-3 text-sm text-gray-800 text-center">${executadoMes !== null ? formatCurrency(executadoMes) : ''}</td>
-                                    <td class="px-5 py-3 text-sm text-gray-800 text-center">${executadoAcum !== null ? formatCurrencyAndPercentage(executadoAcum, totalContractValueForPercentages) : ''}</td>
-                                    ${diferencaCell}
-                                    <td class="px-5 py-3 text-sm text-center ${statusClass}">${status}</td>
-                                </tr>
-                            `;
-                        }).join('');
-
-                        comparativeTableBody.innerHTML = tableRowsHtml;
-                        comparativeTableContainer.classList.remove('hidden');
-                        predictedScheduleTableContainer.classList.add('hidden');
-                        tabTableButton.textContent = "Tabela Comparativa";
-                    } else {
-                        tableHeadersHtml = `
-                            <tr>
-                                <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Medição</th>
-                                <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Período</th>
-                                <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Ref.</th>
-                                <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Valor Medição</th>
-                                <th scope="col" class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Valor Acumulado</th>
-                            </tr>
-                        `;
-
-                        const totalContractValueForPercentages = data.valorAtual;
-
-                        tableRowsHtml = data.medicoes.map((m) => {
-                            let periodDisplay = `${m.inicio} a ${m.fim}`;
-                            let refDisplay = m.ref || "-";
-                            if (contractsWithoutRealMeasurements.includes(data.observacoes)) {
-                                periodDisplay = `${m.medicao}º Mês`;
-                                refDisplay = "-";
-                            }
-                            return `
-                                <tr class="border-b border-slate-200/50 hover:bg-white/50">
-                                    <td class="px-5 py-3 text-sm font-medium text-center text-gray-900">${m.medicao}</td>
-                                    <td class="px-5 py-3 text-sm text-center text-gray-700">${periodDisplay}</td>
-                                    <td class="px-5 py-3 text-sm text-center text-gray-700">${refDisplay}</td>
-                                    <td class="px-5 py-3 text-sm text-gray-800 text-center">${formatCurrency(m.valor)}</td>
-                                    <td class="px-5 py-3 text-sm text-gray-800 font-semibold text-center">${formatCurrencyAndPercentage(m.acumulado, totalContractValueForPercentages)}</td>
-                                </tr>
-                            `;
-                        }).join('');
-
-                        predictedScheduleTableBody.innerHTML = tableRowsHtml;
-                        comparativeTableContainer.classList.add('hidden');
-                        predictedScheduleTableContainer.classList.remove('hidden');
-                        tabTableButton.textContent = "Cronograma Previsto";
-                    }
-                }
-
-                function renderChart(data, hasExecutedChartData) {
-                    if (mainChart) mainChart.destroy();
-
-                    const preparedChartData = prepareChartData(data);
-                    const labels = preparedChartData.labels;
-                    const datasets = [];
-
-                    if (preparedChartData.previstoDataSets) {
-                        datasets.push(
-                            {
-                                label: preparedChartData.previstoDataSets[0].label,
-                                data: preparedChartData.previstoDataSets[0].data,
-                                borderColor: '#9333ea', // Cor roxa para o Cronograma Inicial
-                                borderWidth: 1,
-                                borderDash: [5, 5],
-                                fill: false,
-                                tension: 0.4,
-                                pointBackgroundColor: '#9333ea',
-                                pointBorderColor: '#9333ea',
-                                pointBorderWidth: 2,
-                                pointRadius: 3,
-                                pointHoverRadius: 4,
-                                datalabels: {
-                                    align: (ctx) => ctx.dataIndex === 0.3 ? 'center' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'end'),
-                                    anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'end'),
-                                    offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
-                                    color: '#9333ea',
-                                    font: { weight: 'bold', size: 13, family: 'Poppins' },
-                                    formatter: (value) => formatChartLabelValue(value),
-                                    textShadowColor: 'rgba(0, 0, 0, 0.0)',
-                                    textShadowBlur: 0,
-                                    textShadowOffsetX: 0,
-                                    textShadowOffsetY: 0,
-                                    display: (ctx) => {
-                                        // Display label only for existing data points, not for nulls if they are within the initial data set
-                                        return ctx.dataset.data[ctx.dataIndex] !== null;
-                                    }
-                                },
-                                order: 1
-                            },
-                            {
-                                label: preparedChartData.previstoDataSets[1].label,
-                                data: preparedChartData.previstoDataSets[1].data,
-                                borderColor: '#007BFF', // Cor azul para o Cronograma Reajuste I
-                                borderWidth: 1,
-                                borderDash: [5, 5],
-                                fill: false,
-                                tension: 0.4,
-                                pointBackgroundColor: '#007BFF',
-                                pointBorderColor: '#007BFF',
-                                pointBorderWidth: 2,
-                                pointRadius: 3,
-                                pointHoverRadius: 4,
-                                datalabels: {
-                                    align: (ctx) => ctx.dataIndex === 0 ? 'right' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'end'),
-                                    anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'end'),
-                                    offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
-                                    color: '#007BFF',
-                                    font: { weight: 'bold', size: 13, family: 'Poppins' },
-                                    formatter: (value) => formatChartLabelValue(value),
-                                    textShadowColor: 'rgba(0, 0, 0, 0.0)',
-                                    textShadowBlur: 0,
-                                    textShadowOffsetX: 0,
-                                    textShadowOffsetY: 0,
-                                    display: (ctx) => {
-                                        // Display label only for existing data points, not for nulls if they are within the initial data set
-                                        return ctx.dataset.data[ctx.dataIndex] !== null;
-                                    }
-                                },
-                                order: 2
-                            },
-                            {
-                                label: preparedChartData.previstoDataSets[2].label,
-                                data: preparedChartData.previstoDataSets[2].data,
-                                borderColor: '#CC5200', // Cor laranja para o Cronograma Reajuste II
-                                borderWidth: 1,
-                                borderDash: [5, 5],
-                                fill: false,
-                                tension: 0.4,
-                                pointBackgroundColor: '#CC5200',
-                                pointBorderColor: '#CC5200',
-                                pointBorderWidth: 2,
-                                pointRadius: 3,
-                                pointHoverRadius: 4,
-                                datalabels: {
-                                        align: 'end',    // Todos os rótulos acima do ponto
-                                        anchor: 'center', // Todos os rótulos centralizados horizontalmente
-                                        offset: 8,       // Distância padrão acima do ponto
-                                        color: '#CC5200', // Cor do texto do rótulo
-                                        font: { weight: 'bold', size: 14, family: 'Poppins' },
-                                        formatter: (value) => formatChartLabelValue(value),
-                                        textShadowColor: 'rgba(0, 0, 0, 0.0)', // Sem sombra
-                                        textShadowBlur: 0,
-                                        textShadowOffsetX: 0,
-                                        textShadowOffsetY: 0,
-                                        display: (ctx) => {
-                                        // Display label only for non-null data points from the NEW schedule
-                                        return ctx.dataset.data[ctx.dataIndex] !== null;
-                                    }
-                                },
-                                order: 3
-                            }
-                        );
-                    } else {
-                        datasets.push({
-                            label: 'Previsto',
-                            data: preparedChartData.previsto,
-                            borderColor: '#CC5200',
-                            borderWidth: 2,
-                            borderDash: [5, 5],
-                            fill: false,
-                            tension: 0.4,
-                            pointBackgroundColor: 'transparent',
-                            pointBorderColor: '#CC5200',
-                            pointBorderWidth: 2,
-                            pointRadius: 3,
-                            pointHoverRadius: 4,
-                            datalabels: {
-                                align: (ctx) => ctx.dataIndex === 0 ? 'right' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'left' : 'end'),
-                                anchor: (ctx) => ctx.dataIndex === 0 ? 'end' : (ctx.dataIndex === ctx.dataset.data.length - 1 ? 'start' : 'end'),
-                                offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 20 : 5,
-                                color: '#CC5200',
-                                font: { weight: 'bold', size: 14, family: 'Poppins' },
-                                formatter: (value) => formatChartLabelValue(value),
-                                textShadowColor: 'rgba(0, 0, 0, 0.0)',
-                                textShadowBlur: 0,
-                                textShadowOffsetX: 0,
-                                textShadowOffsetY: 0
-                            },
-                            order: 2
-                        });
-                    }
-
-                    if (hasExecutedChartData) {
-                        datasets.push({
-                            label: 'Executado',
-                            data: preparedChartData.executado,
-                            borderColor: '#007B3D',
-                            backgroundColor: 'transparent',
-                            borderWidth: 1.5,
-                            fill: false,
-                            tension: 0.4,
-                            pointBackgroundColor: '#007B3D',
-                            pointBorderColor: '#007B3D',
-                            pointBorderWidth: 2,
-                            pointRadius: 3,
-                            pointHoverRadius: 4,
-                            pointStyle: 'rectRot',
-                            datalabels: {
-                                align: (ctx) => ctx.dataIndex === 0 ? 'start' : (ctx.dataIndex === ctx.dataset.data.length - 0 ? 'left' : 'start'),
-                                anchor: (ctx) => ctx.dataIndex === 0 ? 'center' : (ctx.dataIndex === ctx.dataset.data.length - 0 ? 'start' : 'start'),
-                                offset: (ctx) => ctx.dataIndex === 0 || ctx.dataIndex === ctx.dataset.data.length - 1 ? 5 : 5,
-                                color: '#007B3D',
-                                font: { weight: 'bold', size: 14, family: 'Poppins' },
-                                formatter: (value) => formatChartLabelValue(value),
-                                textShadowColor: 'rgba(0, 0, 0, 0.0)',
-                                textShadowBlur: 0,
-                                textShadowOffsetX: 0,
-                                textShadowOffsetY: 0
-                            },
-                            order: 4
-                        });
-                        noChartDataMessage.style.display = 'none';
-                        chartCanvasContainer.classList.remove('hidden');
-                        tabChartButton.classList.remove('hidden');
-                    } else {
-                        noChartDataMessage.style.display = 'block';
-                        chartCanvasContainer.classList.add('hidden');
-                        tabChartButton.classList.add('hidden');
-                    }
-
-                    if (datasets.length > 0) {
-                        mainChart = new Chart(document.getElementById('mainChart'), {
-                            type: 'line',
-                            data: { labels: labels, datasets: datasets },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                scales: {
-                                    y: {
-                                        beginAtZero: true,
-                                        ticks: {
-                                            color: '#6b7280',
-                                            callback: (value) => formatCurrency(value)
-                                        },
-                                        grid: {
-                                            color: 'rgba(0,0,0,0.08)',
-                                            drawBorder: false
-                                        }
-                                    },
-                                    x: {
-                                        ticks: {
-                                            color: '#6b7280',
-                                            font: { weight: '700', family: 'Poppins' }
-                                        },
-                                        grid: {
-                                            display: false
-                                        }
-                                    }
-                                },
-                                plugins: {
-                                    datalabels: { display: true },
-                                    legend: {
-                                        position: 'bottom',
-                                        labels: {
-                                            usePointStyle: true,
-                                            font: { size: 14, weight: '700', family: 'Poppins' },
-                                            color: '#374151',
-                                            padding: 20
-                                        }
-                                    },
-                                    tooltip: {
-                                        enabled: true,
-                                        mode: 'index',
-                                        intersect: false,
-                                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                                        titleFont: { weight: 'bold', family: 'Poppins' },
-                                        bodyFont: { size: 12, weight: 'bold', family: 'Poppins' },
-                                        footerFont: { size: 12, weight: 'bold', family: 'Poppins' },
-                                        callbacks: {
-                                            label: (context) => {
-                                                const label = context.dataset.label || '';
-                                                const value = context.parsed.y;
-                                                const total = data.valorAtual || 0;
-                                                return `${label}: ${formatCurrency(value)} (${((value / total) * 100).toFixed(2)}%)`;
-                                            },
-                                            footer: (tooltipItems) => {
-                                                const executadoItem = tooltipItems.find(item => item.dataset.label === 'Executado');
-                                                if (executadoItem) {
-                                                    const index = executadoItem.dataIndex;
-                                                    const datasetExecutado = executadoItem.dataset.data;
-                                                    let previstoData = null;
-                                                    const previstoDatasets = tooltipItems.filter(item => 
-                                                        item.dataset.label === 'Previsto' || item.dataset.label.includes('Cronograma')
-                                                    );
-                                                    if (previstoDatasets.length > 0) {
-                                                        // Encontrar o último valor previsto não nulo (o cronograma ativo para a data)
-                                                        for (let i = previstoDatasets.length - 1; i >= 0; i--) {
-                                                            if (previstoDatasets[i].parsed.y !== null && !isNaN(previstoDatasets[i].parsed.y)) {
-                                                                previstoData = previstoDatasets[i].parsed.y;
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                                    const executadoAcum = datasetExecutado[index];
-                                                    if (previstoData !== null && executadoAcum !== null && !isNaN(previstoData) && !isNaN(executadoAcum)) {
-                                                        const diff = executadoAcum - previstoData;
-                                                        return `Diferença: ${formatCurrency(diff)}`;
-                                                    }
-                                                }
-                                                return '';
-                                            },
-                                            footerTextColor: function(context) {
-                                                const executadoItem = context.tooltip.dataPoints.find(item => item.dataset.label === 'Executado');
-                                                if (executadoItem) {
-                                                    const index = executadoItem.dataIndex;
-                                                    const datasetExecutado = executadoItem.dataset.data;
-                                                    let previstoData = null;
-                                                    const previstoDatasets = context.tooltip.dataPoints.filter(item => 
-                                                        item.dataset.label === 'Previsto' || item.dataset.label.includes('Cronograma')
-                                                    );
-                                                    if (previstoDatasets.length > 0) {
-                                                        for (let i = previstoDatasets.length - 1; i >= 0; i--) {
-                                                            if (previstoDatasets[i].parsed.y !== null && !isNaN(previstoDatasets[i].parsed.y)) {
-                                                                previstoData = previstoDatasets[i].parsed.y;
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                                    const executadoAcum = datasetExecutado[index];
-                                                    if (previstoData !== null && executadoAcum !== null && !isNaN(previstoData) && !isNaN(executadoAcum)) {
-                                                        const diff = executadoAcum - previstoData;
-                                                        return diff >= 0 ? '#0073a1' : '#b80404';
-                                                    }
-                                                }
-                                                return '#970700';
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    } else {
-                        noChartDataMessage.style.display = 'block';
-                        chartCanvasContainer.classList.add('hidden');
-                        tabChartButton.classList.add('hidden');
-                    }
-                }
-
-                function handleTabVisibility(hasExecutedChartData) {
-                    if (hasExecutedChartData) {
-                        tabChartButton.classList.remove('hidden');
-                        switchToTab('chart');
-                    } else {
-                        tabChartButton.classList.add('hidden');
-                        switchToTab('table');
-                    }
-                }
-
-                function showMapView() {
-                    mapView.classList.remove('hidden');
-                    dashboardView.classList.add('hidden');
-                    if (map) {
-                        map.invalidateSize();
-                    }
-                }
-
-                function showDashboardView(projectId) {
-                    mapView.classList.add('hidden');
-                    dashboardView.classList.remove('hidden');
-                    updateView(projectId);
-                }
-
-                function switchToTab(tabName) {
-                    contentChart.classList.add('hidden');
-                    contentTable.classList.add('hidden');
-                    tabChartButton.classList.remove('active');
-                    tabTableButton.classList.remove('active');
-
-                    if (tabName === 'chart') {
-                        contentChart.classList.remove('hidden');
-                        tabChartButton.classList.add('active');
-                    } else if (tabName === 'table') {
-                        contentTable.classList.remove('hidden');
-                        tabTableButton.classList.add('active');
-                    }
-                }
-
-                function exportChartAsPNG() {
-                    if (mainChart) {
-                        const originalCanvas = document.getElementById('mainChart');
-                        const tempCanvas = document.createElement('canvas');
-                        tempCanvas.width = originalCanvas.width;
-                        tempCanvas.height = originalCanvas.height;
-                        const tempCtx = tempCanvas.getContext('2d');
-
-                        tempCtx.fillStyle = '#FFFFFF'; // Ensure white background for export
-                        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-
-                        tempCtx.drawImage(originalCanvas, 0, 0);
-
-                        const imgUrl = tempCanvas.toDataURL('image/png');
-
-                        const link = document.createElement('a');
-                        link.href = imgUrl;
-                        const contractId = contractSelector.value.replace(/\s|\//g, '_');
-                        link.download = `grafico_contrato_${contractId}.png`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    } else {
-                        console.warn("Nenhum gráfico disponível para exportar.");
-                    }
-                }
-
-                function exportTableAsCSV() {
-                    const currentContractId = contractSelector.value;
-                    const data = projectData.find(p => p.id === currentContractId);
-                    if (!data) {
-                        console.warn("Nenhum dado de contrato para exportar.");
-                        return;
-                    }
-
-                    let csvContent = "";
-                    let headers = [];
-                    let rows = [];
-                    const delimiter = ';';
-
-                    const formatNumberForCSV = (value) => {
-                        if (value === null || isNaN(value)) return '';
-                        return String(value).replace('.', ','); // Use comma for decimal separator
-                    };
-
-                    const formatPercentageForCSV = (value, total) => {
-                        if (value === null || isNaN(value) || total === 0) return '';
-                        return ((value / total) * 100).toFixed(2).replace('.', ','); // Use comma for decimal separator
-                    };
-
-                    const summaryHeader = [
-                        `Relatório de Contrato: ${data.id} - ${data.objeto}`,
-                        `Empresa: ${data.empresa}`,
-                        `Valor Total do Contrato: ${formatCurrency(data.valorAtual)}`
-                    ].join('\n') + '\n\n';
-                    csvContent += summaryHeader;
-
-
-                    const hasExecutedChartData = data.grafico && data.grafico.executado && data.grafico.executado.some(val => val !== null);
-
-                    if (hasExecutedChartData) {
-                        headers = [
-                            "Medicao", "Mes",
-                            "Previsto Mes (Valor)", "Previsto Mes (%)",
-                            "Previsto Acum. (Valor)", "Previsto Acum. (%)",
-                            "Executado Mes (Valor)", "Executado Mes (%)",
-                            "Executado Acum. (Valor)", "Executado Acum. (%)",
-                            "Diferenca (Valor)", "Diferenca (%)",
-                            "Status"
-                        ];
-                        csvContent += headers.map(h => `"${h}"`).join(delimiter) + "\n"; // Wrap headers in quotes
-
-                        let prevPrevistoAcum = 0;
-                        let prevExecutadoAcum = 0;
-                        const totalContractValueForPercentages = data.valorAtual;
-
-                        const preparedChartData = prepareChartData(data);
-
-                        preparedChartData.labels.forEach((label, index) => {
-                            let previstoAcum;
-                            if (preparedChartData.previstoDataSets) {
-                                const dsInitial = preparedChartData.previstoDataSets[0].data[index];
-                                const dsNovo = preparedChartData.previstoDataSets[1].data[index];
-                                previstoAcum = dsNovo !== null ? dsNovo : dsInitial;
-                            } else {
-                                previstoAcum = preparedChartData.previsto[index];
-                            }
-                            const executadoAcum = preparedChartData.executado[index];
-
-                            const previstoMes = (previstoAcum !== null && !isNaN(previstoAcum) && prevPrevistoAcum !== null) ? previstoAcum - prevPrevistoAcum : (previstoAcum !== null && !isNaN(previstoAcum) ? previstoAcum : null);
-                            const executadoMes = (executadoAcum !== null && !isNaN(executadoAcum) && prevExecutadoAcum !== null) ? executadoAcum - prevExecutadoAcum : (executadoAcum !== null && !isNaN(executadoAcum) ? executadoAcum : null);
-
-                            const diferenca = (previstoAcum !== null && executadoAcum !== null) ? executadoAcum - previstoAcum : null;
-                            const status = (diferenca !== null) ? (diferenca >= 0 ? 'Adiantado' : 'Atrasado') : '';
-
-                            prevPrevistoAcum = previstoAcum;
-                            prevExecutadoAcum = executadoAcum;
-
-                            rows.push([
-                                index + 1,
-                                label,
-                                formatNumberForCSV(previstoMes),
-                                formatPercentageForCSV(previstoMes, totalContractValueForPercentages),
-                                formatNumberForCSV(previstoAcum),
-                                formatPercentageForCSV(previstoAcum, totalContractValueForPercentages),
-                                formatNumberForCSV(executadoMes),
-                                formatPercentageForCSV(executadoMes, totalContractValueForPercentages),
-                                formatNumberForCSV(executadoAcum),
-                                formatPercentageForCSV(executadoAcum, totalContractValueForPercentages),
-                                executadoAcum !== null ? formatNumberForCSV(diferenca) : '',
-                                executadoAcum !== null ? formatPercentageForCSV(diferenca, totalContractValueForPercentages) : '',
-                                status
-                            ]);
-                        });
-                    } else {
-                        headers = [
-                            "Medicao", "Periodo", "Ref.",
-                            "Valor Medicao (Valor)", "Valor Medicao (%)",
-                            "Valor Acumulado (Valor)", "Valor Acumulado (%)"
-                        ];
-                        csvContent += headers.map(h => `"${h}"`).join(delimiter) + "\n"; // Wrap headers in quotes
-
-                        const totalContractValueForPercentages = data.valorAtual;
-
-                        data.medicoes.forEach((m) => {
-                            let periodDisplay = `${m.inicio} a ${m.fim}`;
-                            let refDisplay = m.ref || "-";
-                            if (contractsWithoutRealMeasurements.includes(data.observacoes)) {
-                                periodDisplay = `${m.medicao}º Mês`;
-                                refDisplay = "-";
-                            }
-                            rows.push([
-                                m.medicao,
-                                periodDisplay,
-                                refDisplay,
-                                formatNumberForCSV(m.valor),
-                                formatPercentageForCSV(m.valor, totalContractValueForPercentages),
-                                formatNumberForCSV(m.acumulado),
-                                formatPercentageForCSV(m.acumulado, totalContractValueForPercentages)
-                            ]);
-                        });
-                    }
-
-                    rows.forEach(row => {
-                        csvContent += row.map(cell => {
-                            if (typeof cell === 'string' && (cell.includes(delimiter) || cell.includes('\n') || cell.includes('"'))) {
-                                return `"${cell.replace(/"/g, '""')}"`;
-                            }
-                            return cell;
-                        }).join(delimiter) + "\n";
-                    });
-
-                    const bom = "\uFEFF"; // BOM for UTF-8 compatibility with Excel
-                    const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
-                    const link = document.createElement("a");
-                    if (link.download !== undefined) {
-                        const url = URL.createObjectURL(blob);
-                        link.setAttribute("href", url);
-                        const contractId = currentContractId.replace(/\s|\//g, '_');
-                        link.setAttribute("download", `tabela_contrato_${contractId}.csv`);
-                        link.style.visibility = 'hidden';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    }
-                }
-
-                async function exportAsPDF() {
-                    const currentContractId = contractSelector.value;
-                    const data = projectData.find(p => p.id === currentContractId);
-
-                    if (!data) {
-                        console.warn("Nenhum dado de contrato disponível para exportar para PDF.");
-                        return;
-                    }
-
-                    const tempContainer = document.createElement('div');
-                    tempContainer.style.position = 'absolute';
-                    tempContainer.style.left = '-9999px';
-                    tempContainer.style.width = 'auto';
-                    tempContainer.style.minWidth = '800px';
-                    tempContainer.style.backgroundColor = '#FFFFFF'; // White background for PDF
-                    document.body.appendChild(tempContainer);
-
-                    document.body.classList.add('pdf-export-active');
-
-                    const clonedHeader = mainHeader.cloneNode(true);
-                    const clonedDashboard = dashboardView.cloneNode(true);
-
-                    // Remove interactive elements from the cloned content for PDF
-                    clonedDashboard.querySelector('#backToMapButton')?.remove();
-                    clonedDashboard.querySelector('.flex-grow')?.remove(); // This removes the contract selector div
-                    clonedDashboard.querySelector('.inline-flex')?.remove(); // This removes the tab buttons div
-                    clonedDashboard.querySelector('#exportChartPngButton')?.remove();
-                    clonedDashboard.querySelector('#exportTableCsvButton')?.remove();
-                    clonedDashboard.querySelector('#exportPdfButton')?.remove();
-                    clonedDashboard.querySelector('#exportRouteButton')?.remove(); // Remove o novo botão de rota
-
-                    // Ensure all content views are visible for PDF export
-                    clonedDashboard.querySelectorAll('.content-view').forEach(el => {
-                        el.classList.remove('hidden');
-                        el.style.display = 'block';
-                    });
-
-                    const originalChartCanvas = document.getElementById('mainChart');
-                    const clonedChartCanvas = clonedDashboard.querySelector('#mainChart');
-
-                    if (originalChartCanvas && clonedChartCanvas) {
-                        // Create a temporary canvas for chart with white background
-                        const chartTempCanvas = document.createElement('canvas');
-                        chartTempCanvas.width = originalChartCanvas.width;
-                        chartTempCanvas.height = originalChartCanvas.height;
-                        const chartTempCtx = chartTempCanvas.getContext('2d');
-                        chartTempCtx.fillStyle = '#FFFFFF'; // Set white background
-                        chartTempCtx.fillRect(0, 0, chartTempCanvas.width, chartTempCanvas.height);
-                        chartTempCtx.drawImage(originalCanvas, 0, 0);
-
-                        const chartImg = new Image();
-                        chartImg.src = chartTempCanvas.toDataURL('image/png');
-                        await new Promise(resolve => {
-                            chartImg.onload = () => {
-                                const ctx = clonedChartCanvas.getContext('2d');
-                                ctx.clearRect(0, 0, clonedChartCanvas.width, clonedChartCanvas.height);
-                                clonedChartCanvas.width = originalChartCanvas.width;
-                                clonedChartCanvas.height = originalChartCanvas.height;
-                                ctx.drawImage(chartImg, 0, 0);
-                                resolve();
-                            };
-                            chartImg.onerror = () => {
-                                console.error("Erro ao carregar imagem do gráfico para o PDF.");
-                                resolve();
-                            };
-                        });
-                    }
-
-                    tempContainer.appendChild(clonedHeader);
-                    tempContainer.appendChild(clonedDashboard);
-
-                    const comparativeTable = tempContainer.querySelector('#comparativeTableContainer');
-                    const predictedScheduleTable = tempContainer.querySelector('#predictedScheduleTableContainer');
-                    let originalComparativeWidth = '';
-                    let originalPredictedWidth = '';
-
-                    // Adjust table widths to ensure full content is captured if overflow-x-auto is applied
-                    if (comparativeTable && !comparativeTable.classList.contains('hidden')) {
-                        originalComparativeWidth = comparativeTable.style.width;
-                        comparativeTable.style.width = `${comparativeTable.scrollWidth + 20}px`; // Add some padding
-                    }
-                    if (predictedScheduleTable && !predictedScheduleTable.classList.contains('hidden')) {
-                        originalPredictedWidth = predictedScheduleTable.style.width;
-                        predictedScheduleTable.style.width = `${predictedScheduleTable.scrollWidth + 20}px`; // Add some padding
-                    }
-
-                    const canvas = await html2canvas(tempContainer, {
-                        scale: 2,
-                        useCORS: true,
-                        logging: true,
-                        allowTaint: true,
-                        backgroundColor: '#FFFFFF' // Force white background for the canvas
-                    });
-
-                    // Restore original table widths
-                    if (comparativeTable && !comparativeTable.classList.contains('hidden')) {
-                        comparativeTable.style.width = originalComparativeWidth;
-                    }
-                    if (predictedScheduleTable && !predictedScheduleTable.classList.contains('hidden')) {
-                        predictedScheduleTable.style.width = originalPredictedWidth;
-                    }
-
-                    document.body.classList.remove('pdf-export-active');
-                    document.body.removeChild(tempContainer);
-
-                    const imgData = canvas.toDataURL('image/png');
-                    const pdf = new window.jspdf.jsPDF('p', 'mm', 'a4');
-
-                    const imgWidth = 210;
-                    const pageHeight = 297;
-                    const imgHeight = canvas.height * imgWidth / canvas.width;
-                    let heightLeft = imgHeight;
-
-                    let position = 0;
-
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-
-                    while (heightLeft >= 0) {
-                        position = heightLeft - imgHeight;
-                        pdf.addPage();
-                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                        heightLeft -= pageHeight;
-                    }
-
-                    const filename = `relatorio_contrato_${currentContractId.replace(/\s|\//g, '_')}.pdf`;
-                    pdf.save(filename);
-                }
-
-                /**
-                 * Abre uma nova aba no Google Maps com uma rota da Prefeitura Municipal de Jundiaí
-                 * até a localização do contrato selecionado.
-                 */
-                function exportRouteToGoogleMaps() {
-                    const currentContractId = contractSelector.value;
-                    const data = projectData.find(p => p.id === currentContractId);
-
-                    if (!data || !data.location || !data.location.lat || !data.location.lng) {
-                        alert("Localização do contrato não disponível para gerar rota.");
-                        return;
-                    }
-
-                    const destinationLat = parseFloat(data.location.lat);
-                    const destinationLng = parseFloat(data.location.lng);
-
-                    if (isNaN(destinationLat) || isNaN(destinationLng)) {
-                        alert("Coordenadas de localização inválidas para gerar rota.");
-                        return;
-                    }
-
-                    // Utiliza as coordenadas da Prefeitura Municipal de Jundiaí e do contrato
-                    const googleMapsUrl = `https://www.google.com/maps/dir/${prefeituraJundiaiLocation}/${destinationLat},${destinationLng}`;
-                    window.open(googleMapsUrl, '_blank');
-                }
-
-                // Initial map and data loading
-                map = L.map('map').setView([-23.17, -46.87], 12);
-
-                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                    attribution: 'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-                }).addTo(map);
-
-                const bounds = [];
-
-                projectData.forEach(p => {
-                    const lat = parseFloat(p.location.lat);
-                    const lng = parseFloat(p.location.lng);
-
-                    if (!isNaN(lat) && !isNaN(lng)) {
-                        let iconToUse = projectIcons.default;
-                        let iconColorClass = '';
-
-                        if (p.objeto.includes("EMEB")) {
-                            iconToUse = projectIcons.EMEB;
-                            iconColorClass = iconToUse.colorClass;
-                        } else if (p.objeto.includes("CECE")) {
-                            iconToUse = projectIcons.CECE;
-                            iconColorClass = iconToUse.colorClass;
-                        } else if (p.objeto.includes("UBS")) {
-                            iconToUse = projectIcons.UBS;
-                            iconColorClass = iconToUse.colorClass;
-                        }
-
-                        let iconHtml;
-                        if (iconToUse.type === 'fontawesome') {
-                            iconHtml = `<i class="${iconToUse.symbol}"></i>`;
-                        } else {
-                            iconHtml = `<span>${iconToUse.symbol}</span>`;
-                        }
-
-                        const customPinIcon = L.divIcon({
-                            className: `custom-pin-icon ${iconColorClass}`,
-                            html: iconHtml,
-                            iconSize: [28, 28],
-                            iconAnchor: [14, 28],
-                            tooltipAnchor: [14, -14]
-                        });
-
-                        const marker = L.marker([lat, lng], { icon: customPinIcon })
-                            .addTo(map)
-                            .bindTooltip(`<b>${p.objeto}</b>`, {
-                                direction: 'top',
-                                permanent: true,
-                                className: 'map-label-tooltip',
-                                opacity: 0.9,
-                                offset: L.point(0, -10)
-                            });
-
-                        bounds.push([lat, lng]);
-
-                        marker.on('click', () => {
-                            showDashboardView(p.id);
-                        });
-                    } else {
-                        console.warn(`Localização inválida para o projeto ${p.id}: Latitude=${p.location.lat}, Longitude=${p.location.lng}`);
-                    }
-                });
-
-                if (bounds.length > 0) {
-                    map.fitBounds(bounds);
-                } else {
-                    map.setView([-23.17, -46.87], 12);
-                }
-
-                projectData.forEach(p => {
-                    const option = document.createElement('option');
-                    option.value = p.id;
-                    option.textContent = `${p.id} - ${p.objeto}`;
-                    contractSelector.appendChild(option);
-                });
-
-                contractSelector.addEventListener('change', (e) => {
-                    updateView(e.target.value);
-                    const data = projectData.find(p => p.id === e.target.value);
-                    const hasExecutedChartData = data.grafico && data.grafico.executado && data.grafico.executado.some(val => val !== null);
-                    handleTabVisibility(hasExecutedChartData);
-                });
-
-                tabChartButton.addEventListener('click', () => switchToTab('chart'));
-                tabTableButton.addEventListener('click', () => switchToTab('table'));
-
-                backToMapButton.addEventListener('click', showMapView);
-
-                document.getElementById('exportChartPngButton').addEventListener('click', exportChartAsPNG);
-                document.getElementById('exportTableCsvButton').addEventListener('click', exportTableAsCSV);
-                document.getElementById('exportPdfButton').addEventListener('click', exportAsPDF);
-                document.getElementById('exportRouteButton').addEventListener('click', exportRouteToGoogleMaps); // Adiciona o event listener ao novo botão
-
-                showMapView();
-                updateSummaryMetrics();
-            } // End of initializeDashboard function
-        });
-    </script>
-</body>
-</html>
+// Dados dos projetos/contratos
+// Esta constante 'projectData' é um array de objetos, onde cada objeto representa um contrato.
+// Os dados aqui são a fonte de informações para o painel.
+
+const projectData = [
+    {
+        // ID do contrato: Usado para identificação única. Formato "CT XXX/YY" é recomendado.
+        id: "CT 039/25",
+        // Objeto do contrato: Descrição clara do que a obra/serviço abrange (ex: nome da escola, UBS).
+        objeto: "EMEB Adail",
+        // Empresa contratada: Nome completo da empresa responsável.
+        empresa: "CDR Infra Inst. e Montag.",
+        // Valor atual do contrato: O valor total do contrato, incluindo aditivos.
+        valorAtual: 1718878.29,
+        // Observações: Campo opcional para notas importantes sobre o contrato (prorrogações, status, etc.).
+        observacoes: null, // Deixe como 'null' se não houver observações.
+
+        // Medições do contrato: Array de objetos que detalham cada medição (prevista ou executada).
+        // A ordem dos objetos neste array é importante para a cronologia.
+        medicoes: [
+            {
+                // Número da medição (pode ser "1", "2", "1-5" para medições agrupadas, etc.)
+                medicao: 1,
+                // Data de início do período de medição. Formato 'DD/MM/AA' ou 'DD/MM/AAAA'.
+                inicio: "15/04/25",
+                // Data de fim do período de medição. Formato 'DD/MM/AA' ou 'DD/MM/AAAA'.
+                fim: "14/05/25",
+                // Referência do mês/ano da medição (ex: "Mai/25", "Jun/25"). Crucial para alinhamento com o gráfico.
+                ref: "Mai/25",
+                // Valor financeiro da medição para este período.
+                valor: 124644.24,
+                // Valor acumulado das medições até este período.
+                acumulado: 124644.24
+            },
+            { medicao: 2, inicio: "16/05/25", fim: "15/06/25", ref: "Jun/25", valor: 171933.40, acumulado: 336423.85 },
+            { medicao: 3, inicio: "16/06/25", fim: "16/07/25", ref: "Jul/25", valor: 241980.72, acumulado: 578404.57 },
+            { medicao: 4, inicio: "17/07/25", fim: "16/08/25", ref: "Ago/25", valor: 244895.61, acumulado: 823300.18 },
+            { medicao: 5, inicio: "17/08/25", fim: "16/09/25", ref: "Set/25", valor: 206279.55, acumulado: 1029579.73 },
+            { medicao: 6, inicio: "17/09/25", fim: "17/10/25", ref: "Out/25", valor: 235402.36, acumulado: 1264982.09 },
+            { medicao: 7, inicio: "18/10/25", fim: "17/11/25", ref: "Nov/25", valor: 237641.42, acumulado: 1502623.51 },
+            { medicao: 8, inicio: "18/11/25", fim: "10/12/25", ref: "Dez/25", valor: 216254.79, acumulado: 1718878.30 },
+        ],
+
+        // Dados para o gráfico: Define as séries de dados a serem plotadas.
+        grafico: {
+            // Rótulos do eixo X (geralmente meses/períodos). Devem corresponder aos 'ref' das medições.
+            labels: ["Mai/25", "Jun/25", "Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25"],
+            // Valores acumulados previstos. Use 'null' para pontos futuros onde ainda não há execução.
+            // Se houver mais de um cronograma previsto (ex: inicial e novo), use 'previstoDataSets'.
+            previsto: [164490.45, 336423.85, 578404.57, 823300.18, 1029579.73, 1264982.09, 1502623.51, 1718878.30],
+            // Valores acumulados executados. Use 'null' para períodos sem execução ou futuros.
+            executado: [107178.95, 124644.24, null, null, null, null, null, null],
+            // Para contratos com múltiplos cronogramas previstos (ex: inicial e novo).
+            // Remova ou defina como 'null' se o contrato tiver apenas um cronograma previsto simples.
+            previstoDataSets: null 
+        },
+        // Data prevista de início do contrato. Formato 'DD/MM/AAAA'. Use 'N/A' se não aplicável.
+        predicted_start_date: '15/04/2025',
+        // Data prevista de fim do contrato. Formato 'DD/MM/AAAA'. Use 'N/A' se não aplicável.
+        predicted_end_date: '10/12/2025',
+        // Localização geográfica do contrato (Latitude e Longitude).
+        location: { lat: -23.22359379674732, lng: -46.85593132352297 }
+    },
+    {
+        id: "CT 127/24",
+        objeto: "UBS Rio Branco",
+        empresa: "CJM Construtora Ltda",
+        valorAtual: 2669510.38, // Valor atualizado para o último acumulado do Cronograma Reajuste II
+        observacoes: "Além do novo cronograma, adotado a partir de abril, foi protocolado novo aditivo que extenderá o contrato para término em novembro.", // Observação atualizada
+        medicoes: [
+            { medicao: 1, inicio: '07/10/24', fim: '05/11/24', ref: 'Nov/24', valor: 147017.36, acumulado: 147017.36 },
+            { medicao: 2, inicio: '06/11/24', fim: '05/12/24', ref: 'Dez/24', valor: 193930.07, acumulado: 340947.43 },
+            { medicao: 3, inicio: '06/12/24', fim: '04/01/25', ref: 'Jan/25', valor: 78717.56, acumulado: 419664.99 },
+            { medicao: 4, inicio: '05/01/25', fim: '03/02/25', ref: 'Fev/25', valor: 96409.89, acumulado: 516074.88 },
+            { medicao: 5, inicio: '04/02/25', fim: '03/03/25', ref: 'Mar/25', valor: 267092.82, acumulado: 783167.70 }, // Preenchido com valor do reajuste 1, depois passa para o reajuste 2
+            { medicao: 6, inicio: '04/03/25', fim: '03/04/25', ref: 'Abr/25', valor: 437000.00, acumulado: 1220155.93 }, // Este valor é a diferença entre o acumulado de Mar/25 (do reajuste 1) e o acumulado de Abr/25 (do reajuste 2)
+            { medicao: 7, inicio: '04/04/25', fim: '03/05/25', ref: 'Mai/25', valor: 308812.37, acumulado: 1174071.39 },
+            { medicao: 8, inicio: '04/05/25', fim: '03/06/25', ref: 'Jun/25', valor: 333302.47, acumulado: 1507373.86 },
+            { medicao: 9, inicio: '04/06/25', fim: '03/07/25', ref: 'Jul/25', valor: 265536.22, acumulado: 1772910.08 }, 
+            { medicao: 10, inicio: '04/07/25', fim: '03/08/25', ref: 'Ago/25', valor: 255395.87, acumulado: 2028305.95 }, 
+            { medicao: 11, inicio: '04/08/25', fim: '03/09/25', ref: 'Set/25', valor: 149312.68, acumulado: 2177618.63 }, 
+            { medicao: 12, inicio: '04/09/25', fim: '03/10/25', ref: 'Out/25', valor: 251223.27, acumulado: 2428841.90 }, 
+            { medicao: 13, inicio: '04/10/25', fim: '03/11/25', ref: 'Nov/25', valor: 240668.48, acumulado: 2669510.38 }, 
+        ],
+        grafico: {
+            labels: ["Nov/24", "Dez/24", "Jan/25", "Fev/25", "Mar/25", "Abr/25", "Mai/25", "Jun/25", "Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25"], // Labels estendidos até Mar/25 para o cronograma inicial
+            previstoDataSets: [
+                { label: "Cronograma Inicial", data: [223098.81, 446197.62, 691408.56, 953063.11, 1526040.85, null, null, null, null, null, null, null, null] }, // Termina em Mar/25
+                { label: "Cronograma Reajuste I", data: [null, null, null, null,  865259.02, 1174071.39, 1507373.86, null, null, null, null, null, null] }, // Nova série azul (reajuste 1)
+                { label: "Cronograma Reajuste II", data: [null, null, null, null, null, null, 1397234.90, 1662771.12, 1918166.99, 2177618.63, 2428841.90, 2669510.38] } // Nova série laranja (reajuste 2) - Inicia em Jul/25 ou onde a laranja da sua imagem iniciar
+            ],
+            executado: [147017.36, 340947.43, 419664.99, 516074.88, 893732.79, 1177420.96, 1397234.9, null, null, null, null, null, null] // Executado até Jun/25
+        },
+        predicted_start_date: '07/10/2024',
+        predicted_end_date: '03/11/2025', // Atualizado para novembro de 2025
+        location: { lat: -23.17462221037069, lng: -46.88650911818413 }
+    },
+    {
+        id: "CT 036/25",
+        objeto: "UBS Tamoio",
+        empresa: "SLN Telecom. e Eng. Ltda",
+        valorAtual: 6598840.00,
+        observacoes: null,
+        medicoes: [
+            { medicao: 1, inicio: "22/04/25", fim: "21/05/25", ref: "Mai/25", valor: 90152.14, acumulado: 90152.14 },
+            { medicao: 2, inicio: "22/05/25", fim: "21/06/25", ref: "Jun/25", valor: 414541.33, acumulado: 736137.24 },
+            { medicao: 3, inicio: "22/06/25", fim: "21/07/25", ref: "Jul/25", valor: 239422.48, acumulado: 975559.72 },
+            { medicao: 4, inicio: "22/07/25", fim: "21/08/25", ref: "Ago/25", valor: 354046.97, acumulado: 1329606.69 },
+            { medicao: 5, inicio: "22/08/25", fim: "21/09/25", ref: "Set/25", valor: 273732.54, acumulado: 1603339.23 },
+            { medicao: 6, inicio: "22/09/25", fim: "21/10/25", ref: "Out/25", valor: 834046.03, acumulado: 2437385.26 },
+            { medicao: 7, inicio: "22/10/25", fim: "21/11/25", ref: "Nov/25", valor: 826863.39, acumulado: 3264248.65 },
+            { medicao: 8, inicio: "22/11/25", fim: "21/12/25", ref: "Dez/25", valor: 1182068.62, acumulado: 4446317.27 },
+            { medicao: 9, inicio: "22/12/25", fim: "21/01/26", ref: "Jan/26", valor: 973345.29, acumulado: 5419662.56 },
+            { medicao: 10, inicio: "22/01/26", fim: "21/02/26", ref: "Fev/26", valor: 587119.79, acumulado: 6006782.35 },
+            { medicao: 11, inicio: "22/02/26", fim: "21/03/26", ref: "Mar/26", valor: 340667.51, acumulado: 6347449.86 },
+            { medicao: 12, inicio: "22/03/26", fim: "21/04/26", ref: "Abr/26", valor: 251390.14, acumulado: 6598840.00 },
+        ],
+        grafico: {
+            labels: ["Mai/25", "Jun/25", "Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25", "Jan/26", "Fev/26", "Mar/26", "Abr/26"],
+            previsto: [321595.91, 736137.24, 975559.72, 1329606.69, 1603339.23, 2437385.26, 3264248.65, 4446317.27, 5419662.56, 6006782.35, 6347449.86, 6598840.00],
+            executado: [90152.14, null, null, null, null, null, null, null, null, null, null, null],
+            previstoDataSets: null
+        },
+        predicted_start_date: '22/04/2025',
+        predicted_end_date: '21/04/2026',
+        location: { lat: -23.19038589001708, lng: -46.85558008684543 }
+    },
+    {
+        id: "CT 052/25",
+        objeto: "UBS Ivoturucaia",
+        empresa: "J.S.O. Constr. Ltda.",
+        valorAtual: 5654210.10,
+        observacoes: "Contrato ainda não possui medições.", // Observação indica que é só cronograma
+        medicoes: [
+            { medicao: 1, inicio: "1º Mês", fim: "N/A", ref: null, valor: 84127.17, acumulado: 84127.17 },
+            { medicao: 2, inicio: "2º Mês", fim: "N/A", ref: null, valor: 103035.32, acumulado: 187162.49 },
+            { medicao: 3, inicio: "3º Mês", fim: "N/A", ref: null, valor: 156263.40, acumulado: 343425.89 },
+            { medicao: 4, inicio: "4º Mês", fim: "N/A", ref: null, valor: 315717.56, acumulado: 659143.45 },
+            { medicao: 5, inicio: "5º Mês", fim: "N/A", ref: null, valor: 519490.15, acumulado: 1178633.60 },
+            { medicao: 6, inicio: "6º Mês", fim: "N/A", ref: null, valor: 434719.57, acumulado: 1613353.17 },
+            { medicao: 7, inicio: "7º Mês", fim: "N/A", ref: null, valor: 501301.56, acumulado: 2114654.73 },
+            { medicao: 8, inicio: "8º Mês", fim: "N/A", ref: null, valor: 982847.79, acumulado: 3097502.52 },
+            { medicao: 9, inicio: "9º Mês", fim: "N/A", ref: null, valor: 735049.10, acumulado: 3832551.62 },
+            { medicao: 10, inicio: "10º Mês", fim: "N/A", ref: null, valor: 699466.12, acumulado: 4532017.74 },
+            { medicao: 11, inicio: "11º Mês", fim: "N/A", ref: null, "valor": 734830.81, "acumulado": 5266848.55 },
+            { medicao: 12, inicio: "12º Mês", fim: "N/A", ref: null, "valor": 387361.55, "acumulado": 5654210.10 },
+        ],
+        grafico: { // Populated based on medicoes
+            labels: ["1º Mês", "2º Mês", "3º Mês", "4º Mês", "5º Mês", "6º Mês", "7º Mês", "8º Mês", "9º Mês", "10º Mês", "11º Mês", "12º Mês"], // Pode usar ref ou Nº Mês
+            previsto: [84127.17, 187162.49, 343425.89, 659143.45, 1178633.60, 1613353.17, 2114654.73, 3097502.52, 3832551.62, 4532017.74, 5266848.55, 5654210.10],
+            executado: [], // Vazio para contratos sem medições reais
+            previstoDataSets: null
+        },
+        // Datas fictícias para contratos que ainda não tem cronograma real de início e fim.
+        predicted_start_date: '30/01/2000',
+        predicted_end_date: '06/12/2000',
+        location: { lat: -23.18183604007579, lng: -46.81048269582229 }
+    },
+    {
+        id: "CT 054/25",
+        objeto: "UBS Maringá",
+        empresa: "Studio Sabino & Souza A",
+        valorAtual: 3629613.36,
+        observacoes: "Contrato ainda não possui medições.",
+        medicoes: [
+            { medicao: 1, inicio: "1º Mês", fim: "N/A", ref: null, valor: 292590.76, acumulado: 292590.76 },
+            { medicao: 2, inicio: "2º Mês", fim: "N/A", ref: null, valor: 241692.06, acumulado: 534282.82 },
+            { medicao: 3, inicio: "3º Mês", fim: "N/A", ref: null, valor: 97972.28, acumulado: 632255.10 },
+            { medicao: 4, inicio: "4º Mês", fim: "N/A", ref: null, valor: 94521.03, acumulado: 726776.13 },
+            { medicao: 5, inicio: "5º Mês", fim: "N/A", ref: null, valor: 179720.76, acumulado: 906496.89 },
+            { medicao: 6, inicio: "6º Mês", fim: "N/A", ref: null, valor: 171538.45, acumulado: 1078035.34 },
+            { medicao: 7, inicio: "7º Mês", "fim": "N/A", ref: null, valor: 297860.75, acumulado: 1375896.09 },
+            { medicao: 8, inicio: "8º Mês", fim: "N/A", ref: null, valor: 355919.31, acumulado: 1731815.40 },
+            { medicao: 9, inicio: "9º Mês", fim: "N/A", ref: null, valor: 207339.02, acumulado: 1939154.42 },
+            { medicao: 10, inicio: "10º Mês", fim: "N/A", ref: null, valor: 347741.35, acumulado: 2286895.77 },
+            { medicao: 11, inicio: "11º Mês", fim: "N/A", ref: null, valor: 483139.95, acumulado: 2770035.72 },
+            { medicao: 12, inicio: "12º Mês", fim: "N/A", ref: null, valor: 292186.51, acumulado: 3062222.23 },
+            { medicao: 13, inicio: "13º Mês", fim: "N/A", ref: null, valor: 336583.53, acumulado: 3398805.76 },
+            { medicao: 14, inicio: "14º Mês", fim: "N/A", ref: null, valor: 230807.60, acumulado: 3629613.36 },
+        ],
+        grafico: { // Populated based on medicoes
+            labels: ["1º Mês", "2º Mês", "3º Mês", "4º Mês", "5º Mês", "6º Mês", "7º Mês", "8º Mês", "9º Mês", "10º Mês", "11º Mês", "12º Mês", "13º Mês", "14º Mês"],
+            previsto: [292590.76, 534282.82, 632255.10, 726776.13, 906496.89, 1078035.34, 1375896.09, 1731815.40, 1939154.42, 2286895.77, 2770035.72, 3062222.23, 3398805.76, 3629613.36],
+            executado: [],
+            previstoDataSets: null
+        },
+        predicted_start_date: '16/06/2025',
+        predicted_end_date: '10/08/2026',
+        location: { lat: -23.22526128860949, lng: -46.88200264672982 }
+    },
+    {
+        id: "CT 058/25",
+        objeto: "UBS Rio Acima",
+        empresa: "LBD Engenharia Ltda EPP",
+        valorAtual: 4770000.00,
+        observacoes: "Contrato ainda não foi assinado.",
+        medicoes: [
+            { medicao: 1, inicio: '1º Mês', fim: 'N/A', ref: null, valor: 651465.99, acumulado: 651465.99 },
+            { medicao: 2, inicio: '2º Mês', fim: 'N/A', ref: null, valor: 235455.54, acumulado: 886921.53 },
+            { medicao: 3, inicio: '3º Mês', fim: 'N/A', ref: null, valor: 214136.63, acumulado: 1101058.16 },
+            { medicao: 4, inicio: '4º Mês', fim: 'N/A', ref: null, valor: 207896.03, acumulado: 1308953.19 },
+            { medicao: 5, inicio: '5º Mês', fim: 'N/A', ref: null, valor: 248274.38, acumulado: 1557227.57 },
+            { medicao: 6, inicio: '6º Mês', fim: 'N/A', ref: null, valor: 364000.85, acumulado: 1921228.42 },
+            { medicao: 7, inicio: '7º Mês', fim: 'N/A', ref: null, valor: 526704.03, acumulado: 2447932.45 },
+            { medicao: 8, inicio: "8º Mês", fim: 'N/A', ref: null, valor: 401628.60, acumulado: 2849561.05 },
+            { medicao: 9, inicio: "9º Mês", fim: 'N/A', ref: null, valor: 433111.60, acumulado: 3282672.65 },
+            { medicao: 10, inicio: "10º Mês", fim: "N/A", ref: null, valor: 448241.70, acumulado: 3730914.35 },
+            { medicao: 11, inicio: "11º Mês", fim: "N/A", ref: null, valor: 410658.28, acumulado: 4141572.63 },
+            { medicao: 12, inicio: "12º Mês", fim: "N/A", ref: null, valor: 287880.94, acumulado: 4429453.57 },
+            { medicao: 13, inicio: "13º Mês", fim: 'N/A', ref: null, valor: 262817.27, acumulado: 4692270.84 },
+            { medicao: 14, inicio: "14º Mês", fim: 'N/A', ref: null, valor: 77729.16, acumulado: 4770000.00 },
+        ],
+        grafico: { // Populated based on medicoes
+            labels: ["1º Mês", "2º Mês", "3º Mês", "4º Mês", "5º Mês", "6º Mês", "7º Mês", "8º Mês", "9º Mês", "10º Mês", "11º Mês", "12º Mês", "13º Mês", "14º Mês"],
+            previsto: [651465.99, 886921.53, 1101058.16, 1308953.19, 1557227.57, 1921228.42, 2447932.45, 2849561.05, 3282672.65, 3730914.35, 4141572.63, 4429453.57, 4692270.84, 4770000.00],
+            executado: [],
+            previstoDataSets: null
+        },
+        predicted_start_date: 'N/A', // Placeholder
+        predicted_end_date: 'N/A', // Placeholder
+        location: { lat: -23.11557702080163, lng: -46.92453149 }
+    },
+    {
+        id: "CT 048/25",
+        objeto: "CECE Romão",
+        empresa: "Adriana Rodrigues Belles",
+        valorAtual: 1480000.00,
+        observacoes: "Contrato ainda não possui medições.",
+        medicoes: [
+            { medicao: 1, inicio: '1º Mês', fim: 'N/A', ref: null, valor: 149571.75, acumulado: 149571.75 },
+            { medicao: 2, inicio: '2º Mês', fim: 'N/A', ref: null, valor: 581145.10, acumulado: 730716.85 },
+            { medicao: 3, inicio: '3º Mês', fim: 'N/A', ref: null, valor: 569545.05, acumulado: 1300261.90 },
+            { medicao: 4, inicio: '4º Mês', fim: 'N/A', ref: null, valor: 179738.10, acumulado: 1480000.00 }
+        ],
+        grafico: { // Populated based on medicoes
+            labels: ["1º Mês", "2º Mês", "3º Mês", "4º Mês"],
+            previsto: [149571.75, 730716.85, 1300261.90, 1480000.00],
+            executado: [],
+            previstoDataSets: null
+        },
+        predicted_start_date: '30/01/2000', // Placeholder
+        predicted_end_date: '02/04/2000', // Placeholder
+        location: { lat: -23.18555067042124, lng: -46.85363796732586 }
+    }
+];
