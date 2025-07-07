@@ -1200,7 +1200,7 @@
                     }
                 }
 
-                async function exportAsPDF() {
+               async function exportAsPDF() {
                     const currentContractId = contractSelector.value;
                     const data = projectData.find(p => p.id === currentContractId);
 
@@ -1248,7 +1248,7 @@
                         const chartTempCtx = chartTempCanvas.getContext('2d');
                         chartTempCtx.fillStyle = '#FFFFFF'; // Set white background
                         chartTempCtx.fillRect(0, 0, chartTempCanvas.width, chartTempCanvas.height);
-                        chartTempCtx.drawImage(originalCanvas, 0, 0);
+                        chartTempCtx.drawImage(originalChartCanvas, 0, 0);
 
                         const chartImg = new Image();
                         chartImg.src = chartTempCanvas.toDataURL('image/png');
