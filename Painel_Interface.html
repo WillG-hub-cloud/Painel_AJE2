@@ -216,6 +216,9 @@
                 <button id="exportPdfButton" title="Exportar PDF" class="p-1 w-8 h-8 rounded-lg shadow transition-colors flex items-center justify-center font-bold" style="background-color: transparent; hover:background-color: rgba(220, 53, 69, 0.2);">
                     <i class="fas fa-file-pdf text-2xl text-gray-800"></i>
                 </button>
+                <button id="exportRouteButton" title="Gerar Rota no Google Maps" class="p-1 w-8 h-8 rounded-lg shadow transition-colors flex items-center justify-center font-bold" style="background-color: transparent; hover:background-color: rgba(0, 150, 136, 0.2);">
+                    <i class="fas fa-route text-2xl text-gray-800"></i>
+                </button>
             </div>
 
             <main>
@@ -393,6 +396,11 @@
                 const exportChartPngButton = document.getElementById('exportChartPngButton');
                 const exportTableCsvButton = document.getElementById('exportTableCsvButton');
                 const exportPdfButton = document.getElementById('exportPdfButton');
+                const exportRouteButton = document.getElementById('exportRouteButton'); // Novo botão
+
+                // Define a localização da Prefeitura Municipal de Jundiaí usando o endereço fornecido
+                // Coordenadas obtidas através de pesquisa no Google Maps para: Av. da Liberdade, S/N - Jardim Botânico, Jundiaí - SP, 13214-900
+                const prefeituraJundiaiLocation = "-23.170850, -46.900323"; // Latitude e Longitude da Prefeitura de Jundiaí
 
                 let map;
                 let mainChart;
@@ -1177,6 +1185,7 @@
                     clonedDashboard.querySelector('#exportChartPngButton')?.remove();
                     clonedDashboard.querySelector('#exportTableCsvButton')?.remove();
                     clonedDashboard.querySelector('#exportPdfButton')?.remove();
+                    clonedDashboard.querySelector('#exportRouteButton')?.remove(); // Remove o novo botão de rota
 
                     // Ensure all content views are visible for PDF export
                     clonedDashboard.querySelectorAll('.content-view').forEach(el => {
@@ -1276,6 +1285,32 @@
                     pdf.save(filename);
                 }
 
+                /**
+                 * Abre uma nova aba no Google Maps com uma rota da Prefeitura Municipal de Jundiaí
+                 * até a localização do contrato selecionado.
+                 */
+                function exportRouteToGoogleMaps() {
+                    const currentContractId = contractSelector.value;
+                    const data = projectData.find(p => p.id === currentContractId);
+
+                    if (!data || !data.location || !data.location.lat || !data.location.lng) {
+                        alert("Localização do contrato não disponível para gerar rota.");
+                        return;
+                    }
+
+                    const destinationLat = parseFloat(data.location.lat);
+                    const destinationLng = parseFloat(data.location.lng);
+
+                    if (isNaN(destinationLat) || isNaN(destinationLng)) {
+                        alert("Coordenadas de localização inválidas para gerar rota.");
+                        return;
+                    }
+
+                    // Utiliza as coordenadas da Prefeitura Municipal de Jundiaí e do contrato
+                    const googleMapsUrl = `https://www.google.com/maps/dir/${prefeituraJundiaiLocation}/${destinationLat},${destinationLng}`;
+                    window.open(googleMapsUrl, '_blank');
+                }
+
                 // Initial map and data loading
                 map = L.map('map').setView([-23.17, -46.87], 12);
 
@@ -1367,6 +1402,7 @@
                 document.getElementById('exportChartPngButton').addEventListener('click', exportChartAsPNG);
                 document.getElementById('exportTableCsvButton').addEventListener('click', exportTableAsCSV);
                 document.getElementById('exportPdfButton').addEventListener('click', exportAsPDF);
+                document.getElementById('exportRouteButton').addEventListener('click', exportRouteToGoogleMaps); // Adiciona o event listener ao novo botão
 
                 showMapView();
                 updateSummaryMetrics();
