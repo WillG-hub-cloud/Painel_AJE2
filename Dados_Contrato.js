@@ -72,14 +72,14 @@ const projectData = [
             { medicao: 2, inicio: '06/11/24', fim: '05/12/24', ref: 'Dez/24', valor: 193930.07, acumulado: 340947.43 },
             { medicao: 3, inicio: '06/12/24', fim: '04/01/25', ref: 'Jan/25', valor: 78717.56, acumulado: 419664.99 },
             { medicao: 4, inicio: '05/01/25', fim: '03/02/25', ref: 'Fev/25', valor: 96409.89, acumulado: 516074.88 },
-            { medicao: 6, inicio: '04/02/25', fim: '03/04/25', ref: 'Abr/25', valor: 437000.00, acumulado: 1220155.93 }, // Este valor é a diferença entre o acumulado de Mar/25 (do reajuste 1) e o acumulado de Abr/25 (do reajuste 2)
-            { medicao: 7, inicio: '04/04/25', fim: '03/05/25', ref: 'Mai/25', valor: 308812.37, acumulado: 1174071.39 },
-            { medicao: 8, inicio: '04/05/25', fim: '03/06/25', ref: 'Jun/25', valor: 333302.47, acumulado: 1507373.86 },
-            { medicao: 9, inicio: '04/06/25', fim: '03/07/25', ref: 'Jul/25', valor: 265536.22, acumulado: 1772910.08 }, 
-            { medicao: 10, inicio: '04/07/25', fim: '03/08/25', ref: 'Ago/25', valor: 255395.87, acumulado: 2028305.95 }, 
-            { medicao: 11, inicio: '04/08/25', fim: '03/09/25', ref: 'Set/25', valor: 149312.68, acumulado: 2177618.63 }, 
-            { medicao: 12, inicio: '04/09/25', fim: '03/10/25', ref: 'Out/25', valor: 251223.27, acumulado: 2428841.90 }, 
-            { medicao: 13, inicio: '04/10/25', fim: '03/11/25', ref: 'Nov/25', valor: 240668.48, acumulado: 2669510.38 }, 
+            { medicao: 5, inicio: '04/02/25', fim: '03/04/25', ref: 'Abr/25', valor: 437000.00, acumulado: 1220155.93 }, // Este valor é a diferença entre o acumulado de Mar/25 (do reajuste 1) e o acumulado de Abr/25 (do reajuste 2)
+            { medicao: 6, inicio: '04/04/25', fim: '03/05/25', ref: 'Mai/25', valor: 308812.37, acumulado: 1174071.39 },
+            { medicao: 7, inicio: '04/05/25', fim: '03/06/25', ref: 'Jun/25', valor: 333302.47, acumulado: 1507373.86 },
+            { medicao: 8, inicio: '04/06/25', fim: '03/07/25', ref: 'Jul/25', valor: 265536.22, acumulado: 1772910.08 }, 
+            { medicao: 9, inicio: '04/07/25', fim: '03/08/25', ref: 'Ago/25', valor: 255395.87, acumulado: 2028305.95 }, 
+            { medicao: 10, inicio: '04/08/25', fim: '03/09/25', ref: 'Set/25', valor: 149312.68, acumulado: 2177618.63 }, 
+            { medicao: 11, inicio: '04/09/25', fim: '03/10/25', ref: 'Out/25', valor: 251223.27, acumulado: 2428841.90 }, 
+            { medicao: 12, inicio: '04/10/25', fim: '03/11/25', ref: 'Nov/25', valor: 240668.48, acumulado: 2669510.38 }, 
         ],
         grafico: {
             labels: ["Nov/24", "Dez/24", "Jan/25", "Fev/25", "Mar/25", "Abr/25", "Mai/25", "Jun/25", "Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25"], // Labels estendidos até Mar/25 para o cronograma inicial
