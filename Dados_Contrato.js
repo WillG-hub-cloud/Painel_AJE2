@@ -72,8 +72,7 @@ const projectData = [
             { medicao: 2, inicio: '06/11/24', fim: '05/12/24', ref: 'Dez/24', valor: 193930.07, acumulado: 340947.43 },
             { medicao: 3, inicio: '06/12/24', fim: '04/01/25', ref: 'Jan/25', valor: 78717.56, acumulado: 419664.99 },
             { medicao: 4, inicio: '05/01/25', fim: '03/02/25', ref: 'Fev/25', valor: 96409.89, acumulado: 516074.88 },
-            { medicao: 5, inicio: '04/02/25', fim: '03/03/25', ref: 'Mar/25', valor: 267092.82, acumulado: 783167.70 }, // Preenchido com valor do reajuste 1, depois passa para o reajuste 2
-            { medicao: 6, inicio: '04/03/25', fim: '03/04/25', ref: 'Abr/25', valor: 437000.00, acumulado: 1220155.93 }, // Este valor é a diferença entre o acumulado de Mar/25 (do reajuste 1) e o acumulado de Abr/25 (do reajuste 2)
+            { medicao: 6, inicio: '04/02/25', fim: '03/04/25', ref: 'Abr/25', valor: 437000.00, acumulado: 1220155.93 }, // Este valor é a diferença entre o acumulado de Mar/25 (do reajuste 1) e o acumulado de Abr/25 (do reajuste 2)
             { medicao: 7, inicio: '04/04/25', fim: '03/05/25', ref: 'Mai/25', valor: 308812.37, acumulado: 1174071.39 },
             { medicao: 8, inicio: '04/05/25', fim: '03/06/25', ref: 'Jun/25', valor: 333302.47, acumulado: 1507373.86 },
             { medicao: 9, inicio: '04/06/25', fim: '03/07/25', ref: 'Jul/25', valor: 265536.22, acumulado: 1772910.08 }, 
