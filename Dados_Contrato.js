@@ -43,17 +43,12 @@ const projectData = [
 
         // Dados para o gráfico: Define as séries de dados a serem plotadas.
         grafico: {
-            // Rótulos do eixo X (geralmente meses/períodos). Devem corresponder aos 'ref' das medições.
-            labels: ["Mai/25", "Jun/25", "Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25"],
-            // Valores acumulados previstos. Use 'null' para pontos futuros onde ainda não há execução.
-            // Se houver mais de um cronograma previsto (ex: inicial e novo), use 'previstoDataSets'.
+            labels: ["Mai/25", "Jun/25", "Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25"], // Termina em Dez/25
             previstoDataSets: [
-                { label: "Cronograma Inicial", data: [164490.45, 336423.85, null, null, null, null, null, null] }, // Termina em Dez/25
-                { label: "Cronograma Retificado I", data: [null, null, 200391.22, 456648.02,  759827.63, 1147658.15, 1443929.50, 1718878.29] }, // Nova série azul (reajuste 1)
+                { label: "Cronograma Inicial", data: [164490.45, 336423.85, null, null, null, null, null, null] }, // Termina em Mar/25
+                { label: "Cronograma Prorrogação I", data: [null, null, 200391.22, 456648.02,  759827.63, 1147658.15, 1443929.50, 1718878.29] }, // Nova série azul (Retificado 1)
                 ],
-            // Valores acumulados executados. Use 'null' para períodos sem execução ou futuros.
-            executado: [107178.95, 124644.24, 185092.67, null, null, null, null, null],
-            // Para contratos com múltiplos cronogramas previstos (ex: inicial e novo).
+            executado: [107178.95, 124644.24, 185092.67, null, null, null, null, null] // Executado até Jul/25
         },
         // Data prevista de início do contrato. Formato 'DD/MM/AAAA'. Use 'N/A' se não aplicável.
         predicted_start_date: '15/04/2025',
