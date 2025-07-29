@@ -47,9 +47,12 @@ const projectData = [
             labels: ["Mai/25", "Jun/25", "Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25"],
             // Valores acumulados previstos. Use 'null' para pontos futuros onde ainda não há execução.
             // Se houver mais de um cronograma previsto (ex: inicial e novo), use 'previstoDataSets'.
-            previsto: [164490.45, 336423.85, 578404.57, 823300.18, 1029579.73, 1264982.09, 1502623.51, 1718878.30],
+            previstoDataSets: [
+                { label: "Cronograma Inicial", data: [164490.45, 336423.85, null, null, null, null, null, null] }, // Termina em Dez/25
+                { label: "Cronograma Retificado I", data: [null, null, 200391.22, 456648.02,  759827.63, 1147658.15, 1443929.50, 1718878.29] }, // Nova série azul (reajuste 1)
+                ],
             // Valores acumulados executados. Use 'null' para períodos sem execução ou futuros.
-            executado: [107178.95, 124644.24, 60448.43, null, null, null, null, null],
+            executado: [107178.95, 124644.24, 185092.67, null, null, null, null, null],
             // Para contratos com múltiplos cronogramas previstos (ex: inicial e novo).
             // Remova ou defina como 'null' se o contrato tiver apenas um cronograma previsto simples.
             previstoDataSets: null 
