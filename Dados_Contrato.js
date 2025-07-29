@@ -54,8 +54,6 @@ const projectData = [
             // Valores acumulados executados. Use 'null' para períodos sem execução ou futuros.
             executado: [107178.95, 124644.24, 185092.67, null, null, null, null, null],
             // Para contratos com múltiplos cronogramas previstos (ex: inicial e novo).
-            // Remova ou defina como 'null' se o contrato tiver apenas um cronograma previsto simples.
-            previstoDataSets: null 
         },
         // Data prevista de início do contrato. Formato 'DD/MM/AAAA'. Use 'N/A' se não aplicável.
         predicted_start_date: '15/04/2025',
