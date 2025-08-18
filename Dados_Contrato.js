@@ -40,15 +40,11 @@ const projectData = [
             { medicao: 7, inicio: "18/10/25", fim: "17/11/25", ref: "Nov/25", valor: 237641.42, acumulado: 1502623.51 },
             { medicao: 8, inicio: "18/11/25", fim: "10/12/25", ref: "Dez/25", valor: 216254.79, acumulado: 1718878.30 },
         ],
-
-        // Dados para o gráfico: Define as séries de dados a serem plotadas.
         grafico: {
-            labels: ["Mai/25", "Jun/25", "Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25"], // Termina em Dez/25
-            previstoDataSets: [
-                { label: "Cronograma Inicial", data: [164490.45, 336423.85, null, null, null, null, null, null] }, // Termina em Mar/25
-                { label: "Cronograma Prorrogação I", data: [null, null, 200391.22, 456648.02,  759827.63, 1147658.15, 1443929.50, 1718878.29] }, // Nova série azul (Retificado 1)
-                ],
-            executado: [107178.95, 124644.24, 185092.67, null, null, null, null, null] // Executado até Jul/25
+            labels: ["Mai/25", "Jun/25", "Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25", "Jan/26", "Fev/26", "Mar/26", "Abr/26"],
+            previsto: [164490.45, 336423.85, 200391.22, 456648.02,  759827.63, 1147658.15, 1443929.50, 1718878.29],
+            executado: [107178.95, 124644.24, 185092.67, null, null, null, null, null],
+            previstoDataSets: null
         },
         // Data prevista de início do contrato. Formato 'DD/MM/AAAA'. Use 'N/A' se não aplicável.
         predicted_start_date: '15/04/2025',
@@ -238,3 +234,4 @@ const projectData = [
         location: { lat: -23.18555067042124, lng: -46.85363796732586 }
     }
 ];
+
