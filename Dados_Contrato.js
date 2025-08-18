@@ -143,8 +143,8 @@ const projectData = [
             previstoDataSets: null
         },
         // Datas fictícias para contratos que ainda não tem cronograma real de início e fim.
-        predicted_start_date: '30/01/2000',
-        predicted_end_date: '06/12/2000',
+        predicted_start_date: 'N/A',
+        predicted_end_date: 'N/A',
         location: { lat: -23.18183604007579, lng: -46.81048269582229 }
     },
     {
@@ -207,8 +207,8 @@ const projectData = [
             executado: [],
             previstoDataSets: null
         },
-        predicted_start_date: 'N/A', // Placeholder
-        predicted_end_date: 'N/A', // Placeholder
+        predicted_start_date: '28/07/2025', // OS 10/2025 emitida em 25/07/2025
+        predicted_end_date: '20/09/2026', // 420 dias de execução segundo a OS
         location: { lat: -23.11557702080163, lng: -46.92453149 }
     },
     {
@@ -234,6 +234,7 @@ const projectData = [
         location: { lat: -23.18555067042124, lng: -46.85363796732586 }
     }
 ];
+
 
 
 
