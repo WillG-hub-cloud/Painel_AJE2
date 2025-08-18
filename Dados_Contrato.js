@@ -208,7 +208,7 @@ const projectData = [
             previstoDataSets: null
         },
         predicted_start_date: '28/07/2025', // OS 10/2025 emitida em 25/07/2025
-        predicted_end_date: '20/09/2026', // 420 dias de execução segundo a OS
+        predicted_end_date: '20/09/2026', // 420 dias corridos de execução segundo a OS
         location: { lat: -23.11557702080163, lng: -46.92453149 }
     },
     {
@@ -229,11 +229,12 @@ const projectData = [
             executado: [],
             previstoDataSets: null
         },
-        predicted_start_date: '30/01/2000', // Placeholder
-        predicted_end_date: '02/04/2000', // Placeholder
+        predicted_start_date: '07/07/2025', // OS 9/2025 emitida em 24/06/2025
+        predicted_end_date: '03/11/2025', // 120 dias corridos de execução segundo a OS
         location: { lat: -23.18555067042124, lng: -46.85363796732586 }
     }
 ];
+
 
 
 
