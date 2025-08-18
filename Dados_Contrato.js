@@ -57,7 +57,7 @@ const projectData = [
         id: "CT 127/24",
         objeto: "UBS Rio Branco",
         empresa: "CJM Construtora Ltda",
-        valorAtual: 2669510.38, // Valor atualizado para o último acumulado do Cronograma Reajuste II
+        valorAtual: 2664287.67, // Valor atualizado para o último acumulado do Cronograma Reajuste II
         observacoes: "Além do novo cronograma, adotado a partir de abril, foi protocolado novo aditivo que extenderá o contrato para término em novembro.", // Observação atualizada
         medicoes: [
             { medicao: 1, inicio: '07/10/24', fim: '05/11/24', ref: 'Nov/24', valor: 147017.36, acumulado: 147017.36 },
@@ -234,6 +234,7 @@ const projectData = [
         location: { lat: -23.18555067042124, lng: -46.85363796732586 }
     }
 ];
+
 
 
 
