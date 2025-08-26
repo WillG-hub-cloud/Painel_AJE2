@@ -43,7 +43,7 @@ const projectData = [
         grafico: {
             labels: ["Mai/25", "Jun/25", "Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25", "Jan/26", "Fev/26", "Mar/26", "Abr/26"],
             previsto: [164490.45, 336423.85, 200391.22, 456648.02,  759827.63, 1147658.15, 1443929.50, 1718878.29],
-            executado: [107178.95, 124644.24, 185092.67, null, null, null, null, null],
+            executado: [107178.95, 124644.24, 185092.67, 340430.46, null, null, null, null],
             previstoDataSets: null
         },
         // Data prevista de início do contrato. Formato 'DD/MM/AAAA'. Use 'N/A' se não aplicável.
@@ -234,6 +234,7 @@ const projectData = [
         location: { lat: -23.18555067042124, lng: -46.85363796732586 }
     }
 ];
+
 
 
 
