@@ -152,7 +152,7 @@ const projectData = [
         objeto: "UBS Maringá",
         empresa: "Studio Sabino & Souza A",
         valorAtual: 3629613.36,
-        observacoes: "Contrato ainda não possui medições.",
+        observacoes: null,
         medicoes: [
             { medicao: 1, inicio: "1º Mês", fim: "15/07/2025", ref: "Jul/25", valor: 292590.76, acumulado: 292590.76 },
             { medicao: 2, inicio: "2º Mês", fim: "15/08/2025", ref: "Ago/25", valor: 241692.06, acumulado: 534282.82 },
@@ -184,7 +184,7 @@ const projectData = [
         objeto: "UBS Rio Acima",
         empresa: "LBD Engenharia Ltda EPP",
         valorAtual: 4770000.00,
-        observacoes: "Contrato ainda não foi assinado.",
+        observacoes: null,
         medicoes: [
             { medicao: 1, inicio: '1º Mês', fim: 'N/A', ref: null, valor: 651465.99, acumulado: 651465.99 },
             { medicao: 2, inicio: '2º Mês', fim: 'N/A', ref: null, valor: 235455.54, acumulado: 886921.53 },
@@ -216,7 +216,7 @@ const projectData = [
         objeto: "CECE Romão",
         empresa: "Adriana Rodrigues Belles",
         valorAtual: 1480000.00,
-        observacoes: "Contrato ainda não possui medições.",
+        observacoes: "OS Emitida em 07/07/2025",
         medicoes: [
             { medicao: 1, inicio: '1º Mês', fim: 'N/A', ref: null, valor: 149571.75, acumulado: 149571.75 },
             { medicao: 2, inicio: '2º Mês', fim: 'N/A', ref: null, valor: 581145.10, acumulado: 730716.85 },
@@ -234,6 +234,7 @@ const projectData = [
         location: { lat: -23.18555067042124, lng: -46.85363796732586 }
     }
 ];
+
 
 
 
