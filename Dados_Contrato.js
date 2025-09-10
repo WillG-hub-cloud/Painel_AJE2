@@ -226,7 +226,7 @@ const projectData = [
         grafico: { // Populated based on medicoes
             labels: ["1º Mês", "2º Mês", "3º Mês", "4º Mês"],
             previsto: [149571.75, 730716.85, 1300261.90, 1480000.00],
-            executado: [],
+            executado: [261030.50, null, null, null],
             previstoDataSets: null
         },
         predicted_start_date: '07/07/2025', // OS 9/2025 emitida em 24/06/2025
@@ -234,6 +234,7 @@ const projectData = [
         location: { lat: -23.18555067042124, lng: -46.85363796732586 }
     }
 ];
+
 
 
 
