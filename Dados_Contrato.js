@@ -80,7 +80,7 @@ const projectData = [
                 { label: "Cronograma Prorrogação I", data: [null, null, null, null,  865259.02, 1174071.39, 1507373.86, null, null, null, null, null] }, // Nova série azul (reajuste 1)
                 { label: "Cronograma Prorrogação II", data: [null, null, null, null, null, null, 1397234.90, 1662771.12, 1918166.99, 2172395.90, 2423619.18, 2664287.67] } // Nova série laranja (reajuste 2) - Inicia em Jul/25 ou onde a laranja da sua imagem iniciar
             ],
-            executado: [147017.36, 340947.43, 419664.99, 516074.88, 893732.79, 1177420.96, 1397234.9, 1826026.83 , 2080121.09, null, null, null, null] // Executado até Jun/25
+            executado: [147017.36, 340947.43, 419664.99, 516074.88, 893732.79, 1177420.96, 1397234.9, 1611630.86, 1826026.83, 2080121.09, null, null, null] // Executado até Jun/25
         },
         predicted_start_date: '07/10/2024',
         predicted_end_date: '03/11/2025', // Atualizado para novembro de 2025
@@ -234,6 +234,7 @@ const projectData = [
         location: { lat: -23.18555067042124, lng: -46.85363796732586 }
     }
 ];
+
 
 
 
