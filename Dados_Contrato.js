@@ -109,7 +109,7 @@ const projectData = [
         grafico: {
             labels: ["Mai/25", "Jun/25", "Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25", "Jan/26", "Fev/26", "Mar/26", "Abr/26"],
             previsto: [321595.91, 975559.72, 1329606.69, 1603339.23, 2437385.26, 3264248.65, 4446317.27, 5419662.56, 6006782.35, 6347449.86, 6598840.00],
-            executado: [90152.14, 400780.12, null, null, null, null, null, null, null, null, null],
+            executado: [90152.14, 400780.12, 501867.82, null, null, null, null, null, null, null, null],
             previstoDataSets: null
         },
         predicted_start_date: '22/04/2025',
@@ -234,6 +234,7 @@ const projectData = [
         location: { lat: -23.18555067042124, lng: -46.85363796732586 }
     }
 ];
+
 
 
 
