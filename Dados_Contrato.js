@@ -172,7 +172,7 @@ const projectData = [
         grafico: { // Populated based on medicoes
             labels: ["1º Mês", "2º Mês", "3º Mês", "4º Mês", "5º Mês", "6º Mês", "7º Mês", "8º Mês", "9º Mês", "10º Mês", "11º Mês", "12º Mês", "13º Mês", "14º Mês"],
             previsto: [292590.76, 534282.82, 632255.10, 726776.13, 906496.89, 1078035.34, 1375896.09, 1731815.40, 1939154.42, 2286895.77, 2770035.72, 3062222.23, 3398805.76, 3629613.36],
-            executado: [311389.54, null, null, null, null, null, null, null, null, null, null, null, null, null],
+            executado: [311389.54, 311389.54, 311389.54, null, null, null, null, null, null, null, null, null, null, null],
             previstoDataSets: null
         },
         predicted_start_date: '16/06/2025',
@@ -234,6 +234,7 @@ const projectData = [
         location: { lat: -23.18555067042124, lng: -46.85363796732586 }
     }
 ];
+
 
 
 
