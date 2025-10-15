@@ -114,7 +114,7 @@ const projectData = [
         },
         predicted_start_date: '22/04/2025',
         predicted_end_date: '21/04/2026',
-        location: { lat: -23.19038589001708, lng: -46.85558008684543 }
+        location: { lat: -23.189364, lng: -46.855773 }, 
     },
     {
         id: "CT 052/25",
@@ -234,6 +234,7 @@ const projectData = [
         location: { lat: -23.18555067042124, lng: -46.85363796732586 }
     }
 ];
+
 
 
 
