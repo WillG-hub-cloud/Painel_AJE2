@@ -233,10 +233,11 @@ const projectData = [
             previstoDataSets: null
         },
         predicted_start_date: '07/07/2025', // OS 9/2025 emitida em 24/06/2025
-        predicted_end_date: '03/11/2025', // 120 dias corridos de execução segundo a OS
+        predicted_end_date: '06/02/2025', // 120 dias corridos de execução segundo a OS
         location: { lat: -23.184126, lng: -46.853513 }, 
     }
 ];
+
 
 
 
