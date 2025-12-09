@@ -202,7 +202,7 @@ const projectData = [
             { medicao: 14, inicio: "28/08/2026", fim: "27/09/2026", ref: "Set/26", valor: 77729.16, acumulado: 4770000.00 },
         ],
         grafico: { // Populated based on medicoes
-            labels: ["1º Mês", "2º Mês", "3º Mês", "4º Mês", "5º Mês", "6º Mês", "7º Mês", "8º Mês", "9º Mês", "10º Mês", "11º Mês", "12º Mês", "13º Mês", "14º Mês"],
+            labels: ["Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25", "Jan/26", "Fev/26", "Mar/26", "Abr/26", "Mai/26", "Jun/26", "Jul/26", "Ago/26", "Set/26"],
             previsto: [651465.99, 886921.53, 1101058.16, 1308953.19, 1557227.57, 1921228.42, 2447932.45, 2849561.05, 3282672.65, 3730914.35, 4141572.63, 4429453.57, 4692270.84, 4770000.00],
             executado: [252392.52 , 252392.52, 515634.17, null, null, null, null, null, null, null, null, null, null, null],
             previstoDataSets: null
@@ -237,6 +237,7 @@ const projectData = [
         location: { lat: -23.184126, lng: -46.853513 }, 
     }
 ];
+
 
 
 
