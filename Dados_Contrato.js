@@ -224,7 +224,7 @@ const projectData = [
             { medicao: 4, inicio: '07/10/2025', fim: '06/11/2025', ref: "Out/25", valor: 498074.55, acumulado: 866856.13 },
             { medicao: 5, inicio: "07/11/25", fim: "06/12/2025", ref: "Nov/25", valor: 302628.67, acumulado: 1169484.80 },
             { medicao: 6, inicio: "07/12/25", fim: "06/01/2026", ref: "Dez/25", valor: 163668.40, acumulado: 1333153.20 },
-            { medicao: 7, inicio: "07/01/26", fim: "06/02/2025", ref: "Jan/26", valor: 146846.80, acumulado: 148000.00 },
+            { medicao: 7, inicio: "07/01/26", fim: "06/02/2026", ref: "Jan/26", valor: 146846.80, acumulado: 148000.00 },
         ],
         grafico: { // Populated based on medicoes
             labels: ["Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25", "Jan/26"],
@@ -233,10 +233,11 @@ const projectData = [
             previstoDataSets: null
         },
         predicted_start_date: '07/07/2025', // OS 9/2025 emitida em 24/06/2025
-        predicted_end_date: '06/02/2025', // 120 dias corridos de execução segundo a OS
+        predicted_end_date: '06/02/2026', // 120 dias corridos de execução segundo a OS
         location: { lat: -23.184126, lng: -46.853513 }, 
     }
 ];
+
 
 
 
