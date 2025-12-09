@@ -186,25 +186,25 @@ const projectData = [
         valorAtual: 4770000.00,
         observacoes: null,
         medicoes: [
-            { medicao: 1, inicio: '1º Mês', fim: 'N/A', ref: null, valor: 651465.99, acumulado: 651465.99 },
-            { medicao: 2, inicio: '2º Mês', fim: 'N/A', ref: null, valor: 235455.54, acumulado: 886921.53 },
-            { medicao: 3, inicio: '3º Mês', fim: 'N/A', ref: null, valor: 214136.63, acumulado: 1101058.16 },
-            { medicao: 4, inicio: '4º Mês', fim: 'N/A', ref: null, valor: 207896.03, acumulado: 1308953.19 },
-            { medicao: 5, inicio: '5º Mês', fim: 'N/A', ref: null, valor: 248274.38, acumulado: 1557227.57 },
-            { medicao: 6, inicio: '6º Mês', fim: 'N/A', ref: null, valor: 364000.85, acumulado: 1921228.42 },
-            { medicao: 7, inicio: '7º Mês', fim: 'N/A', ref: null, valor: 526704.03, acumulado: 2447932.45 },
-            { medicao: 8, inicio: "8º Mês", fim: 'N/A', ref: null, valor: 401628.60, acumulado: 2849561.05 },
-            { medicao: 9, inicio: "9º Mês", fim: 'N/A', ref: null, valor: 433111.60, acumulado: 3282672.65 },
-            { medicao: 10, inicio: "10º Mês", fim: "N/A", ref: null, valor: 448241.70, acumulado: 3730914.35 },
-            { medicao: 11, inicio: "11º Mês", fim: "N/A", ref: null, valor: 410658.28, acumulado: 4141572.63 },
-            { medicao: 12, inicio: "12º Mês", fim: "N/A", ref: null, valor: 287880.94, acumulado: 4429453.57 },
-            { medicao: 13, inicio: "13º Mês", fim: 'N/A', ref: null, valor: 262817.27, acumulado: 4692270.84 },
-            { medicao: 14, inicio: "14º Mês", fim: 'N/A', ref: null, valor: 77729.16, acumulado: 4770000.00 },
+            { medicao: 1, inicio: "28/07/2025", fim: "27/08/2025", ref: "Ago/25", valor: 651465.99, acumulado: 651465.99 },
+            { medicao: 2, inicio: "28/08/2025", fim: "27/09/2025", ref: "Set/25", valor: 235455.54, acumulado: 886921.53 },
+            { medicao: 3, inicio: "28/09/2025", fim: "27/10/2025", ref: "Out/25", valor: 214136.63, acumulado: 1101058.16 },
+            { medicao: 4, inicio: "28/10/2025", fim: "27/11/2025", ref: "Nov/25", valor: 207896.03, acumulado: 1308953.19 },
+            { medicao: 5, inicio: "28/11/2025", fim: "27/12/2025", ref: "Dez/25", valor: 248274.38, acumulado: 1557227.57 },
+            { medicao: 6, inicio: "28/12/2025", fim: "27/01/2026", ref: "Jan/26", valor: 364000.85, acumulado: 1921228.42 },
+            { medicao: 7, inicio: "28/01/2026", fim: "27/02/2026", ref: "Fev/26", valor: 526704.03, acumulado: 2447932.45 },
+            { medicao: 8, inicio: "28/02/2026", fim: "27/03/2026", ref: "Mar/26", valor: 401628.60, acumulado: 2849561.05 },
+            { medicao: 9, inicio: "28/03/2026", fim: "27/04/2026", ref: "Abr/26", valor: 433111.60, acumulado: 3282672.65 },
+            { medicao: 10, inicio: "28/04/2026", fim: "27/05/2026", ref: "Mai/26", valor: 448241.70, acumulado: 3730914.35 },
+            { medicao: 11, inicio: "28/05/2026", fim: "27/06/2026", ref: "Jun/26", valor: 410658.28, acumulado: 4141572.63 },
+            { medicao: 12, inicio: "28/06/2026", fim: "27/07/2026", ref: "Jul/26", valor: 287880.94, acumulado: 4429453.57 },
+            { medicao: 13, inicio: "28/07/2026", fim: "27/08/2026", ref: "Ago/26", valor: 262817.27, acumulado: 4692270.84 },
+            { medicao: 14, inicio: "28/08/2026", fim: "27/09/2026", ref: "Set/26", valor: 77729.16, acumulado: 4770000.00 },
         ],
         grafico: { // Populated based on medicoes
             labels: ["1º Mês", "2º Mês", "3º Mês", "4º Mês", "5º Mês", "6º Mês", "7º Mês", "8º Mês", "9º Mês", "10º Mês", "11º Mês", "12º Mês", "13º Mês", "14º Mês"],
             previsto: [651465.99, 886921.53, 1101058.16, 1308953.19, 1557227.57, 1921228.42, 2447932.45, 2849561.05, 3282672.65, 3730914.35, 4141572.63, 4429453.57, 4692270.84, 4770000.00],
-            executado: [252392.52 , 515634.17, null, null, null, null, null, null, null, null, null, null, null, null],
+            executado: [252392.52 , 252392.52, 515634.17, null, null, null, null, null, null, null, null, null, null, null],
             previstoDataSets: null
         },
         predicted_start_date: '28/07/2025', // OS 10/2025 emitida em 25/07/2025
@@ -237,6 +237,7 @@ const projectData = [
         location: { lat: -23.184126, lng: -46.853513 }, 
     }
 ];
+
 
 
 
