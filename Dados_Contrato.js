@@ -221,7 +221,7 @@ const projectData = [
             { medicao: 1, inicio: '07/07/2025', fim: '06/08/2025', ref: "Jul/25", valor: 149571.75, acumulado: 149571.75 },
             { medicao: 2, inicio: '07/08/2025', fim: '06/09/2025', ref: "Ago/25", valor: 57580.00, acumulado: 318610.50 },
             { medicao: 3, inicio: '07/09/2025', fim: '06/10/2025', ref: "Set/25", valor: 50171.08, acumulado: 368781.58 },
-            { medicao: 4, inicio: '07/10/2025', fim: '06/11/2025', ref: "Out/25", valor: 498074.55, acumulado: 866856.13 }
+            { medicao: 4, inicio: '07/10/2025', fim: '06/11/2025', ref: "Out/25", valor: 498074.55, acumulado: 866856.13 },
             { medicao: 5, inicio: "07/11/25", fim: "06/12/2025", ref: "Nov/25", valor: 302628.67, acumulado: 1169484.80 },
             { medicao: 6, inicio: "07/12/25", fim: "06/01/2026", ref: "Dez/25", valor: 163668.40, acumulado: 1333153.20 },
             { medicao: 7, inicio: "07/01/26", fim: "06/02/2025", ref: "Jan/26", valor: 146846.80, acumulado: 148000.00 },
@@ -237,6 +237,7 @@ const projectData = [
         location: { lat: -23.184126, lng: -46.853513 }, 
     }
 ];
+
 
 
 
