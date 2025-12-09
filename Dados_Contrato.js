@@ -228,7 +228,7 @@ const projectData = [
         ],
         grafico: { // Populated based on medicoes
             labels: ["Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25", "Jan/26"],
-            previsto: [149571.75, 318610.50, 368781.58, 866856.13, 1169484.80, 1333153.20, 148000.00],
+            previsto: [149571.75, 318610.50, 368781.58, 866856.13, 1169484.80, 1333153.20, 1480000.00],
             executado: [261030.50, 261030.50, 261030.50, 366229.87, 553163.84, null, null],
             previstoDataSets: null
         },
@@ -237,6 +237,7 @@ const projectData = [
         location: { lat: -23.184126, lng: -46.853513 }, 
     }
 ];
+
 
 
 
