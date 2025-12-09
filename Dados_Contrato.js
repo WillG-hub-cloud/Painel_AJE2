@@ -109,7 +109,7 @@ const projectData = [
         grafico: {
             labels: ["Mai/25", "Jun/25", "Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25", "Jan/26", "Fev/26", "Mar/26", "Abr/26"],
             previsto: [321595.91, 975559.72, 1329606.69, 1603339.23, 2437385.26, 3264248.65, 4446317.27, 5419662.56, 6006782.35, 6347449.86, 6598840.00],
-            executado: [90152.14, 400780.12, 501867.82, 575647.70 , null, null, null, null, null, null, null],
+            executado: [90152.14, 400780.12, 501867.82, 575647.70 , 939679.49, null, null, null, null, null, null],
             previstoDataSets: null
         },
         predicted_start_date: '22/04/2025',
@@ -204,7 +204,7 @@ const projectData = [
         grafico: { // Populated based on medicoes
             labels: ["1º Mês", "2º Mês", "3º Mês", "4º Mês", "5º Mês", "6º Mês", "7º Mês", "8º Mês", "9º Mês", "10º Mês", "11º Mês", "12º Mês", "13º Mês", "14º Mês"],
             previsto: [651465.99, 886921.53, 1101058.16, 1308953.19, 1557227.57, 1921228.42, 2447932.45, 2849561.05, 3282672.65, 3730914.35, 4141572.63, 4429453.57, 4692270.84, 4770000.00],
-            executado: [252392.52 , null, null, null, null, null, null, null, null, null, null, null, null, null],
+            executado: [252392.52 , 515634.17, null, null, null, null, null, null, null, null, null, null, null, null],
             previstoDataSets: null
         },
         predicted_start_date: '28/07/2025', // OS 10/2025 emitida em 25/07/2025
@@ -226,7 +226,7 @@ const projectData = [
         grafico: { // Populated based on medicoes
             labels: ["1º Mês", "2º Mês", "3º Mês", "4º Mês"],
             previsto: [149571.75, 730716.85, 1300261.90, 1480000.00],
-            executado: [261030.50, null, null, null],
+            executado: [261030.50, 366229.87, 553163.84, null],
             previstoDataSets: null
         },
         predicted_start_date: '07/07/2025', // OS 9/2025 emitida em 24/06/2025
@@ -234,6 +234,7 @@ const projectData = [
         location: { lat: -23.184126, lng: -46.853513 }, 
     }
 ];
+
 
 
 
