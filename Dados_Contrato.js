@@ -47,6 +47,8 @@ const projectData = [
                 { label: "Cronograma Inicial", data: [164490.45, 336423.85, null, null, null, null, null, null, null] }, // Termina em Mar/25
                 { label: "Cronograma Prorrogação I", data: [null, null, 200391.22, 456648.02,  759827.63, 1147658.15, null, null, null] }, // Nova série azul (reajuste 1)
                 { label: "Cronograma Prorrogação II", data: [null, null, null, null, null, null, 1008975.63, 1372929.56, 1718878.29] }
+                ]
+        },
         // Data prevista de início do contrato. Formato 'DD/MM/AAAA'. Use 'N/A' se não aplicável.
         predicted_start_date: '15/04/2025',
         // Data prevista de fim do contrato. Formato 'DD/MM/AAAA'. Use 'N/A' se não aplicável.
@@ -168,7 +170,7 @@ const projectData = [
             { medicao: 11, inicio: "16/04/2026", fim: "15/05/2026", ref: "Mai/26", valor: 483139.95, acumulado: 3011727.49 },
             { medicao: 12, inicio: "16/05/2026", fim: "15/06/2026", ref: "Jun/26", valor: 292186.51, acumulado: 3401989.43 },
             { medicao: 13, inicio: "16/06/2026", fim: "15/07/2026", ref: "Jul/26", valor: 336583.53, acumulado: 3592627.37 },
-            { medicao: 14, inicio: "16/01/20267", fim: "15/08/2026", ref: "Ago/26", valor: 230807.60, acumulado: 3625286.12 },
+            { medicao: 14, inicio: "16/07/2026", fim: "15/08/2026", ref: "Ago/26", valor: 230807.60, acumulado: 3625286.12 },
         ],
         grafico: { // Populated based on medicoes
             labels: ["Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25", "Jan/26", "Fev/26", "Mar/26", "Abr/26", "Mai/26", "Jun/26", "Jul/26", "Ago/26"],
@@ -238,6 +240,7 @@ const projectData = [
         location: { lat: -23.184126, lng: -46.853513 }, 
     }
 ];
+
 
 
 
