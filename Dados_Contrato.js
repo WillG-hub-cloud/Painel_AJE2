@@ -173,7 +173,6 @@ const projectData = [
             { medicao: 13, inicio: "16/06/2026", fim: "15/07/2026", ref: "Jul/26", valor: 336583.53, acumulado: 3592627.37 },
             { medicao: 14, inicio: "16/07/2026", fim: "15/08/2026", ref: "Ago/26", valor: 230807.60, acumulado: 3625286.12 },
         ],
-      
         grafico: { // Populated based on medicoes
             labels: ["Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25", "Jan/26", "Fev/26", "Mar/26", "Abr/26", "Mai/26", "Jun/26", "Jul/26", "Ago/26"],
             previsto: [292590.76, 534282.82, 632255.10, 453476.70, 682448.69, 1005437.35, 1308972.20, 1665743.54, 2226698.41, 2584618.50, 3011727.49, 3401989.43, 3592627.37, 3625286.12],
@@ -242,11 +241,6 @@ const projectData = [
         location: { lat: -23.184126, lng: -46.853513 }, 
     }
 ];
-
-
-
-
-
 
 
 
