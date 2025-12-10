@@ -50,7 +50,7 @@ const projectData = [
         // Data prevista de início do contrato. Formato 'DD/MM/AAAA'. Use 'N/A' se não aplicável.
         predicted_start_date: '15/04/2025',
         // Data prevista de fim do contrato. Formato 'DD/MM/AAAA'. Use 'N/A' se não aplicável.
-        predicted_end_date: '10/12/2025',
+        predicted_end_date: '10/01/2026',
         // Localização geográfica do contrato (Latitude e Longitude).
         location: { lat: -23.22359379674732, lng: -46.85593132352297 }
     },
@@ -238,6 +238,7 @@ const projectData = [
         location: { lat: -23.184126, lng: -46.853513 }, 
     }
 ];
+
 
 
 
