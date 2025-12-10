@@ -47,7 +47,8 @@ const projectData = [
                 { label: "Cronograma Inicial", data: [164490.45, 336423.85, null, null, null, null, null, null, null] }, // Termina em Mar/25
                 { label: "Cronograma Prorrogação I", data: [null, null, 200391.22, 456648.02,  759827.63, 1147658.15, null, null, null] }, // Nova série azul (reajuste 1)
                 { label: "Cronograma Prorrogação II", data: [null, null, null, null, null, null, 1008975.63, 1372929.56, 1718878.29] }
-                ]
+                ],
+            executado: [107178.95, 124644.24, 185092.67, 340430.46, 574149.13, 805713.77, 972077.83, null, null],
         },
         // Data prevista de início do contrato. Formato 'DD/MM/AAAA'. Use 'N/A' se não aplicável.
         predicted_start_date: '15/04/2025',
@@ -240,6 +241,7 @@ const projectData = [
         location: { lat: -23.184126, lng: -46.853513 }, 
     }
 ];
+
 
 
 
