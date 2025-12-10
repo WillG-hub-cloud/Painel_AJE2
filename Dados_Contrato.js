@@ -44,8 +44,8 @@ const projectData = [
         grafico: {
             labels: ["Mai/25", "Jun/25", "Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25", "Jan/26"], // Labels estendidos até Mar/25 para o cronograma inicial
             previstoDataSets: [
-                { label: "Cronograma Inicial", data: [164490.45, 336423.85, null, null, null, null, null, null, null] }, // Termina em Mar/25
-                { label: "Cronograma Prorrogação I", data: [null, null, 200391.22, 456648.02,  759827.63, 1147658.15, null, null, null] }, // Nova série azul (reajuste 1)
+                { label: "Cronograma Inicial", data: [164490.45, 336423.85, 578404.56, 823300.17, 1029579.72, 1264982.08, 1502623.50, 1718875.29, null] }, // Termina em Mar/25
+                { label: "Cronograma Prorrogação I", data: [null, null, 200391.22, 456648.02,  759827.63, 1147658.15, 1443929.50, 1718878.29, null] }, // Nova série azul (reajuste 1)
                 { label: "Cronograma Prorrogação II", data: [null, null, null, null, null, null, 1008975.63, 1372929.56, 1718878.29] }
                 ],
             executado: [107178.95, 124644.24, 185092.67, 340430.46, 574149.13, 805713.77, 972077.83, null, null],
@@ -241,6 +241,7 @@ const projectData = [
         location: { lat: -23.184126, lng: -46.853513 }, 
     }
 ];
+
 
 
 
