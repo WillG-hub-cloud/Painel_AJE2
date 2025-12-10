@@ -38,12 +38,12 @@ const projectData = [
             { medicao: 5, inicio: "17/08/25", fim: "16/09/25", ref: "Set/25", valor: 206279.55, acumulado: 1029579.73 },
             { medicao: 6, inicio: "17/09/25", fim: "17/10/25", ref: "Out/25", valor: 235402.36, acumulado: 1264982.09 },
             { medicao: 7, inicio: "18/10/25", fim: "17/11/25", ref: "Nov/25", valor: 237641.42, acumulado: 1502623.51 },
-            { medicao: 8, inicio: "18/11/25", fim: "10/12/25", ref: "Dez/25", valor: 216254.79, acumulado: 1718878.30 },
+            { medicao: 8, inicio: "18/11/25", fim: "10/12/25", ref: "Dez/25", valor: 216254.79, acumulado: 1372929.56 },
             { medicao: 9, inicio: "11/12/25", fim: "10/01/26", ref: "Jan/26", valor: 216254.79, acumulado: 1718878.30 },
         ],
         grafico: {
             labels: ["Mai/25", "Jun/25", "Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25", "Jan/26"],
-            previsto: [164490.45, 336423.85, 200391.22, 456648.02,  759827.63, 1147658.15, 1372929.56, 1718878.29],
+            previsto: [164490.45, 336423.85, 200391.22, 456648.02,  759827.63, 1147658.15, 1008975.63, 1372929.56, 1718878.29],
             executado: [107178.95, 124644.24, 185092.67, 340430.46, 574149.13, 805713.77, 972077.83, null, null],
             previstoDataSets: null
         },
@@ -238,6 +238,7 @@ const projectData = [
         location: { lat: -23.184126, lng: -46.853513 }, 
     }
 ];
+
 
 
 
