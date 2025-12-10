@@ -181,7 +181,6 @@ const projectData = [
                 { label: "Cronograma Prorrogação II", data: [null, null, null, null, null, null, null, null, null, null, null, null, null, null] }
                 ],
             executado: [311389.54, 311389.54, 311389.54, 501587.58, null, null, null, null, null, null, null, null, null, null],
-            previstoDataSets: null
         },
         predicted_start_date: '16/06/2025',
         predicted_end_date: '15/08/2026',
@@ -245,6 +244,7 @@ const projectData = [
         location: { lat: -23.184126, lng: -46.853513 }, 
     }
 ];
+
 
 
 
