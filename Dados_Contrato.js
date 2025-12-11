@@ -1,298 +1,391 @@
-// Dados dos projetos/contratos
-// Esta constante 'projectData' é um array de objetos, onde cada objeto representa um contrato.
-// Os dados aqui são a fonte de informações para o painel.
+/**
+ * ARQUITETURA DE SOFTWARE - REFATORAÇÃO
+ * ----------------------------------------------------------------------
+ * 1. Interfaces: Garantem a estrutura dos objetos (Type Safety).
+ * 2. Adapter: Transforma dados brutos em dados de visualização (Business Logic).
+ * 3. Raw Data: Apenas os dados essenciais, sem duplicação (Single Source of Truth).
+ */
 
-const projectData = [
-    {
-        // ID do contrato: Usado para identificação única. Formato "CT XXX/YY" é recomendado.
-        id: "CT 039/25",
-        // Objeto do contrato: Descrição clara do que a obra/serviço abrange (ex: nome da escola, UBS).
-        objeto: "EMEB Adail",
-        // Empresa contratada: Nome completo da empresa responsável.
-        empresa: "CDR Infra Inst. e Montag.",
-        // Valor atual do contrato: O valor total do contrato, incluindo aditivos.
-        valorAtual: 1718878.29,
-        // Observações: Campo opcional para notas importantes sobre o contrato (prorrogações, status, etc.).
-        observacoes: null, // Deixe como 'null' se não houver observações.
+// ======================================================================
+// 1. DEFINIÇÕES DE TIPO (INTERFACES)
+// ======================================================================
 
-        // Medições do contrato: Array de objetos que detalham cada medição (prevista ou executada).
-        // A ordem dos objetos neste array é importante para a cronologia.
-        medicoes: [
-            {
-                // Número da medição (pode ser "1", "2", "1-5" para medições agrupadas, etc.)
-                medicao: 1,
-                // Data de início do período de medição. Formato 'DD/MM/AA' ou 'DD/MM/AAAA'.
-                inicio: "15/04/25",
-                // Data de fim do período de medição. Formato 'DD/MM/AA' ou 'DD/MM/AAAA'.
-                fim: "14/05/25",
-                // Referência do mês/ano da medição (ex: "Mai/25", "Jun/25"). Crucial para alinhamento com o gráfico.
-                ref: "Mai/25",
-                // Valor financeiro da medição para este período.
-                valor: 124644.24,
-                // Valor acumulado das medições até este período.
-                acumulado: 124644.24
+interface GeoLocation {
+    lat: number;
+    lng: number;
+}
+
+interface MedicaoRaw {
+    id: number;
+    // Datas em ISO 8601 (YYYY-MM-DD) para facilitar ordenação
+    dataInicio: string; 
+    dataFim: string;
+    // O valor desta medição específica (NÃO o acumulado)
+    valor: number;
+}
+
+interface CronogramaCenario {
+    nome: string; // Ex: "Cronograma Inicial", "Prorrogação I"
+    // Array de valores acumulados previstos. Null representa meses sem previsão.
+    valoresAcumulados: (number | null)[];
+}
+
+interface Contrato {
+    id: string;
+    objeto: string;
+    empresa: string;
+    valorTotal: number;
+    observacoes: string | null;
+    previsaoInicio: string | null;
+    previsaoFim: string | null;
+    localizacao: GeoLocation;
+    
+    // Lista de medições realizadas (Dados REAIS)
+    medicoes: MedicaoRaw[];
+    
+    // Cenários de previsão (Dados PROJETADOS/ESTÁTICOS)
+    cronogramas: CronogramaCenario[];
+}
+
+// Interface de Saída para o Painel (O que o gráfico vai consumir)
+interface DadosPainel {
+    resumo: {
+        id: string;
+        objeto: string;
+        percentualExecutado: number;
+        valorTotal: number;
+        valorExecutado: number;
+    };
+    grafico: {
+        labels: string[]; // Eixo X (Meses)
+        datasets: {
+            label: string;
+            data: (number | null)[]; // Eixo Y (Valores)
+            borderColor?: string;
+            borderDash?: number[];
+            fill?: boolean;
+        }[];
+    };
+}
+
+// ======================================================================
+// 2. LÓGICA DE NEGÓCIO (ADAPTER)
+// ======================================================================
+
+class ProjectDashboardAdapter {
+    /**
+     * Transforma os dados brutos do contrato no formato exigido pelo Painel/Gráfico.
+     * Calcula os acumulados em tempo de execução para garantir integridade.
+     */
+    static processarContrato(contrato: Contrato): DadosPainel {
+        
+        // 1. Ordenar medições por data cronológica
+        const medicoesOrdenadas = [...contrato.medicoes].sort((a, b) => 
+            new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime()
+        );
+
+        // 2. Gerar Labels dinâmicos (Eixo X) baseados nas datas das medições
+        // Se não houver medições, usa índices genéricos ou lógica de data prevista
+        const labels = medicoesOrdenadas.length > 0 
+            ? medicoesOrdenadas.map(m => this.formatarDataLabel(m.dataInicio))
+            : this.gerarLabelsGenericos(12); // Fallback para contratos sem medição
+
+        // 3. Calcular a linha de "Executado" (Acumulado Real)
+        let acumulador = 0;
+        const dadosExecutados = medicoesOrdenadas.map(m => {
+            acumulador += m.valor;
+            return Number(acumulador.toFixed(2)); // Correção de ponto flutuante
+        });
+
+        // 4. Montar os Datasets (Linhas do gráfico)
+        const datasets = [];
+
+        // Adiciona a linha Real/Executado
+        if (dadosExecutados.length > 0) {
+            datasets.push({
+                label: 'Executado',
+                data: dadosExecutados,
+                borderColor: '#2ecc71', // Verde
+                fill: false
+            });
+        }
+
+        // Adiciona os Cronogramas (Previsões)
+        contrato.cronogramas.forEach((crono, index) => {
+            // Define cores diferentes para cada cronograma ou padrão
+            const cores = ['#3498db', '#e67e22', '#9b59b6']; // Azul, Laranja, Roxo
+            datasets.push({
+                label: crono.nome,
+                data: crono.valoresAcumulados,
+                borderColor: cores[index % cores.length],
+                borderDash: [5, 5], // Linha tracejada para indicar previsão
+                fill: false
+            });
+        });
+
+        // 5. Retornar estrutura pronta para uso
+        return {
+            resumo: {
+                id: contrato.id,
+                objeto: contrato.objeto,
+                valorTotal: contrato.valorTotal,
+                valorExecutado: acumulador,
+                percentualExecutado: contrato.valorTotal > 0 
+                    ? Number(((acumulador / contrato.valorTotal) * 100).toFixed(2)) 
+                    : 0
             },
-            { medicao: 2, inicio: "16/05/25", fim: "15/06/25", ref: "Jun/25", valor: 171933.40, acumulado: 336423.85 },
-            { medicao: 3, inicio: "16/06/25", fim: "16/07/25", ref: "Jul/25", valor: 241980.72, acumulado: 578404.57 },
-            { medicao: 4, inicio: "17/07/25", fim: "16/08/25", ref: "Ago/25", valor: 244895.61, acumulado: 823300.18 },
-            { medicao: 5, inicio: "17/08/25", fim: "16/09/25", ref: "Set/25", valor: 206279.55, acumulado: 1029579.73 },
-            { medicao: 6, inicio: "17/09/25", fim: "17/10/25", ref: "Out/25", valor: 235402.36, acumulado: 1264982.09 },
-            { medicao: 7, inicio: "18/10/25", fim: "17/11/25", ref: "Nov/25", valor: 237641.42, acumulado: 1502623.51 },
-            { medicao: 8, inicio: "18/11/25", fim: "10/12/25", ref: "Dez/25", valor: 216254.79, acumulado: 1372929.56 },
-            { medicao: 9, inicio: "11/12/25", fim: "10/01/26", ref: "Jan/26", valor: 216254.79, acumulado: 1718878.30 },
+            grafico: {
+                labels,
+                datasets
+            }
+        };
+    }
+
+    // Função auxiliar para formatar datas (Ex: "2025-05-01" -> "Mai/25")
+    private static formatarDataLabel(isoDate: string): string {
+        try {
+            const date = new Date(isoDate);
+            // Formata para Português-BR. Ajuste 'short' para 'long' se quiser o mês completo.
+            const mes = new Intl.DateTimeFormat('pt-BR', { month: 'short' }).format(date);
+            const ano = new Intl.DateTimeFormat('pt-BR', { year: '2-digit' }).format(date);
+            // Capitaliza a primeira letra do mês e remove o ponto (ex: "mai." -> "Mai")
+            return `${mes.charAt(0).toUpperCase() + mes.slice(1).replace('.', '')}/${ano}`;
+        } catch (e) {
+            return isoDate;
+        }
+    }
+
+    private static gerarLabelsGenericos(qtd: number): string[] {
+        return Array.from({ length: qtd }, (_, i) => `${i + 1}º Mês`);
+    }
+}
+
+// ======================================================================
+// 3. DADOS BRUTOS (FONTE DA VERDADE)
+// ======================================================================
+
+const rawProjects: Contrato[] = [
+    {
+        id: "CT 039/25",
+        objeto: "EMEB Adail",
+        empresa: "CDR Infra Inst. e Montag.",
+        valorTotal: 1718878.29,
+        observacoes: null,
+        previsaoInicio: "2025-04-15",
+        previsaoFim: "2026-01-10",
+        localizacao: { lat: -23.22359379674732, lng: -46.85593132352297 },
+        cronogramas: [
+            { 
+                nome: "Cronograma Inicial", 
+                valoresAcumulados: [164490.45, 336423.85, 578404.56, 823300.17, 1029579.72, 1264982.08, 1502623.50, 1718875.29, null] 
+            },
+            { 
+                nome: "Cronograma Prorrogação I", 
+                valoresAcumulados: [null, null, 200391.22, 456648.02, 759827.63, 1147658.15, 1443929.50, 1718878.29, null] 
+            },
+            {
+                nome: "Cronograma Prorrogação II",
+                valoresAcumulados: [null, null, null, null, null, null, 1008975.63, 1372929.56, 1718878.29]
+            }
         ],
-        grafico: {
-            labels: ["Mai/25", "Jun/25", "Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25", "Jan/26"], // Labels estendidos até Mar/25 para o cronograma inicial
-            previstoDataSets: [
-                { label: "Cronograma Inicial", data: [164490.45, 336423.85, 578404.56, 823300.17, 1029579.72, 1264982.08, 1502623.50, 1718875.29, null] }, // Termina em Mar/25
-                { label: "Cronograma Prorrogação I", data: [null, null, 200391.22, 456648.02,  759827.63, 1147658.15, 1443929.50, 1718878.29, null] }, // Nova série azul (reajuste 1)
-                { label: "Cronograma Prorrogação II", data: [null, null, null, null, null, null, 1008975.63, 1372929.56, 1718878.29] }
-                ],
-            executado: [107178.95, 124644.24, 185092.67, 340430.46, 574149.13, 805713.77, 972077.83, null, null],
-        },
-        // Data prevista de início do contrato. Formato 'DD/MM/AAAA'. Use 'N/A' se não aplicável.
-        predicted_start_date: '15/04/2025',
-        // Data prevista de fim do contrato. Formato 'DD/MM/AAAA'. Use 'N/A' se não aplicável.
-        predicted_end_date: '10/01/2026',
-        // Localização geográfica do contrato (Latitude e Longitude).
-        location: { lat: -23.22359379674732, lng: -46.85593132352297 }
+        medicoes: [
+            { id: 1, dataInicio: "2025-04-15", dataFim: "2025-05-14", valor: 124644.24 },
+            { id: 2, dataInicio: "2025-05-16", dataFim: "2025-06-15", valor: 171933.40 },
+            { id: 3, dataInicio: "2025-06-16", dataFim: "2025-07-16", valor: 241980.72 },
+            { id: 4, dataInicio: "2025-07-17", dataFim: "2025-08-16", valor: 244895.61 },
+            { id: 5, dataInicio: "2025-08-17", dataFim: "2025-09-16", valor: 206279.55 },
+            { id: 6, dataInicio: "2025-09-17", dataFim: "2025-10-17", valor: 235402.36 },
+            { id: 7, dataInicio: "2025-10-18", dataFim: "2025-11-17", valor: 237641.42 },
+            { id: 8, dataInicio: "2025-11-18", dataFim: "2025-12-10", valor: 216254.79 },
+            { id: 9, dataInicio: "2025-12-11", dataFim: "2026-01-10", valor: 216254.79 } // O último acumulado na origem parecia ser 1.7M, assumindo valor cheio aqui
+        ]
     },
     {
         id: "CT 127/24",
         objeto: "UBS Rio Branco",
         empresa: "CJM Construtora Ltda",
-        valorAtual: 2664287.67, // Valor atualizado para o último acumulado do Cronograma Reajuste II
-        observacoes: "Além do novo cronograma, adotado a partir de abril, foi protocolado novo aditivo que extenderá o contrato para término em novembro.", // Observação atualizada
-        medicoes: [
-            { medicao: 1, inicio: '07/10/24', fim: '05/11/24', ref: 'Nov/24', valor: 147017.36, acumulado: 147017.36 },
-            { medicao: 2, inicio: '06/11/24', fim: '05/12/24', ref: 'Dez/24', valor: 193930.07, acumulado: 340947.43 },
-            { medicao: 3, inicio: '06/12/24', fim: '04/01/25', ref: 'Jan/25', valor: 78717.56, acumulado: 419664.99 },
-            { medicao: 4, inicio: '05/01/25', fim: '03/02/25', ref: 'Fev/25', valor: 96409.89, acumulado: 516074.88 },
-            { medicao: 5, inicio: '04/02/25', fim: '03/04/25', ref: 'Abr/25', valor: 437000.00, acumulado: 1220155.93 }, // Este valor é a diferença entre o acumulado de Mar/25 (do reajuste 1) e o acumulado de Abr/25 (do reajuste 2)
-            { medicao: 6, inicio: '04/04/25', fim: '03/05/25', ref: 'Mai/25', valor: 308812.37, acumulado: 1174071.39 },
-            { medicao: 7, inicio: '04/05/25', fim: '03/06/25', ref: 'Jun/25', valor: 333302.47, acumulado: 1507373.86 },
-            { medicao: 8, inicio: '04/06/25', fim: '03/08/25', ref: 'Jul/25', valor: 265536.22, acumulado: 1772910.08 }, 
-            { medicao: 9, inicio: '04/07/25', fim: '03/09/25', ref: 'Ago/25', valor: 255395.87, acumulado: 2028305.95 }, 
-            { medicao: 10, inicio: '04/08/25', fim: '03/10/25', ref: 'Set/25', valor: 149312.68, acumulado: 2177618.63 }, 
-            { medicao: 11, inicio: '04/09/25', fim: '03/11/25', ref: 'Out/25', valor: 251223.27, acumulado: 2428841.90 }, 
-            { medicao: 12, inicio: '04/10/25', fim: '03/11/25', ref: 'Nov/25', valor: 240668.48, acumulado: 2669510.38 }, 
+        valorTotal: 2664287.67,
+        observacoes: "Aditivo extendendo término para novembro.",
+        previsaoInicio: "2024-10-07",
+        previsaoFim: "2025-11-03",
+        localizacao: { lat: -23.17462221037069, lng: -46.88650911818413 },
+        cronogramas: [
+            {
+                nome: "Cronograma Inicial",
+                valoresAcumulados: [223098.81, 446197.62, 691408.56, 953063.11, 1526040.85, null, null, null, null, null, null, null]
+            },
+            {
+                nome: "Cronograma Prorrogação I",
+                valoresAcumulados: [null, null, null, null, 865259.02, 1174071.39, 1507373.86, null, null, null, null, null]
+            },
+            {
+                nome: "Cronograma Prorrogação II",
+                valoresAcumulados: [null, null, null, null, null, null, 1397234.90, 1918166.99, 2172395.90, 2423619.18, 2664287.67]
+            }
         ],
-        grafico: {
-            labels: ["Nov/24", "Dez/24", "Jan/25", "Fev/25", "Abr/25", "Mai/25", "Jun/25", "Ago/25", "Set/25", "Out/25", "Nov/25"], // Labels estendidos até Mar/25 para o cronograma inicial
-            previstoDataSets: [
-                { label: "Cronograma Inicial", data: [223098.81, 446197.62, 691408.56, 953063.11, 1526040.85, null, null, null, null, null, null, null] }, // Termina em Mar/25
-                { label: "Cronograma Prorrogação I", data: [null, null, null, null,  865259.02, 1174071.39, 1507373.86, null, null, null, null, null] }, // Nova série azul (reajuste 1)
-                { label: "Cronograma Prorrogação II", data: [null, null, null, null, null, null, 1397234.90, 1918166.99, 2172395.90, 2423619.18, 2664287.67] } // Nova série laranja (reajuste 2) - Inicia em Jul/25 ou onde a laranja da sua imagem iniciar
-            ],
-            executado: [147017.36, 340947.43, 419664.99, 516074.88, 893732.79, 1177420.96, 1397234.9, 1826026.83, 2080121.09, 2309472.05, 2508630.65] // Executado até Jun/25
-        },
-        predicted_start_date: '07/10/2024',
-        predicted_end_date: '03/11/2025', // Atualizado para novembro de 2025
-        location: { lat: -23.17462221037069, lng: -46.88650911818413 }
+        medicoes: [
+            { id: 1, dataInicio: "2024-10-07", dataFim: "2024-11-05", valor: 147017.36 },
+            { id: 2, dataInicio: "2024-11-06", dataFim: "2024-12-05", valor: 193930.07 },
+            { id: 3, dataInicio: "2024-12-06", dataFim: "2025-01-04", valor: 78717.56 },
+            { id: 4, dataInicio: "2025-01-05", dataFim: "2025-02-03", valor: 96409.89 },
+            { id: 5, dataInicio: "2025-02-04", dataFim: "2025-04-03", valor: 437000.00 }, // Gap temporal mantido conforme original
+            { id: 6, dataInicio: "2025-04-04", dataFim: "2025-05-03", valor: 308812.37 },
+            { id: 7, dataInicio: "2025-05-04", dataFim: "2025-06-03", valor: 333302.47 },
+            { id: 8, dataInicio: "2025-06-04", dataFim: "2025-08-03", valor: 265536.22 },
+            { id: 9, dataInicio: "2025-07-04", dataFim: "2025-09-03", valor: 255395.87 },
+            { id: 10, dataInicio: "2025-08-04", dataFim: "2025-10-03", valor: 149312.68 },
+            { id: 11, dataInicio: "2025-09-04", dataFim: "2025-11-03", valor: 251223.27 },
+            { id: 12, dataInicio: "2025-10-04", dataFim: "2025-11-03", valor: 240668.48 }
+        ]
     },
     {
         id: "CT 036/25",
         objeto: "UBS Tamoio",
         empresa: "SLN Telecom. e Eng. Ltda",
-        valorAtual: 6598840.00,
+        valorTotal: 6598840.00,
         observacoes: null,
-        medicoes: [
-            { medicao: 1, inicio: "22/04/25", fim: "21/05/25", ref: "Mai/25", valor: 90152.14, acumulado: 90152.14 },
-            { medicao: 2, inicio: "22/05/25", fim: "21/06/25", ref: "Jun/25", valor: 414541.33, acumulado: 736137.24 },
-            { medicao: 3, inicio: "22/06/25", fim: "21/07/25", ref: "Jul/25", valor: 239422.48, acumulado: 975559.72 },
-            { medicao: 4, inicio: "22/07/25", fim: "21/08/25", ref: "Ago/25", valor: 354046.97, acumulado: 1329606.69 },
-            { medicao: 5, inicio: "22/08/25", fim: "21/09/25", ref: "Set/25", valor: 273732.54, acumulado: 1603339.23 },
-            { medicao: 6, inicio: "22/09/25", fim: "21/10/25", ref: "Out/25", valor: 834046.03, acumulado: 2437385.26 },
-            { medicao: 7, inicio: "22/10/25", fim: "21/11/25", ref: "Nov/25", valor: 826863.39, acumulado: 3264248.65 },
-            { medicao: 8, inicio: "22/11/25", fim: "21/12/25", ref: "Dez/25", valor: 1182068.62, acumulado: 4446317.27 },
-            { medicao: 9, inicio: "22/12/25", fim: "21/01/26", ref: "Jan/26", valor: 973345.29, acumulado: 5419662.56 },
-            { medicao: 10, inicio: "22/01/26", fim: "21/02/26", ref: "Fev/26", valor: 587119.79, acumulado: 6006782.35 },
-            { medicao: 11, inicio: "22/02/26", fim: "21/03/26", ref: "Mar/26", valor: 340667.51, acumulado: 6347449.86 },
-            { medicao: 12, inicio: "22/03/26", fim: "21/04/26", ref: "Abr/26", valor: 251390.14, acumulado: 6598840.00 },
+        previsaoInicio: "2025-04-22",
+        previsaoFim: "2026-04-21",
+        localizacao: { lat: -23.189364, lng: -46.855773 },
+        cronogramas: [
+            {
+                nome: "Previsto Inicial",
+                valoresAcumulados: [321595.91, 975559.72, 1329606.69, 1603339.23, 2437385.26, 3264248.65, 4446317.27, 5419662.56, 6006782.35, 6347449.86, 6598840.00]
+            }
         ],
-        grafico: {
-            labels: ["Mai/25", "Jun/25", "Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25", "Jan/26", "Fev/26", "Mar/26", "Abr/26"],
-            previsto: [321595.91, 975559.72, 1329606.69, 1603339.23, 2437385.26, 3264248.65, 4446317.27, 5419662.56, 6006782.35, 6347449.86, 6598840.00],
-            executado: [90152.14, 400780.12, 501867.82, 575647.70 , 939679.49, null, null, null, null, null, null],
-            previstoDataSets: null
-        },
-        predicted_start_date: '22/04/2025',
-        predicted_end_date: '21/04/2026',
-        location: { lat: -23.189364, lng: -46.855773 }, 
+        medicoes: [
+            { id: 1, dataInicio: "2025-04-22", dataFim: "2025-05-21", valor: 90152.14 },
+            { id: 2, dataInicio: "2025-05-22", dataFim: "2025-06-21", valor: 414541.33 },
+            { id: 3, dataInicio: "2025-06-22", dataFim: "2025-07-21", valor: 239422.48 },
+            { id: 4, dataInicio: "2025-07-22", dataFim: "2025-08-21", valor: 354046.97 },
+            { id: 5, dataInicio: "2025-08-22", dataFim: "2025-09-21", valor: 273732.54 },
+            { id: 6, dataInicio: "2025-09-22", dataFim: "2025-10-21", valor: 834046.03 },
+            { id: 7, dataInicio: "2025-10-22", dataFim: "2025-11-21", valor: 826863.39 },
+            { id: 8, dataInicio: "2025-11-22", dataFim: "2025-12-21", valor: 1182068.62 },
+            { id: 9, dataInicio: "2025-12-22", dataFim: "2026-01-21", valor: 973345.29 },
+            { id: 10, dataInicio: "2026-01-22", dataFim: "2026-02-21", valor: 587119.79 },
+            { id: 11, dataInicio: "2026-02-22", dataFim: "2026-03-21", valor: 340667.51 },
+            { id: 12, dataInicio: "2026-03-22", dataFim: "2026-04-21", valor: 251390.14 }
+        ]
     },
     {
         id: "CT 052/25",
         objeto: "UBS Ivoturucaia",
         empresa: "J.S.O. Constr. Ltda.",
-        valorAtual: 5654210.10,
-        observacoes: "Contrato ainda não possui medições.", // Observação indica que é só cronograma
-        medicoes: [
-            { medicao: 1, inicio: "1º Mês", fim: "N/A", ref: null, valor: 84127.17, acumulado: 84127.17 },
-            { medicao: 2, inicio: "2º Mês", fim: "N/A", ref: null, valor: 103035.32, acumulado: 187162.49 },
-            { medicao: 3, inicio: "3º Mês", fim: "N/A", ref: null, valor: 156263.40, acumulado: 343425.89 },
-            { medicao: 4, inicio: "4º Mês", fim: "N/A", ref: null, valor: 315717.56, acumulado: 659143.45 },
-            { medicao: 5, inicio: "5º Mês", fim: "N/A", ref: null, valor: 519490.15, acumulado: 1178633.60 },
-            { medicao: 6, inicio: "6º Mês", fim: "N/A", ref: null, valor: 434719.57, acumulado: 1613353.17 },
-            { medicao: 7, inicio: "7º Mês", fim: "N/A", ref: null, valor: 501301.56, acumulado: 2114654.73 },
-            { medicao: 8, inicio: "8º Mês", fim: "N/A", ref: null, valor: 982847.79, acumulado: 3097502.52 },
-            { medicao: 9, inicio: "9º Mês", fim: "N/A", ref: null, valor: 735049.10, acumulado: 3832551.62 },
-            { medicao: 10, inicio: "10º Mês", fim: "N/A", ref: null, valor: 699466.12, acumulado: 4532017.74 },
-            { medicao: 11, inicio: "11º Mês", fim: "N/A", ref: null, "valor": 734830.81, "acumulado": 5266848.55 },
-            { medicao: 12, inicio: "12º Mês", fim: "N/A", ref: null, "valor": 387361.55, "acumulado": 5654210.10 },
+        valorTotal: 5654210.10,
+        observacoes: "Contrato ainda não possui medições reais.",
+        previsaoInicio: null, // Indefinido no original
+        previsaoFim: null,
+        localizacao: { lat: -23.181836, lng: -46.810482 },
+        cronogramas: [
+            {
+                nome: "Previsto Inicial",
+                valoresAcumulados: [84127.17, 187162.49, 343425.89, 659143.45, 1178633.60, 1613353.17, 2114654.73, 3097502.52, 3832551.62, 4532017.74, 5266848.55, 5654210.10]
+            }
         ],
-        grafico: { // Populated based on medicoes
-            labels: ["1º Mês", "2º Mês", "3º Mês", "4º Mês", "5º Mês", "6º Mês", "7º Mês", "8º Mês", "9º Mês", "10º Mês", "11º Mês", "12º Mês"], // Pode usar ref ou Nº Mês
-            previsto: [84127.17, 187162.49, 343425.89, 659143.45, 1178633.60, 1613353.17, 2114654.73, 3097502.52, 3832551.62, 4532017.74, 5266848.55, 5654210.10],
-            executado: [], // Vazio para contratos sem medições reais
-            previstoDataSets: null
-        },
-        // Datas fictícias para contratos que ainda não tem cronograma real de início e fim.
-        predicted_start_date: 'N/A',
-        predicted_end_date: 'N/A',
-        location: { lat: -23.18183604007579, lng: -46.81048269582229 }
+        medicoes: [] // Array vazio pois não há medições reais
     },
     {
         id: "CT 054/25",
         objeto: "UBS Maringá",
         empresa: "Studio Sabino & Souza A",
-        valorAtual: 3629613.36,
+        valorTotal: 3629613.36,
         observacoes: null,
-        medicoes: [
-            { medicao: 1, inicio: "16/06/2025", fim: "15/07/2025", ref: "Jul/25", valor: 292590.76, acumulado: 292590.76 },
-            { medicao: 2, inicio: "16/07/2025", fim: "15/08/2025", ref: "Ago/25", valor: 241692.06, acumulado: 534282.82 },
-            { medicao: 3, inicio: "16/08/2025", fim: "15/09/2025", ref: "Set/25", valor: 97972.28, acumulado: 632255.10 },
-            { medicao: 4, inicio: "16/09/2025", fim: "15/10/2025", ref: "Out/25", valor: 94521.03, acumulado: 453476.70 },
-            { medicao: 5, inicio: "16/10/2025", fim: "15/11/2025", ref: "Nov/25", valor: 179720.76, acumulado: 682448.69 },
-            { medicao: 6, inicio: "16/11/2025", fim: "15/12/2025", ref: "Dez/25", valor: 171538.45, acumulado: 1005437.35 },
-            { medicao: 7, inicio: "16/12/2025", "fim": "15/01/2026", ref: "Jan/26", valor: 297860.75, acumulado: 1308972.20 },
-            { medicao: 8, inicio: "16/01/2026", fim: "15/02/2026", ref: "Fev/26", valor: 355919.31, acumulado: 1665743.54 },
-            { medicao: 9, inicio: "16/02/2026", fim: "15/03/2026", ref: "Mar/26", valor: 207339.02, acumulado: 2226698.41 },
-            { medicao: 10, inicio: "16/03/2026", fim: "15/04/2026", ref: "Abr/26", valor: 347741.35, acumulado: 2584618.50 },
-            { medicao: 11, inicio: "16/04/2026", fim: "15/05/2026", ref: "Mai/26", valor: 483139.95, acumulado: 3011727.49 },
-            { medicao: 12, inicio: "16/05/2026", fim: "15/06/2026", ref: "Jun/26", valor: 292186.51, acumulado: 3401989.43 },
-            { medicao: 13, inicio: "16/06/2026", fim: "15/07/2026", ref: "Jul/26", valor: 336583.53, acumulado: 3592627.37 },
-            { medicao: 14, inicio: "16/07/2026", fim: "15/08/2026", ref: "Ago/26", valor: 230807.60, acumulado: 3625286.12 },
+        previsaoInicio: "2025-06-16",
+        previsaoFim: "2026-08-15",
+        localizacao: { lat: -23.225261, lng: -46.882002 },
+        cronogramas: [
+            {
+                nome: "Cronograma Inicial",
+                valoresAcumulados: [292590.76, 534282.82, 632255.10, 726776.13, 906496.89, 1078035.34, 1375896.09, 1731815.40, 1939154.42, 2286895.77, 2770035.72, 3062222.23, 3398805.76, 3629613.36]
+            },
+            {
+                nome: "Cronograma Prorrogação I",
+                valoresAcumulados: [null, null, null, 453476.70, 682448.69, 1005437.35, 1308972.20, 1665743.54, 2226698.41, 2584618.50, 3011727.49, 3401989.43, 3592627.37, 3625286.12]
+            }
         ],
-        grafico: { // Populated based on medicoes
-            labels: ["Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25", "Jan/26", "Fev/26", "Mar/26", "Abr/26", "Mai/26", "Jun/26", "Jul/26", "Ago/26"],
-            previstoDataSets: [
-                { label: "Cronograma Inicial", data: [292590.76, 534282.82, 632255.10, 726776.13, 906496.89, 1078035.34, 1375896.09, 1731815.40, 1939154.42, 2286895.77, 2770035.72, 3062222.23, 3398805.76, 3629613.36] }, 
-                { label: "Cronograma Prorrogação I", data: [null, null, null, 453476.70, 682448.69, 1005437.35, 1308972.20, 1665743.54, 2226698.41, 2584618.50, 3011727.49, 3401989.43, 3592627.37, 3625286.12] }, // Nova série azul (reajuste 1)
-                { label: "", data: [null, null, null, null, null, null, null, null, null, null, null, null, null, null] }
-                ],
-            executado: [311389.54, 311389.54, 311389.54, 501587.58, null, null, null, null, null, null, null, null, null, null],
-        },
-        predicted_start_date: '16/06/2025',
-        predicted_end_date: '15/08/2026',
-        location: { lat: -23.22526128860949, lng: -46.88200264672982 }
+        medicoes: [
+            { id: 1, dataInicio: "2025-06-16", dataFim: "2025-07-15", valor: 292590.76 },
+            { id: 2, dataInicio: "2025-07-16", dataFim: "2025-08-15", valor: 241692.06 },
+            { id: 3, dataInicio: "2025-08-16", dataFim: "2025-09-15", valor: 97972.28 },
+            { id: 4, dataInicio: "2025-09-16", dataFim: "2025-10-15", valor: 94521.03 },
+            { id: 5, dataInicio: "2025-10-16", dataFim: "2025-11-15", valor: 179720.76 },
+            { id: 6, dataInicio: "2025-11-16", dataFim: "2025-12-15", valor: 171538.45 },
+            { id: 7, dataInicio: "2025-12-16", dataFim: "2026-01-15", valor: 297860.75 },
+            { id: 8, dataInicio: "2026-01-16", dataFim: "2026-02-15", valor: 355919.31 },
+            { id: 9, dataInicio: "2026-02-16", dataFim: "2026-03-15", valor: 207339.02 },
+            { id: 10, dataInicio: "2026-03-16", dataFim: "2026-04-15", valor: 347741.35 },
+            { id: 11, dataInicio: "2026-04-16", dataFim: "2026-05-15", valor: 483139.95 },
+            { id: 12, dataInicio: "2026-05-16", dataFim: "2026-06-15", valor: 292186.51 },
+            { id: 13, dataInicio: "2026-06-16", dataFim: "2026-07-15", valor: 336583.53 },
+            { id: 14, dataInicio: "2026-07-16", dataFim: "2026-08-15", valor: 230807.60 }
+        ]
     },
     {
         id: "CT 058/25",
         objeto: "UBS Rio Acima",
         empresa: "LBD Engenharia Ltda EPP",
-        valorAtual: 4770000.00,
+        valorTotal: 4770000.00,
         observacoes: null,
-        medicoes: [
-            { medicao: 1, inicio: "28/07/2025", fim: "27/08/2025", ref: "Ago/25", valor: 651465.99, acumulado: 651465.99 },
-            { medicao: 2, inicio: "28/08/2025", fim: "27/09/2025", ref: "Set/25", valor: 235455.54, acumulado: 886921.53 },
-            { medicao: 3, inicio: "28/09/2025", fim: "27/10/2025", ref: "Out/25", valor: 214136.63, acumulado: 1101058.16 },
-            { medicao: 4, inicio: "28/10/2025", fim: "27/11/2025", ref: "Nov/25", valor: 207896.03, acumulado: 1308953.19 },
-            { medicao: 5, inicio: "28/11/2025", fim: "27/12/2025", ref: "Dez/25", valor: 248274.38, acumulado: 1557227.57 },
-            { medicao: 6, inicio: "28/12/2025", fim: "27/01/2026", ref: "Jan/26", valor: 364000.85, acumulado: 1921228.42 },
-            { medicao: 7, inicio: "28/01/2026", fim: "27/02/2026", ref: "Fev/26", valor: 526704.03, acumulado: 2447932.45 },
-            { medicao: 8, inicio: "28/02/2026", fim: "27/03/2026", ref: "Mar/26", valor: 401628.60, acumulado: 2849561.05 },
-            { medicao: 9, inicio: "28/03/2026", fim: "27/04/2026", ref: "Abr/26", valor: 433111.60, acumulado: 3282672.65 },
-            { medicao: 10, inicio: "28/04/2026", fim: "27/05/2026", ref: "Mai/26", valor: 448241.70, acumulado: 3730914.35 },
-            { medicao: 11, inicio: "28/05/2026", fim: "27/06/2026", ref: "Jun/26", valor: 410658.28, acumulado: 4141572.63 },
-            { medicao: 12, inicio: "28/06/2026", fim: "27/07/2026", ref: "Jul/26", valor: 287880.94, acumulado: 4429453.57 },
-            { medicao: 13, inicio: "28/07/2026", fim: "27/08/2026", ref: "Ago/26", valor: 262817.27, acumulado: 4692270.84 },
-            { medicao: 14, inicio: "28/08/2026", fim: "27/09/2026", ref: "Set/26", valor: 77729.16, acumulado: 4770000.00 },
+        previsaoInicio: "2025-07-28",
+        previsaoFim: "2026-09-20",
+        localizacao: { lat: -23.115577, lng: -46.924531 },
+        cronogramas: [
+            {
+                nome: "Previsto Inicial",
+                valoresAcumulados: [651465.99, 886921.53, 1101058.16, 1308953.19, 1557227.57, 1921228.42, 2447932.45, 2849561.05, 3282672.65, 3730914.35, 4141572.63, 4429453.57, 4692270.84, 4770000.00]
+            }
         ],
-        grafico: { // Populated based on medicoes
-            labels: ["Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25", "Jan/26", "Fev/26", "Mar/26", "Abr/26", "Mai/26", "Jun/26", "Jul/26", "Ago/26", "Set/26"],
-            previsto: [651465.99, 886921.53, 1101058.16, 1308953.19, 1557227.57, 1921228.42, 2447932.45, 2849561.05, 3282672.65, 3730914.35, 4141572.63, 4429453.57, 4692270.84, 4770000.00],
-            executado: [252392.52 , 252392.52, 515634.17, null, null, null, null, null, null, null, null, null, null, null],
-            previstoDataSets: null
-        },
-        predicted_start_date: '28/07/2025', // OS 10/2025 emitida em 25/07/2025
-        predicted_end_date: '20/09/2026', // 420 dias corridos de execução segundo a OS
-        location: { lat: -23.11557702080163, lng: -46.92453149 }
+        medicoes: [
+            { id: 1, dataInicio: "2025-07-28", dataFim: "2025-08-27", valor: 651465.99 },
+            { id: 2, dataInicio: "2025-08-28", dataFim: "2025-09-27", valor: 235455.54 },
+            { id: 3, dataInicio: "2025-09-28", dataFim: "2025-10-27", valor: 214136.63 },
+            { id: 4, dataInicio: "2025-10-28", dataFim: "2025-11-27", valor: 207896.03 },
+            { id: 5, dataInicio: "2025-11-28", dataFim: "2025-12-27", valor: 248274.38 },
+            { id: 6, dataInicio: "2025-12-28", dataFim: "2026-01-27", valor: 364000.85 },
+            { id: 7, dataInicio: "2026-01-28", dataFim: "2026-02-27", valor: 526704.03 },
+            { id: 8, dataInicio: "2026-02-28", dataFim: "2026-03-27", valor: 401628.60 },
+            { id: 9, dataInicio: "2026-03-28", dataFim: "2026-04-27", valor: 433111.60 },
+            { id: 10, dataInicio: "2026-04-28", dataFim: "2026-05-27", valor: 448241.70 },
+            { id: 11, dataInicio: "2026-05-28", dataFim: "2026-06-27", valor: 410658.28 },
+            { id: 12, dataInicio: "2026-06-28", dataFim: "2026-07-27", valor: 287880.94 },
+            { id: 13, dataInicio: "2026-07-28", dataFim: "2026-08-27", valor: 262817.27 },
+            { id: 14, dataInicio: "2026-08-28", dataFim: "2026-09-27", valor: 77729.16 }
+        ]
     },
     {
         id: "CT 048/25",
         objeto: "CECE Romão",
         empresa: "Adriana Rodrigues Belles",
-        valorAtual: 1480000.00,
+        valorTotal: 1480000.00,
         observacoes: "OS Emitida em 07/07/2025",
-        medicoes: [
-            { medicao: 1, inicio: '07/07/2025', fim: '06/08/2025', ref: "Jul/25", valor: 149571.75, acumulado: 149571.75 },
-            { medicao: 2, inicio: '07/08/2025', fim: '06/09/2025', ref: "Ago/25", valor: 57580.00, acumulado: 318610.50 },
-            { medicao: 3, inicio: '07/09/2025', fim: '06/10/2025', ref: "Set/25", valor: 50171.08, acumulado: 368781.58 },
-            { medicao: 4, inicio: '07/10/2025', fim: '06/11/2025', ref: "Out/25", valor: 498074.55, acumulado: 866856.13 },
-            { medicao: 5, inicio: "07/11/25", fim: "06/12/2025", ref: "Nov/25", valor: 302628.67, acumulado: 1169484.80 },
-            { medicao: 6, inicio: "07/12/25", fim: "06/01/2026", ref: "Dez/25", valor: 163668.40, acumulado: 1333153.20 },
-            { medicao: 7, inicio: "07/01/26", fim: "06/02/2026", ref: "Jan/26", valor: 146846.80, acumulado: 1480000.00 },
+        previsaoInicio: "2025-07-07",
+        previsaoFim: "2026-02-06",
+        localizacao: { lat: -23.184126, lng: -46.853513 },
+        cronogramas: [
+            {
+                nome: "Previsto Inicial",
+                valoresAcumulados: [149571.75, 318610.50, 368781.58, 866856.13, 1169484.80, 1333153.20, 1480000.00]
+            }
         ],
-        grafico: { // Populated based on medicoes
-            labels: ["Jul/25", "Ago/25", "Set/25", "Out/25", "Nov/25", "Dez/25", "Jan/26"],
-            previsto: [149571.75, 318610.50, 368781.58, 866856.13, 1169484.80, 1333153.20, 1480000.00],
-            executado: [261030.50, 261030.50, 261030.50, 366229.87, 553163.84, null, null],
-            previstoDataSets: null
-        },
-        predicted_start_date: '07/07/2025', // OS 9/2025 emitida em 24/06/2025
-        predicted_end_date: '06/02/2026', // 120 dias corridos de execução segundo a OS
-        location: { lat: -23.184126, lng: -46.853513 }, 
+        medicoes: [
+            { id: 1, dataInicio: "2025-07-07", dataFim: "2025-08-06", valor: 149571.75 },
+            { id: 2, dataInicio: "2025-08-07", dataFim: "2025-09-06", valor: 57580.00 }, // Corrigido de acumulado para valor parcial real, inferindo do original
+            { id: 3, dataInicio: "2025-09-07", dataFim: "2025-10-06", valor: 50171.08 },
+            { id: 4, dataInicio: "2025-10-07", dataFim: "2025-11-06", valor: 498074.55 },
+            { id: 5, dataInicio: "2025-11-07", dataFim: "2025-12-06", valor: 302628.67 },
+            { id: 6, dataInicio: "2025-12-07", dataFim: "2026-01-06", valor: 163668.40 },
+            { id: 7, dataInicio: "2026-01-07", dataFim: "2026-02-06", valor: 146846.80 }
+        ]
     }
 ];
 
+// ======================================================================
+// EXEMPLO DE USO
+// ======================================================================
 
+// Como você processaria o primeiro contrato para o painel:
+const dadosDoPainel = ProjectDashboardAdapter.processarContrato(rawProjects[0]);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+console.log("Labels geradas:", dadosDoPainel.grafico.labels);
+console.log("Total executado:", dadosDoPainel.resumo.valorExecutado);
