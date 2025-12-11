@@ -1,7 +1,9 @@
 /**
- * ARQUITETURA DE DADOS - VERSÃO JAVASCRIPT (COMPATÍVEL)
- * Este arquivo contém os dados brutos e uma camada de adaptação
- * para alimentar o HTML existente sem necessidade de alterá-lo.
+ * DADOS_CONTRATO.JS - VERSÃO CORRIGIDA (PATCH DE INTEGRAÇÃO)
+ * * CORREÇÃO APLICADA: 
+ * O Painel (HTML) exige que existam 3 datasets de previsão para renderizar o gráfico.
+ * Contratos novos (Maringá, Rio Acima, Romão) tinham apenas 1 ou 2.
+ * O Adapter agora preenche os espaços vazios com dados nulos para evitar o travamento.
  */
 
 // ======================================================================
@@ -17,6 +19,8 @@ class ProjectDashboardAdapter {
         );
 
         // 2. Gerar Labels (Eixo X)
+        // Se houver medições cadastradas (mesmo futuras), usa as datas delas.
+        // Se não, gera genéricas.
         const labels = medicoesOrdenadas.length > 0 
             ? medicoesOrdenadas.map(m => this.formatarDataLabel(m.dataInicio))
             : this.gerarLabelsGenericos(12);
@@ -25,18 +29,32 @@ class ProjectDashboardAdapter {
         let acumulador = 0;
         const dadosExecutados = medicoesOrdenadas.map(m => {
             acumulador += m.valor;
+            // Se o valor for 0 ou nulo e for uma data futura distante, poderia ser null, 
+            // mas mantemos a lógica original de somar.
             return Number(acumulador.toFixed(2));
         });
 
         // 4. Preparar Datasets de Previsão
-        // Mapeia os cronogramas novos para o formato que o HTML espera (previstoDataSets)
+        // Mapeia os cronogramas reais
         const previstoDataSets = contrato.cronogramas.map(crono => ({
             label: crono.nome,
             data: crono.valoresAcumulados
         }));
 
-        // Fallback para o 'previsto' simples (pega o primeiro cronograma)
-        const previstoSimples = previstoDataSets.length > 0 ? previstoDataSets[0].data : [];
+        // --- CORREÇÃO CRÍTICA AQUI ---
+        // O HTML tenta acessar indices [1] e [2] cegamente. 
+        // Se o contrato só tem 1 cronograma, isso quebra o painel.
+        // Preenchemos com objetos vazios até ter 3 itens.
+        while (previstoDataSets.length < 3) {
+            previstoDataSets.push({
+                label: '', // Label vazia para não aparecer na legenda
+                data: labels.map(() => null) // Array de nulos para não desenhar linha
+            });
+        }
+        // -----------------------------
+
+        // Fallback para o 'previsto' simples (pega o primeiro cronograma real)
+        const previstoSimples = previstoDataSets[0].data;
 
         // Monta o objeto grafico no formato antigo
         const objetoGrafico = {
@@ -70,7 +88,6 @@ class ProjectDashboardAdapter {
     static formatarDataLabel(isoDate) {
         if (!isoDate) return 'N/A';
         try {
-            // Ajuste de fuso horário simples adicionando horas para evitar dia anterior
             const date = new Date(isoDate + 'T12:00:00'); 
             const mes = new Intl.DateTimeFormat('pt-BR', { month: 'short' }).format(date);
             const ano = new Intl.DateTimeFormat('pt-BR', { year: '2-digit' }).format(date);
