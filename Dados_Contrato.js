@@ -288,7 +288,7 @@ const rawProjects: Contrato[] = [
     {
         id: "CT 054/25",
         objeto: "UBS Maringá",
-        empresa: "Studio Sabino & Souza A",
+        empresa: "Studio Sabinno & Souza A",
         valorTotal: 3629613.36,
         observacoes: null,
         previsaoInicio: "2025-06-16",
@@ -389,3 +389,4 @@ const dadosDoPainel = ProjectDashboardAdapter.processarContrato(rawProjects[0]);
 
 console.log("Labels geradas:", dadosDoPainel.grafico.labels);
 console.log("Total executado:", dadosDoPainel.resumo.valorExecutado);
+
