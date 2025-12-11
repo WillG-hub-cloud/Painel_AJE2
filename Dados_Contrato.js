@@ -28,6 +28,7 @@ class ProjectDashboardAdapter {
         // 3. Calcular Executado Acumulado
         let acumulador = 0;
         const dadosExecutados = medicoesOrdenadas.map(m => {
+            if (m.valor === null) return null
             acumulador += m.valor;
             // Se o valor for 0 ou nulo e for uma data futura distante, poderia ser null, 
             // mas mantemos a lógica original de somar.
@@ -354,5 +355,6 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
