@@ -178,7 +178,7 @@ const projectData = [
             previstoDataSets: [
                 { label: "Cronograma Inicial", data: [292590.76, 534282.82, 632255.10, 726776.13, 906496.89, 1078035.34, 1375896.09, 1731815.40, 1939154.42, 2286895.77, 2770035.72, 3062222.23, 3398805.76, 3629613.36] }, 
                 { label: "Cronograma Prorrogação I", data: [null, null, null, 453476.70, 682448.69, 1005437.35, 1308972.20, 1665743.54, 2226698.41, 2584618.50, 3011727.49, 3401989.43, 3592627.37, 3625286.12] }, // Nova série azul (reajuste 1)
-                { label: "", data: [null, null, null, null, null, null, }
+                { label: "", data: [null, null, null, null, null, null, null, null, null, null, null, null, null, null}
                 ],
             executado: [311389.54, 311389.54, 311389.54, 501587.58, null, null, null, null, null, null, null, null, null, null],
         },
@@ -244,57 +244,3 @@ const projectData = [
         location: { lat: -23.184126, lng: -46.853513 }, 
     }
 ];
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
