@@ -22,7 +22,7 @@ class ProjectDashboardAdapter {
         // Se houver medições cadastradas (mesmo futuras), usa as datas delas.
         // Se não, gera genéricas.
         const labels = medicoesOrdenadas.length > 0 
-            ? medicoesOrdenadas.map(m => this.formatarDataLabel(m.dataInicio))
+            ? medicoesOrdenadas.map(m => this.formatarDataLabel(m.dataFim))
             : this.gerarLabelsGenericos(12);
 
         // 3. Calcular Executado Acumulado
@@ -355,6 +355,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
