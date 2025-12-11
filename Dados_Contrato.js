@@ -136,15 +136,15 @@ const rawProjects = [
             }
         ],
         medicoes: [
-            { id: 1, dataInicio: "2025-04-15", dataFim: "2025-05-14", valor: 124644.24 },
-            { id: 2, dataInicio: "2025-05-16", dataFim: "2025-06-15", valor: 171933.40 },
-            { id: 3, dataInicio: "2025-06-16", dataFim: "2025-07-16", valor: 241980.72 },
-            { id: 4, dataInicio: "2025-07-17", dataFim: "2025-08-16", valor: 244895.61 },
-            { id: 5, dataInicio: "2025-08-17", dataFim: "2025-09-16", valor: 206279.55 },
-            { id: 6, dataInicio: "2025-09-17", dataFim: "2025-10-17", valor: 235402.36 },
-            { id: 7, dataInicio: "2025-10-18", dataFim: "2025-11-17", valor: 237641.42 },
-            { id: 8, dataInicio: "2025-11-18", dataFim: "2025-12-10", valor: 216254.79 },
-            { id: 9, dataInicio: "2025-12-11", dataFim: "2026-01-10", valor: 216254.79 } 
+            { id: 1, dataInicio: "2025-04-15", dataFim: "2025-05-14", valor: 107178.95 },
+            { id: 2, dataInicio: "2025-05-16", dataFim: "2025-06-15", valor: 17465.29 },
+            { id: 3, dataInicio: "2025-06-16", dataFim: "2025-07-16", valor: 60448.43 },
+            { id: 4, dataInicio: "2025-07-17", dataFim: "2025-08-16", valor: 155336.53 },
+            { id: 5, dataInicio: "2025-08-17", dataFim: "2025-09-16", valor: 233719.93 },
+            { id: 6, dataInicio: "2025-09-17", dataFim: "2025-10-17", valor: 231564.64 },
+            { id: 7, dataInicio: "2025-10-18", dataFim: "2025-11-17", valor: null },
+            { id: 8, dataInicio: "2025-11-18", dataFim: "2025-12-10", valor: null },
+            { id: 9, dataInicio: "2025-12-11", dataFim: "2026-01-10", valor: null } 
         ]
     },
     {
@@ -354,3 +354,4 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
