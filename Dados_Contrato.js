@@ -1,170 +1,100 @@
 /**
- * ARQUITETURA DE SOFTWARE - REFATORAÇÃO
- * ----------------------------------------------------------------------
- * 1. Interfaces: Garantem a estrutura dos objetos (Type Safety).
- * 2. Adapter: Transforma dados brutos em dados de visualização (Business Logic).
- * 3. Raw Data: Apenas os dados essenciais, sem duplicação (Single Source of Truth).
+ * ARQUITETURA DE DADOS - VERSÃO JAVASCRIPT (COMPATÍVEL)
+ * Este arquivo contém os dados brutos e uma camada de adaptação
+ * para alimentar o HTML existente sem necessidade de alterá-lo.
  */
 
 // ======================================================================
-// 1. DEFINIÇÕES DE TIPO (INTERFACES)
-// ======================================================================
-
-interface GeoLocation {
-    lat: number;
-    lng: number;
-}
-
-interface MedicaoRaw {
-    id: number;
-    // Datas em ISO 8601 (YYYY-MM-DD) para facilitar ordenação
-    dataInicio: string; 
-    dataFim: string;
-    // O valor desta medição específica (NÃO o acumulado)
-    valor: number;
-}
-
-interface CronogramaCenario {
-    nome: string; // Ex: "Cronograma Inicial", "Prorrogação I"
-    // Array de valores acumulados previstos. Null representa meses sem previsão.
-    valoresAcumulados: (number | null)[];
-}
-
-interface Contrato {
-    id: string;
-    objeto: string;
-    empresa: string;
-    valorTotal: number;
-    observacoes: string | null;
-    previsaoInicio: string | null;
-    previsaoFim: string | null;
-    localizacao: GeoLocation;
-    
-    // Lista de medições realizadas (Dados REAIS)
-    medicoes: MedicaoRaw[];
-    
-    // Cenários de previsão (Dados PROJETADOS/ESTÁTICOS)
-    cronogramas: CronogramaCenario[];
-}
-
-// Interface de Saída para o Painel (O que o gráfico vai consumir)
-interface DadosPainel {
-    resumo: {
-        id: string;
-        objeto: string;
-        percentualExecutado: number;
-        valorTotal: number;
-        valorExecutado: number;
-    };
-    grafico: {
-        labels: string[]; // Eixo X (Meses)
-        datasets: {
-            label: string;
-            data: (number | null)[]; // Eixo Y (Valores)
-            borderColor?: string;
-            borderDash?: number[];
-            fill?: boolean;
-        }[];
-    };
-}
-
-// ======================================================================
-// 2. LÓGICA DE NEGÓCIO (ADAPTER)
+// 1. CLASSE ADAPTER (LÓGICA DE NEGÓCIO)
 // ======================================================================
 
 class ProjectDashboardAdapter {
-    /**
-     * Transforma os dados brutos do contrato no formato exigido pelo Painel/Gráfico.
-     * Calcula os acumulados em tempo de execução para garantir integridade.
-     */
-    static processarContrato(contrato: Contrato): DadosPainel {
-        
-        // 1. Ordenar medições por data cronológica
+    
+    static processarContrato(contrato) {
+        // 1. Ordenar medições por data
         const medicoesOrdenadas = [...contrato.medicoes].sort((a, b) => 
             new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime()
         );
 
-        // 2. Gerar Labels dinâmicos (Eixo X) baseados nas datas das medições
-        // Se não houver medições, usa índices genéricos ou lógica de data prevista
+        // 2. Gerar Labels (Eixo X)
         const labels = medicoesOrdenadas.length > 0 
             ? medicoesOrdenadas.map(m => this.formatarDataLabel(m.dataInicio))
-            : this.gerarLabelsGenericos(12); // Fallback para contratos sem medição
+            : this.gerarLabelsGenericos(12);
 
-        // 3. Calcular a linha de "Executado" (Acumulado Real)
+        // 3. Calcular Executado Acumulado
         let acumulador = 0;
         const dadosExecutados = medicoesOrdenadas.map(m => {
             acumulador += m.valor;
-            return Number(acumulador.toFixed(2)); // Correção de ponto flutuante
+            return Number(acumulador.toFixed(2));
         });
 
-        // 4. Montar os Datasets (Linhas do gráfico)
-        const datasets = [];
+        // 4. Preparar Datasets de Previsão
+        // Mapeia os cronogramas novos para o formato que o HTML espera (previstoDataSets)
+        const previstoDataSets = contrato.cronogramas.map(crono => ({
+            label: crono.nome,
+            data: crono.valoresAcumulados
+        }));
 
-        // Adiciona a linha Real/Executado
-        if (dadosExecutados.length > 0) {
-            datasets.push({
-                label: 'Executado',
-                data: dadosExecutados,
-                borderColor: '#2ecc71', // Verde
-                fill: false
-            });
-        }
+        // Fallback para o 'previsto' simples (pega o primeiro cronograma)
+        const previstoSimples = previstoDataSets.length > 0 ? previstoDataSets[0].data : [];
 
-        // Adiciona os Cronogramas (Previsões)
-        contrato.cronogramas.forEach((crono, index) => {
-            // Define cores diferentes para cada cronograma ou padrão
-            const cores = ['#3498db', '#e67e22', '#9b59b6']; // Azul, Laranja, Roxo
-            datasets.push({
-                label: crono.nome,
-                data: crono.valoresAcumulados,
-                borderColor: cores[index % cores.length],
-                borderDash: [5, 5], // Linha tracejada para indicar previsão
-                fill: false
-            });
+        // Monta o objeto grafico no formato antigo
+        const objetoGrafico = {
+            labels: labels,
+            executado: dadosExecutados,
+            previsto: previstoSimples,
+            previstoDataSets: previstoDataSets
+        };
+
+        // Adapta as medições para o formato antigo (com acumulado explícito)
+        let acumuladorMedicao = 0;
+        const medicoesAdaptadas = medicoesOrdenadas.map(m => {
+            acumuladorMedicao += m.valor;
+            return {
+                medicao: m.id,
+                inicio: this.formatarDataISOparaBR(m.dataInicio),
+                fim: this.formatarDataISOparaBR(m.dataFim),
+                ref: this.formatarDataLabel(m.dataInicio),
+                valor: m.valor,
+                acumulado: Number(acumuladorMedicao.toFixed(2))
+            };
         });
 
-        // 5. Retornar estrutura pronta para uso
         return {
-            resumo: {
-                id: contrato.id,
-                objeto: contrato.objeto,
-                valorTotal: contrato.valorTotal,
-                valorExecutado: acumulador,
-                percentualExecutado: contrato.valorTotal > 0 
-                    ? Number(((acumulador / contrato.valorTotal) * 100).toFixed(2)) 
-                    : 0
-            },
-            grafico: {
-                labels,
-                datasets
-            }
+            grafico: objetoGrafico,
+            medicoes: medicoesAdaptadas
         };
     }
 
-    // Função auxiliar para formatar datas (Ex: "2025-05-01" -> "Mai/25")
-    private static formatarDataLabel(isoDate: string): string {
+    // Auxiliar: 2025-05-01 -> Mai/25
+    static formatarDataLabel(isoDate) {
+        if (!isoDate) return 'N/A';
         try {
-            const date = new Date(isoDate);
-            // Formata para Português-BR. Ajuste 'short' para 'long' se quiser o mês completo.
+            // Ajuste de fuso horário simples adicionando horas para evitar dia anterior
+            const date = new Date(isoDate + 'T12:00:00'); 
             const mes = new Intl.DateTimeFormat('pt-BR', { month: 'short' }).format(date);
             const ano = new Intl.DateTimeFormat('pt-BR', { year: '2-digit' }).format(date);
-            // Capitaliza a primeira letra do mês e remove o ponto (ex: "mai." -> "Mai")
             return `${mes.charAt(0).toUpperCase() + mes.slice(1).replace('.', '')}/${ano}`;
-        } catch (e) {
-            return isoDate;
-        }
+        } catch (e) { return isoDate; }
     }
 
-    private static gerarLabelsGenericos(qtd: number): string[] {
+    // Auxiliar: 2025-05-01 -> 01/05/2025
+    static formatarDataISOparaBR(isoDate) {
+        if (!isoDate) return 'N/A';
+        const parts = isoDate.split('-');
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+
+    static gerarLabelsGenericos(qtd) {
         return Array.from({ length: qtd }, (_, i) => `${i + 1}º Mês`);
     }
 }
 
 // ======================================================================
-// 3. DADOS BRUTOS (FONTE DA VERDADE)
+// 2. DADOS BRUTOS (FONTE DA VERDADE LIMPA)
 // ======================================================================
 
-const rawProjects: Contrato[] = [
+const rawProjects = [
     {
         id: "CT 039/25",
         objeto: "EMEB Adail",
@@ -197,7 +127,7 @@ const rawProjects: Contrato[] = [
             { id: 6, dataInicio: "2025-09-17", dataFim: "2025-10-17", valor: 235402.36 },
             { id: 7, dataInicio: "2025-10-18", dataFim: "2025-11-17", valor: 237641.42 },
             { id: 8, dataInicio: "2025-11-18", dataFim: "2025-12-10", valor: 216254.79 },
-            { id: 9, dataInicio: "2025-12-11", dataFim: "2026-01-10", valor: 216254.79 } // O último acumulado na origem parecia ser 1.7M, assumindo valor cheio aqui
+            { id: 9, dataInicio: "2025-12-11", dataFim: "2026-01-10", valor: 216254.79 } 
         ]
     },
     {
@@ -228,7 +158,7 @@ const rawProjects: Contrato[] = [
             { id: 2, dataInicio: "2024-11-06", dataFim: "2024-12-05", valor: 193930.07 },
             { id: 3, dataInicio: "2024-12-06", dataFim: "2025-01-04", valor: 78717.56 },
             { id: 4, dataInicio: "2025-01-05", dataFim: "2025-02-03", valor: 96409.89 },
-            { id: 5, dataInicio: "2025-02-04", dataFim: "2025-04-03", valor: 437000.00 }, // Gap temporal mantido conforme original
+            { id: 5, dataInicio: "2025-02-04", dataFim: "2025-04-03", valor: 437000.00 },
             { id: 6, dataInicio: "2025-04-04", dataFim: "2025-05-03", valor: 308812.37 },
             { id: 7, dataInicio: "2025-05-04", dataFim: "2025-06-03", valor: 333302.47 },
             { id: 8, dataInicio: "2025-06-04", dataFim: "2025-08-03", valor: 265536.22 },
@@ -273,8 +203,8 @@ const rawProjects: Contrato[] = [
         objeto: "UBS Ivoturucaia",
         empresa: "J.S.O. Constr. Ltda.",
         valorTotal: 5654210.10,
-        observacoes: "Contrato ainda não possui medições reais.",
-        previsaoInicio: null, // Indefinido no original
+        observacoes: "Contrato ainda não possui medições.",
+        previsaoInicio: null, 
         previsaoFim: null,
         localizacao: { lat: -23.181836, lng: -46.810482 },
         cronogramas: [
@@ -283,12 +213,12 @@ const rawProjects: Contrato[] = [
                 valoresAcumulados: [84127.17, 187162.49, 343425.89, 659143.45, 1178633.60, 1613353.17, 2114654.73, 3097502.52, 3832551.62, 4532017.74, 5266848.55, 5654210.10]
             }
         ],
-        medicoes: [] // Array vazio pois não há medições reais
+        medicoes: []
     },
     {
         id: "CT 054/25",
         objeto: "UBS Maringá",
-        empresa: "Studio Sabinno & Souza A",
+        empresa: "Studio Sabino & Souza A",
         valorTotal: 3629613.36,
         observacoes: null,
         previsaoInicio: "2025-06-16",
@@ -370,7 +300,7 @@ const rawProjects: Contrato[] = [
         ],
         medicoes: [
             { id: 1, dataInicio: "2025-07-07", dataFim: "2025-08-06", valor: 149571.75 },
-            { id: 2, dataInicio: "2025-08-07", dataFim: "2025-09-06", valor: 57580.00 }, // Corrigido de acumulado para valor parcial real, inferindo do original
+            { id: 2, dataInicio: "2025-08-07", dataFim: "2025-09-06", valor: 57580.00 },
             { id: 3, dataInicio: "2025-09-07", dataFim: "2025-10-06", valor: 50171.08 },
             { id: 4, dataInicio: "2025-10-07", dataFim: "2025-11-06", valor: 498074.55 },
             { id: 5, dataInicio: "2025-11-07", dataFim: "2025-12-06", valor: 302628.67 },
@@ -381,12 +311,29 @@ const rawProjects: Contrato[] = [
 ];
 
 // ======================================================================
-// EXEMPLO DE USO
+// 3. EXPORTAÇÃO COMPATÍVEL (PONTE PARA O HTML ANTIGO)
 // ======================================================================
 
-// Como você processaria o primeiro contrato para o painel:
-const dadosDoPainel = ProjectDashboardAdapter.processarContrato(rawProjects[0]);
+// Aqui está a mágica: Criamos a variável 'projectData' que o HTML espera,
+// mas usamos o Adapter para gerar os dados calculados automaticamente.
 
-console.log("Labels geradas:", dadosDoPainel.grafico.labels);
-console.log("Total executado:", dadosDoPainel.resumo.valorExecutado);
+var projectData = rawProjects.map(p => {
+    // Processa os dados brutos usando a lógica do Adapter
+    const processado = ProjectDashboardAdapter.processarContrato(p);
 
+    // Retorna o objeto no formato EXATO que o HTML antigo exige
+    return {
+        id: p.id,
+        objeto: p.objeto,
+        empresa: p.empresa,
+        valorAtual: p.valorTotal, // HTML usa 'valorAtual', nós mapeamos de 'valorTotal'
+        observacoes: p.observacoes,
+        predicted_start_date: ProjectDashboardAdapter.formatarDataISOparaBR(p.previsaoInicio),
+        predicted_end_date: ProjectDashboardAdapter.formatarDataISOparaBR(p.previsaoFim),
+        location: p.localizacao,
+        
+        // O Adapter já gerou 'medicoes' com acumulados e 'grafico' com arrays prontos
+        medicoes: processado.medicoes,
+        grafico: processado.grafico
+    };
+});
