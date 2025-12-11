@@ -207,7 +207,7 @@ const rawProjects = [
             { id: 3, dataInicio: "2025-06-22", dataFim: "2025-07-21", valor: 310627.98 },
             { id: 4, dataInicio: "2025-07-22", dataFim: "2025-08-21", valor: 101087.70 },
             { id: 5, dataInicio: "2025-08-22", dataFim: "2025-09-21", valor: 73779.88 },
-            { id: 6, dataInicio: "2025-09-22", dataFim: "2025-10-21", valor: 364031,79 },
+            { id: 6, dataInicio: "2025-09-22", dataFim: "2025-10-21", valor: 364031.79 },
             { id: 7, dataInicio: "2025-10-22", dataFim: "2025-11-21", valor: null },
             { id: 8, dataInicio: "2025-11-22", dataFim: "2025-12-21", valor: null },
             { id: 9, dataInicio: "2025-12-22", dataFim: "2026-01-21", valor: null },
@@ -355,6 +355,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
