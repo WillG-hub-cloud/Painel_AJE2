@@ -72,7 +72,7 @@ class ProjectDashboardAdapter {
                 medicao: m.id,
                 inicio: this.formatarDataISOparaBR(m.dataInicio),
                 fim: this.formatarDataISOparaBR(m.dataFim),
-                ref: this.formatarDataLabel(m.dataInicio),
+                ref: this.formatarDataLabel(m.dataFim),
                 valor: m.valor,
                 acumulado: Number(acumuladorMedicao.toFixed(2))
             };
@@ -354,4 +354,5 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
