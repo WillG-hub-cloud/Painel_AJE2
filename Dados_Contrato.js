@@ -222,8 +222,8 @@ const rawProjects = [
         empresa: "J.S.O. Constr. Ltda.",
         valorTotal: 5654210.10,
         observacoes: "Contrato ainda não possui medições.",
-        previsaoInicio: null, 
-        previsaoFim: null,
+        previsaoInicio: "2025-09-24",
+        previsaoFim: "2026-09-23",
         localizacao: { lat: -23.181836, lng: -46.810482 },
         cronogramas: [
             {
@@ -232,18 +232,18 @@ const rawProjects = [
             }
         ],
         medicoes: [
-            { id: 1, dataInicio: "2025-09-22", dataFim: "2025-10-21", valor: 232212.42 },
-            { id: 2, dataInicio: "2025-05-22", dataFim: "2025-06-21", valor: 242268.80 },
-            { id: 3, dataInicio: "2025-06-22", dataFim: "2025-07-21", valor: null },
-            { id: 4, dataInicio: "2025-07-22", dataFim: "2025-08-21", valor: null },
-            { id: 5, dataInicio: "2025-08-22", dataFim: "2025-09-21", valor: null },
-            { id: 6, dataInicio: "2025-09-22", dataFim: "2025-10-21", valor: null },
-            { id: 7, dataInicio: "2025-10-22", dataFim: "2025-11-21", valor: null },
-            { id: 8, dataInicio: "2025-11-22", dataFim: "2025-12-21", valor: null },
-            { id: 9, dataInicio: "2025-12-22", dataFim: "2026-01-21", valor: null },
-            { id: 10, dataInicio: "2026-01-22", dataFim: "2026-02-21", valor: null },
-            { id: 11, dataInicio: "2026-02-22", dataFim: "2026-03-21", valor: null },
-            { id: 12, dataInicio: "2026-03-22", dataFim: "2026-04-21", valor: null }
+            { id: 1, dataInicio: "2025-09-24", dataFim: "2025-10-21", valor: 232212.42 },
+            { id: 2, dataInicio: "2025-10-22", dataFim: "2025-11-21", valor: 242268.80 },
+            { id: 3, dataInicio: "2025-11-22", dataFim: "2025-12-21", valor: null },
+            { id: 4, dataInicio: "2025-12-22", dataFim: "2026-01-21", valor: null },
+            { id: 5, dataInicio: "2026-01-22", dataFim: "2026-02-21", valor: null },
+            { id: 6, dataInicio: "2026-02-22", dataFim: "2026-03-21", valor: null },
+            { id: 7, dataInicio: "2026-03-22", dataFim: "2026-04-21", valor: null },
+            { id: 8, dataInicio: "2026-04-22", dataFim: "2026-05-21", valor: null },
+            { id: 9, dataInicio: "2026-05-22", dataFim: "2026-06-21", valor: null },
+            { id: 10, dataInicio: "2026-06-22", dataFim: "2026-07-21", valor: null },
+            { id: 11, dataInicio: "2026-07-22", dataFim: "2026-08-21", valor: null },
+            { id: 12, dataInicio: "2026-08-22", dataFim: "2026-09-21", valor: null }
         ]
     },
     {
@@ -372,6 +372,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
