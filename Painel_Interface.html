@@ -304,13 +304,25 @@
 
             // --- Utilitários (Helpers) ---
             const Utils = {
-                async sha256(message) {
-                    const msgBuffer = new TextEncoder().encode(message);
-                    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-                    const hashArray = Array.from(new Uint8Array(hashBuffer));
-                    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                // ... (mantenha as funções sha256, formatCurrency, etc que já existem) ...
+
+                // Adicione/Atualize estas funções de formatação:
+                parseDate(dateString) {
+                    if (!dateString || dateString === 'N/A') return null;
+                    const parts = dateString.split('/');
+                    const day = parseInt(parts[0], 10);
+                    const month = parseInt(parts[1], 10) - 1;
+                    const year = parseInt(parts[2], 10);
+                    const fullYear = year < 100 ? (year > 25 ? 1900 + year : 2000 + year) : year;
+                    return new Date(fullYear, month, day);
                 },
-                
+
+                calculateTotalDays(startDate, endDate) {
+                    if (!startDate || !endDate) return 0;
+                    const diff = Math.abs(endDate - startDate);
+                    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+                },
+
                 formatCurrency(value) {
                     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
                 },
@@ -320,24 +332,12 @@
                     const pct = ((value / total) * 100).toFixed(2);
                     return `${this.formatCurrency(value)} (${pct}%)`;
                 },
-
+                
                 formatCompactCurrency(value) {
                     const abs = Math.abs(value);
                     if (abs >= 1e6) return `R$ ${(abs / 1e6).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} mi`;
                     if (abs >= 1e3) return `R$ ${(abs / 1e3).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })} mil`;
                     return `R$ ${abs.toLocaleString('pt-BR')}`;
-                },
-
-                parseDate(dateString) {
-                    if (!dateString || dateString === 'N/A') return null;
-                    const [day, month, year] = dateString.split('/').map(Number);
-                    const fullYear = year < 100 ? (year > 25 ? 1900 + year : 2000 + year) : year;
-                    return new Date(fullYear, month - 1, day);
-                },
-
-                daysBetween(d1, d2) {
-                    if (!d1 || !d2) return 0;
-                    return Math.ceil(Math.abs(d2 - d1) / (1000 * 60 * 60 * 24));
                 }
             };
 
@@ -536,9 +536,7 @@
                     document.getElementById('tab-chart').addEventListener('click', () => this.switchTab('chart'));
                     document.getElementById('tab-table').addEventListener('click', () => this.switchTab('table'));
 
-                    // Exportações
                     document.getElementById('exportRouteButton').addEventListener('click', () => this.exportRoute());
-                    // (Implementar outros exports aqui seguindo lógica original refatorada)
                     
                     this.populateSelector();
                     this.updateSummary();
@@ -556,9 +554,9 @@
 
                 updateSummary() {
                     const totalVal = projectData.reduce((acc, p) => acc + p.valorAtual, 0);
-                    // Lógica simplificada de soma do último mês para o exemplo
                     document.getElementById('totalContracts').textContent = projectData.length;
                     document.getElementById('totalContractValue').textContent = Utils.formatCompactCurrency(totalVal);
+                    // Nota: Soma do último mês requer lógica complexa de iteração nos arrays, simplificado aqui.
                 },
 
                 toggleView(viewName) {
@@ -567,7 +565,7 @@
                     if (viewName === 'map') {
                         mapEl.classList.remove('hidden');
                         dashEl.classList.add('hidden');
-                        state.mapInstance.invalidateSize();
+                        if (state.mapInstance) state.mapInstance.invalidateSize();
                     } else {
                         mapEl.classList.add('hidden');
                         dashEl.classList.remove('hidden');
@@ -603,21 +601,49 @@
                     const data = projectData.find(p => p.id === contractId);
                     if (!data) return;
 
-                    // Header Detalhes - Usando textContent para segurança contra XSS
+                    // --- 1. RENDERIZAÇÃO DO CABEÇALHO (CORRIGIDO) ---
                     const detailsContainer = document.getElementById('contractDetails');
                     
-                    // Criação segura de elementos DOM
-                    const title = document.createElement('h2');
-                    title.className = "text-xl font-bold text-gray-900";
-                    title.textContent = `Contrato ${data.id}: ${data.objeto}`;
-                    
-                    const subInfo = document.createElement('p');
-                    subInfo.className = "text-gray-700";
-                    subInfo.textContent = `Empresa: ${data.empresa} | Valor: ${Utils.formatCurrency(data.valorAtual)}`;
+                    // Lógica de Datas
+                    let dateInfoHtml = '';
+                    if (data.predicted_start_date && data.predicted_end_date && data.predicted_start_date !== 'N/A') {
+                        const start = Utils.parseDate(data.predicted_start_date);
+                        const end = Utils.parseDate(data.predicted_end_date);
+                        const duration = Utils.calculateTotalDays(start, end);
+                        dateInfoHtml = `
+                            <p class="text-xs md:text-sm text-gray-700 mt-0.5">
+                                Início Efetivo: ${data.predicted_start_date} | Fim Previsto: ${data.predicted_end_date} | Duração: ${duration} dias
+                            </p>
+                        `;
+                    }
 
-                    detailsContainer.innerHTML = ''; // Limpa anterior
-                    detailsContainer.appendChild(title);
-                    detailsContainer.appendChild(subInfo);
+                    // Lógica da Imagem do Projeto
+                    let projectImageHtml = '';
+                    if (data.objeto.includes("UBS")) {
+                        projectImageHtml = `<img src="${CONFIG.IMAGES.logoUBS}" class="h-20 md:h-24 object-contain ml-auto" onerror="this.style.display='none'"/>`;
+                    } else if (data.objeto.includes("CECE")) {
+                        projectImageHtml = `<img src="${CONFIG.IMAGES.logoAtleta}" class="h-18 md:h-20 object-contain ml-auto" onerror="this.style.display='none'"/>`;
+                    } else if (data.objeto.includes("EMEB")) {
+                        projectImageHtml = `<img src="${CONFIG.IMAGES.logoEscola}" class="h-20 md:h-24 object-contain ml-auto" onerror="this.style.display='none'"/>`;
+                    }
+
+                    // Montagem do HTML do Header
+                    detailsContainer.innerHTML = `
+                        <div class="flex items-center justify-center flex-wrap text-center space-y-1 w-full">
+                            <div class="flex-grow">
+                                <p class="text-lg md:text-xl font-bold text-gray-900">
+                                    Contrato ${data.id}: ${data.objeto}
+                                </p>
+                                <p class="text-sm md:text-base text-gray-700">
+                                    <span class="font-semibold">Empresa:</span> ${data.empresa} | 
+                                    <span class="font-semibold">Valor Atual:</span> <span class="font-bold" style="color: #072380;">${Utils.formatCurrency(data.valorAtual)}</span>
+                                </p>
+                                ${dateInfoHtml}
+                            </div>
+                            ${projectImageHtml}
+                        </div>
+                        ${data.observacoes ? `<div class="mt-3 text-center w-full"><p class="text-sm text-[#333333] bg-[rgba(255,204,0,0.3)] p-2 rounded-lg inline-block"><span class="font-bold">Observação:</span> ${data.observacoes}</p></div>` : ''}
+                    `;
 
                     // Renderizar Tabelas e Gráficos
                     this.renderTables(data);
@@ -627,26 +653,80 @@
                 renderTables(data) {
                     const compBody = document.getElementById('comparativeTableBody');
                     const schedBody = document.getElementById('measurementsTableBody');
-                    const hasExecuted = data.grafico?.executado?.some(v => v !== null);
+                    
+                    // Verifica se existe dado de execução para decidir qual tabela mostrar
+                    const hasExecuted = data.grafico && data.grafico.executado && data.grafico.executado.some(v => v !== null);
 
-                    // Lógica simplificada de renderização para brevidade
-                    // Em produção, isso seria fragmentado em builders de linhas
                     if (hasExecuted) {
-                        // Renderizar Tabela Comparativa...
+                        // --- 2. RENDERIZAÇÃO DA TABELA COMPARATIVA (CORRIGIDO) ---
                         document.getElementById('comparativeTableContainer').classList.remove('hidden');
                         document.getElementById('predictedScheduleTableContainer').classList.add('hidden');
-                        // Exemplo de injeção de linha (Simplificado)
-                        compBody.innerHTML = ''; 
-                        // Loop data.grafico.labels...
+                        document.getElementById('tab-table').textContent = "Tabela Comparativa";
+
+                        let rowsHtml = '';
+                        let prevPrevisto = 0;
+                        let prevExecutado = 0;
+
+                        // Itera sobre os labels (meses) para criar as linhas
+                        data.grafico.labels.forEach((label, index) => {
+                            // Lógica para pegar o valor previsto correto (prioridade: Reajuste 2 > Reajuste 1 > Inicial)
+                            let previstoAcum = null;
+                            if (data.grafico.previstoDataSets) {
+                                if (data.grafico.previstoDataSets[2]?.data[index] != null) previstoAcum = data.grafico.previstoDataSets[2].data[index];
+                                else if (data.grafico.previstoDataSets[1]?.data[index] != null) previstoAcum = data.grafico.previstoDataSets[1].data[index];
+                                else if (data.grafico.previstoDataSets[0]?.data[index] != null) previstoAcum = data.grafico.previstoDataSets[0].data[index];
+                            } else {
+                                previstoAcum = data.grafico.previsto[index];
+                            }
+
+                            const executadoAcum = data.grafico.executado[index];
+
+                            // Cálculos do Mês
+                            const previstoMes = (previstoAcum != null && prevPrevisto != null) ? previstoAcum - prevPrevisto : previstoAcum;
+                            const executadoMes = (executadoAcum != null && prevExecutado != null) ? executadoAcum - prevExecutado : executadoAcum;
+                            
+                            // Diferença e Status
+                            let diffCell = '<td class="px-5 py-3 text-sm text-center"></td>';
+                            let statusCell = '<td class="px-5 py-3 text-sm text-center"></td>';
+
+                            if (previstoAcum != null && executadoAcum != null) {
+                                const diff = executadoAcum - previstoAcum;
+                                const status = diff >= 0 ? 'Adiantado' : 'Atrasado';
+                                const colorClass = diff >= 0 ? 'text-[#0073a1]' : 'text-[#b80404]';
+                                
+                                diffCell = `<td class="px-5 py-3 text-sm text-center font-bold ${colorClass}">${Utils.formatCurrencyAndPercentage(diff, data.valorAtual)}</td>`;
+                                statusCell = `<td class="px-5 py-3 text-sm text-center font-bold ${colorClass}">${status}</td>`;
+                            }
+
+                            rowsHtml += `
+                                <tr class="border-b border-slate-200/50 hover:bg-white/50">
+                                    <td class="px-5 py-3 text-sm font-medium text-center text-gray-900">${index + 1}</td>
+                                    <td class="px-5 py-3 text-sm text-center text-gray-700">${label}</td>
+                                    <td class="px-5 py-3 text-sm text-center text-gray-800">${Utils.formatCurrency(previstoMes)}</td>
+                                    <td class="px-5 py-3 text-sm text-center text-gray-800">${Utils.formatCurrencyAndPercentage(previstoAcum, data.valorAtual)}</td>
+                                    <td class="px-5 py-3 text-sm text-center text-gray-800">${executadoMes != null ? Utils.formatCurrency(executadoMes) : ''}</td>
+                                    <td class="px-5 py-3 text-sm text-center text-gray-800">${executadoAcum != null ? Utils.formatCurrencyAndPercentage(executadoAcum, data.valorAtual) : ''}</td>
+                                    ${diffCell}
+                                    ${statusCell}
+                                </tr>
+                            `;
+
+                            if (previstoAcum != null) prevPrevisto = previstoAcum;
+                            if (executadoAcum != null) prevExecutado = executadoAcum;
+                        });
+
+                        compBody.innerHTML = rowsHtml;
+
                     } else {
-                        // Renderizar Tabela Cronograma...
+                        // --- 3. RENDERIZAÇÃO DA TABELA CRONOGRAMA SIMPLES ---
                         document.getElementById('comparativeTableContainer').classList.add('hidden');
                         document.getElementById('predictedScheduleTableContainer').classList.remove('hidden');
+                        document.getElementById('tab-table').textContent = "Cronograma Previsto";
                         
                         schedBody.innerHTML = data.medicoes.map(m => `
                             <tr class="border-b border-slate-200/50 hover:bg-white/50">
                                 <td class="px-5 py-3 text-sm text-center text-gray-900">${m.medicao}</td>
-                                <td class="px-5 py-3 text-sm text-center text-gray-700">${m.inicio || '-'}</td>
+                                <td class="px-5 py-3 text-sm text-center text-gray-700">${m.inicio || '-'} a ${m.fim || '-'}</td>
                                 <td class="px-5 py-3 text-sm text-center text-gray-700">${m.ref || '-'}</td>
                                 <td class="px-5 py-3 text-sm text-center text-gray-800">${Utils.formatCurrency(m.valor)}</td>
                                 <td class="px-5 py-3 text-sm text-center text-gray-800 font-bold">${Utils.formatCurrencyAndPercentage(m.acumulado, data.valorAtual)}</td>
@@ -685,6 +765,7 @@
     </script>
 </body>
 </html>
+
 
 
 
