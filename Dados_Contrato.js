@@ -286,9 +286,9 @@ const rawProjects = [
         ],
         medicoes: [
             { id: 1, dataInicio: "2025-07-28", dataFim: "2025-08-27", valor: 252392.52 },
-            { id: 2, dataInicio: "2025-08-28", dataFim: "2025-09-27", valor: null },
-            { id: 3, dataInicio: "2025-09-28", dataFim: "2025-10-27", valor: null },
-            { id: 4, dataInicio: "2025-10-28", dataFim: "2025-11-27", valor: null },
+            { id: 2, dataInicio: "2025-08-28", dataFim: "2025-09-27", valor: 0.00 },
+            { id: 3, dataInicio: "2025-09-28", dataFim: "2025-10-27", valor: 263241.65 },
+            { id: 4, dataInicio: "2025-10-28", dataFim: "2025-11-27", valor: 487483.78 },
             { id: 5, dataInicio: "2025-11-28", dataFim: "2025-12-27", valor: null },
             { id: 6, dataInicio: "2025-12-28", dataFim: "2026-01-27", valor: null },
             { id: 7, dataInicio: "2026-01-28", dataFim: "2026-02-27", valor: null },
@@ -359,6 +359,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
