@@ -453,7 +453,7 @@
                             color: color,
                             align: 'end',
                             anchor: 'end',
-                            font: { weight: 'bold', size: 13, family: 'Poppins' },
+                            font: { weight: 'bold', size: 10, family: 'Poppins' },
                             formatter: (val) => Utils.formatCompactCurrency(val),
                             display: (ctx) => ctx.dataset.data[ctx.dataIndex] !== null
                         }
@@ -512,27 +512,26 @@
                                 y: { 
                                     ticks: { 
                                         callback: (val) => Utils.formatCurrency(val),
-                                        font: { size: 12, family: 'Poppins' }
+                                        font: { size: 10, family: 'Poppins' }
                                     }, 
                                     grid: { color: 'rgba(0,0,0,0.05)' } 
                                 },
                                 x: { 
                                     grid: { display: false },
-                                    ticks: { font: { size: 12, family: 'Poppins', weight: 'bold' } }
+                                    ticks: { font: { size: 10, family: 'Poppins', weight: 'bold' } }
                                 }
                             },
                             plugins: {
                                 legend: { 
                                     position: 'bottom',
                                     labels: {
-                                        // --- OBRIGATÓRIO PARA BOLINHA NA LEGENDA ---
-                                        usePointStyle: true, // Isso força a legenda a usar o 'circle' em vez do retângulo
-                                        boxWidth: 8,         // Ajusta o tamanho da bolinha na legenda
+                                        usePointStyle: true, 
+                                        boxWidth: 6,
                                         // -------------------------------------------
                                         
                                         padding: 25,
                                         font: {
-                                            size: 16, // Fonte aumentada conforme pedido anterior
+                                            size: 14,
                                             family: 'Poppins',
                                             weight: 'bold'
                                         },
@@ -542,8 +541,8 @@
                                 tooltip: {
                                     mode: 'index', intersect: false,
                                     backgroundColor: 'rgba(0,0,0,0.8)',
-                                    titleFont: { size: 14, family: 'Poppins' },
-                                    bodyFont: { size: 14, family: 'Poppins' },
+                                    titleFont: { size: 12, family: 'Poppins' },
+                                    bodyFont: { size: 12, family: 'Poppins' },
                                     callbacks: {
                                         label: (ctx) => `${ctx.dataset.label}: ${Utils.formatCurrency(ctx.parsed.y)}`,
                                         labelColor: function(context) {
@@ -807,6 +806,7 @@
     </script>
 </body>
 </html>
+
 
 
 
