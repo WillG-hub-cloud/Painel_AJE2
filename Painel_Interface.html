@@ -46,12 +46,23 @@
         }
         .chart-container {
             position: relative;
-            height: 600px;
-            max-height: 60vh;
+            height: 45vh;       /* Ocupa 45% da altura da tela */
+            min-height: 350px;  /* Altura mínima de segurança */
+            max-height: 500px;  /* Não deixa ficar gigante em telas 4k */
             width: 100%;
         }
-        @media (max-width: 768px) {
-            .chart-container { height: 300px; }
+
+        #map {
+            height: 60vh;       /* Mapa um pouco maior na view dedicada */
+            width: 100%;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Ajuste fino para telas pequenas (Laptops) */
+        @media (max-height: 800px) {
+            .chart-container { height: 40vh; } 
+            body { font-size: 0.9rem; } /* Reduz levemente a fonte global */
         }
         .message-box {
             background: linear-gradient(to bottom right, rgba(240, 248, 255, 0.9), rgba(240, 248, 255, 0.7));
@@ -131,42 +142,43 @@
         </div>
     </div>
 
-    <div class="container mx-auto p-4 md:p-6 lg:p-8">
-        <header class="text-center mb-8 relative" id="mainHeader">
-            <div class="grid grid-cols-3 items-center gap-4 mb-4">
-                <div class="flex justify-start">
-                    <img src="" id="logoPOE" alt="Logo POE" class="h-18 md:h-20 max-w-full object-contain"/>
+    <div class="container mx-auto p-2 md:p-4 h-screen flex flex-col">
+
+        <header class="text-center mb-2 relative" id="mainHeader">
+            <div class="grid grid-cols-3 items-center gap-2 mb-2"> <div class="flex justify-start">
+                    <img src="" id="logoPOE" alt="Logo POE" class="h-12 md:h-14 max-w-full object-contain"/>
                 </div>
                 <div class="flex justify-center">
-                    <img src="" id="logoJundiai" alt="Logo Jundiaí" class="h-26 md:h-28 max-w-full object-contain"/>
+                    <img src="" id="logoJundiai" alt="Logo Jundiaí" class="h-16 md:h-20 max-w-full object-contain"/>
                 </div>
                 <div class="flex justify-end">
-                    <img src="" id="logoCAF" alt="Logo CAF" class="h-26 md:h-28 max-w-full object-contain"/>    
+                    <img src="" id="logoCAF" alt="Logo CAF" class="h-16 md:h-20 max-w-full object-contain"/>    
                 </div>
             </div>
 
-            <h1 class="text-3xl md:text-4xl font-bold mb-2" style="color: black;">PROGRAMA AVANÇA JUNDIAÍ - ETAPA 2</h1>
-            <div class="glass-card p-1.5 text-center w-fit mx-auto" style="border-top-right-radius: 100px; border-top-left-radius: 0; border-bottom-left-radius: 100px; border-bottom-right-radius: 100px;">
-                <p class="text-[#052b63] mt-2 text-lg font-bold">Análise de performance de contratos de obras.</p>
+            <h1 class="text-2xl md:text-3xl font-bold mb-1" style="color: black;">PROGRAMA AVANÇA JUNDIAÍ - ETAPA 2</h1>
+            <div class="glass-card p-1 text-center w-fit mx-auto" style="border-top-right-radius: 50px; border-bottom-left-radius: 50px;">
+                <p class="text-[#052b63] text-sm md:text-base font-bold px-4">Análise de performance de contratos de obras.</p>
             </div>
-            <div class="flex flex-wrap justify-center items-center gap-4 mt-6" id="header-dynamic-images"></div>
+            <div class="flex flex-wrap justify-center items-center gap-2 mt-2" id="header-dynamic-images"></div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
-            <div class="glass-card p-4 text-center">
-                <p class="text-sm text-gray-700">Contratos de obras Andamento</p>
-                <p id="totalContracts" class="text-3xl font-bold" style="color: #072380;">0</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+            <div class="glass-card p-2 text-center flex flex-col justify-center">
+                <p class="text-xs text-gray-700 font-semibold uppercase">Obras em Andamento</p>
+                <p id="totalContracts" class="text-2xl font-bold" style="color: #072380;">0</p>
             </div>
-            <div class="glass-card p-4 text-center">
-                <p class="text-sm text-gray-700">Valor Total dos Contratos</p>
-                <p id="totalContractValue" class="text-3xl font-bold" style="color: #072380;">R$ 0,00</p>
+            <div class="glass-card p-2 text-center flex flex-col justify-center">
+                <p class="text-xs text-gray-700 font-semibold uppercase">Valor Total Contratos</p>
+                <p id="totalContractValue" class="text-2xl font-bold" style="color: #072380;">R$ 0,00</p>
             </div>
-            <div class="glass-card p-4 text-center">
-                <p id="sumOfLatestMonthlyMeasurements" class="text-3xl font-bold" style="color: #072380;">R$ 0</p>
-                <p class="text-sm text-gray-700">Soma das Medições no último mês</p>
+            <div class="glass-card p-2 text-center flex flex-col justify-center">
+                <p class="text-xs text-gray-700 font-semibold uppercase">Medições (Último Mês)</p>
+                <p id="sumOfLatestMonthlyMeasurements" class="text-2xl font-bold" style="color: #072380;">R$ 0</p>
             </div>
         </div>
 
+        ```
         <div id="mapView" class="glass-card p-4 sm:p-6">
             <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Selecione uma Obra no Mapa</h2>
             <div id="map"></div>
@@ -535,7 +547,7 @@
                             responsive: true,
                             maintainAspectRatio: false,
                             layout: {
-                                padding: { top: 25, bottom: 10, left: 10, right: 10 }
+                                padding: { top: 20, bottom: 5, left: 10, right: 10 }
                             },
                             scales: {
                                 y: { 
@@ -821,6 +833,7 @@
     </script>
 </body>
 </html>
+
 
 
 
