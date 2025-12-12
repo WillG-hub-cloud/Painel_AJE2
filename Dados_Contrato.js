@@ -203,7 +203,7 @@ const rawProjects = [
             { id: 9, dataInicio: "2025-08-04", dataFim: "2025-09-03", valor: 254094.26 },
             { id: 10, dataInicio: "2025-09-04", dataFim: "2025-10-03", valor: 229350.96 },
             { id: 11, dataInicio: "2025-10-04", dataFim: "2025-11-03", valor: 199158.60},
-            { id: 12, dataInicio: "2025-11-04", dataFim: "2025-11-03", valor: null }
+            { id: 12, dataInicio: "2025-11-04", dataFim: "2025-12-03", valor: null }
         ]
     },
     {
@@ -350,7 +350,7 @@ const rawProjects = [
             }
         ],
         medicoes: [
-            { id: 1, dataInicio: "2025-12-01", dataFim: "2026-12-31", valor: 01.00 },
+            { id: 1, dataInicio: "2025-12-01", dataFim: "2026-12-31", valor: 1.00 },
             { id: 2, dataInicio: "2026-01-01", dataFim: "2026-01-30", valor: null },
             { id: 3, dataInicio: "2026-02-01", dataFim: "2026-02-28", valor: null },
             { id: 4, dataInicio: "2026-03-01", dataFim: "2026-04-31", valor: null },
@@ -452,6 +452,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
