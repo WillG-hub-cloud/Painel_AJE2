@@ -1,10 +1,8 @@
 /**
- * DADOS_CONTRATO.JS - VERSÃO CORRIGIDA (PATCH DE INTEGRAÇÃO)
- * * CORREÇÃO APLICADA: 
- * O Painel (HTML) exige que existam 3 datasets de previsão para renderizar o gráfico.
- * Contratos novos (Maringá, Rio Acima, Romão) tinham apenas 1 ou 2.
- * O Adapter agora preenche os espaços vazios com dados nulos para evitar o travamento.
- */
+ * DADOS_CONTRATO.JS - VERSÃO 2025.12.12-50.10
+     * ÚLTIMA ALTERAÇÃO: 
+         * Inserção de medições UBS Ivoturucaia.
+ * */
 
 // ======================================================================
 // 1. CLASSE ADAPTER (LÓGICA DE NEGÓCIO)
@@ -221,7 +219,7 @@ const rawProjects = [
         objeto: "UBS Ivoturucaia",
         empresa: "J.S.O. Constr. Ltda.",
         valorTotal: 5654210.10,
-        observacoes: "Contrato ainda não possui medições.",
+        observacoes: null,
         previsaoInicio: "2025-09-24",
         previsaoFim: "2026-09-23",
         localizacao: { lat: -23.181836, lng: -46.810482 },
@@ -372,20 +370,3 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
