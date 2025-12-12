@@ -436,9 +436,16 @@
                         label,
                         data,
                         borderColor: color,
+                        backgroundColor: color, 
                         pointBackgroundColor: color,
                         pointBorderColor: color,
-                        borderWidth: 1,
+                        
+                        // Define que o ponto no gráfico será um CÍRCULO
+                        pointStyle: 'circle', 
+                        pointRadius: 5,       
+                        pointHoverRadius: 7,  
+                        
+                        borderWidth: 2,
                         borderDash: borderDash,
                         tension: 0.4,
                         order: order,
@@ -460,11 +467,10 @@
                     const noDataMsg = document.getElementById('noChartDataMessage');
                     const container = document.querySelector('#content-chart .chart-container');
 
-                    // Preparação de dados (Fallback para medições se não houver gráfico explícito)
                     let labels = contract.grafico?.labels || [];
                     let datasets = [];
 
-                    // Lógica para montar Datasets Previstos
+                    // Configuração dos Datasets Previstos
                     if (contract.grafico?.previstoDataSets) {
                         const dsConfigs = [
                             { color: CONFIG.COLORS.PREV_1 },
@@ -480,11 +486,11 @@
                         datasets.push(this.createDatasetConfig('Previsto', contract.grafico.previsto, CONFIG.COLORS.PREV_3, 1));
                     }
 
-                    // Lógica para Dataset Executado
+                    // Configuração do Dataset Executado
                     if (contract.grafico?.executado?.some(v => v !== null)) {
                         const execConfig = this.createDatasetConfig('Executado', contract.grafico.executado, CONFIG.COLORS.EXEC, 10, []);
-                        execConfig.backgroundColor = 'transparent';
-                        execConfig.borderWidth = 1.5;
+                        execConfig.backgroundColor = CONFIG.COLORS.EXEC;
+                        execConfig.borderWidth = 2;
                         datasets.push(execConfig);
                         
                         noDataMsg.style.display = 'none';
@@ -503,15 +509,51 @@
                             responsive: true,
                             maintainAspectRatio: false,
                             scales: {
-                                y: { ticks: { callback: (val) => Utils.formatCurrency(val) }, grid: { color: 'rgba(0,0,0,0.05)' } },
-                                x: { grid: { display: false } }
+                                y: { 
+                                    ticks: { 
+                                        callback: (val) => Utils.formatCurrency(val),
+                                        font: { size: 12, family: 'Poppins' }
+                                    }, 
+                                    grid: { color: 'rgba(0,0,0,0.05)' } 
+                                },
+                                x: { 
+                                    grid: { display: false },
+                                    ticks: { font: { size: 12, family: 'Poppins', weight: 'bold' } }
+                                }
                             },
                             plugins: {
-                                legend: { position: 'bottom' },
+                                legend: { 
+                                    position: 'bottom',
+                                    labels: {
+                                        // --- OBRIGATÓRIO PARA BOLINHA NA LEGENDA ---
+                                        usePointStyle: true, // Isso força a legenda a usar o 'circle' em vez do retângulo
+                                        boxWidth: 8,         // Ajusta o tamanho da bolinha na legenda
+                                        // -------------------------------------------
+                                        
+                                        padding: 25,
+                                        font: {
+                                            size: 16, // Fonte aumentada conforme pedido anterior
+                                            family: 'Poppins',
+                                            weight: 'bold'
+                                        },
+                                        color: '#333333'
+                                    }
+                                },
                                 tooltip: {
                                     mode: 'index', intersect: false,
+                                    backgroundColor: 'rgba(0,0,0,0.8)',
+                                    titleFont: { size: 14, family: 'Poppins' },
+                                    bodyFont: { size: 14, family: 'Poppins' },
                                     callbacks: {
-                                        label: (ctx) => `${ctx.dataset.label}: ${Utils.formatCurrency(ctx.parsed.y)}`
+                                        label: (ctx) => `${ctx.dataset.label}: ${Utils.formatCurrency(ctx.parsed.y)}`,
+                                        labelColor: function(context) {
+                                            return {
+                                                borderColor: context.dataset.borderColor,
+                                                backgroundColor: context.dataset.borderColor,
+                                                borderWidth: 2,
+                                                borderRadius: 2,
+                                            };
+                                        }
                                     }
                                 }
                             }
@@ -765,6 +807,7 @@
     </script>
 </body>
 </html>
+
 
 
 
