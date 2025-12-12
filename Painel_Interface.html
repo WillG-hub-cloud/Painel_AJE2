@@ -349,17 +349,17 @@
                     const container = document.getElementById('login-container');
                     const errorMsg = document.getElementById('login-error');
 
-                    // Senha definida diretamente aqui para facilitar o teste local
+                    // Senha exata em texto (sem hash) para evitar erros
                     const CORRECT_PASSWORD = "AVANCA!2025"; 
 
                     const attemptLogin = () => {
-                        // Comparação simples (Texto direto)
+                        // Verifica se o que foi digitado é exatamente igual à senha
                         if (input.value === CORRECT_PASSWORD) {
-                            container.classList.add('hidden');
+                            container.classList.add('hidden'); // Esconde o login
                             input.value = '';
-                            App.init(); // Inicia o Dashboard
+                            App.init(); // Inicia o painel
                         } else {
-                            errorMsg.classList.remove('hidden');
+                            errorMsg.classList.remove('hidden'); // Mostra erro
                             input.value = '';
                             input.focus();
                         }
@@ -679,4 +679,5 @@
     </script>
 </body>
 </html>
+
 
