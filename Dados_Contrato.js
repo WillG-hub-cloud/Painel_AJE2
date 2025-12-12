@@ -176,14 +176,14 @@ const rawProjects = [
             { id: 2, dataInicio: "2024-11-06", dataFim: "2024-12-05", valor: 193930.07 },
             { id: 3, dataInicio: "2024-12-06", dataFim: "2025-01-04", valor: 78717.56 },
             { id: 4, dataInicio: "2025-01-05", dataFim: "2025-02-03", valor: 96409.89 },
-            { id: 5, dataInicio: "2025-02-04", dataFim: "2025-04-03", valor: 437000.00 },
-            { id: 6, dataInicio: "2025-04-04", dataFim: "2025-05-03", valor: 308812.37 },
-            { id: 7, dataInicio: "2025-05-04", dataFim: "2025-06-03", valor: 333302.47 },
-            { id: 8, dataInicio: "2025-06-04", dataFim: "2025-08-03", valor: 265536.22 },
-            { id: 9, dataInicio: "2025-07-04", dataFim: "2025-09-03", valor: 255395.87 },
-            { id: 10, dataInicio: "2025-08-04", dataFim: "2025-10-03", valor: 149312.68 },
-            { id: 11, dataInicio: "2025-09-04", dataFim: "2025-11-03", valor: 251223.27 },
-            { id: 12, dataInicio: "2025-10-04", dataFim: "2025-11-03", valor: 240668.48 }
+            { id: 5, dataInicio: "2025-02-04", dataFim: "2025-04-03", valor: 377657.91 },
+            { id: 6, dataInicio: "2025-04-04", dataFim: "2025-05-03", valor: 283688.17 },
+            { id: 7, dataInicio: "2025-05-04", dataFim: "2025-07-03", valor: 219813.94 },
+            { id: 8, dataInicio: "2025-07-04", dataFim: "2025-08-03", valor: 428791.93 },
+            { id: 9, dataInicio: "2025-08-04", dataFim: "2025-09-03", valor: 254094.26 },
+            { id: 10, dataInicio: "2025-09-04", dataFim: "2025-10-03", valor: 229350.96 },
+            { id: 11, dataInicio: "2025-10-04", dataFim: "2025-11-03", valor: 199158.60},
+            { id: 12, dataInicio: "2025-11-04", dataFim: "2025-11-03", valor: null }
         ]
     },
     {
@@ -355,6 +355,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
