@@ -349,9 +349,12 @@
                     const container = document.getElementById('login-container');
                     const errorMsg = document.getElementById('login-error');
 
-                    const attemptLogin = async () => {
-                        const inputHash = await Utils.sha256(input.value);
-                        if (inputHash === CONFIG.AUTH_HASH) {
+                    // Senha definida diretamente aqui para facilitar o teste local
+                    const CORRECT_PASSWORD = "AVANCA!2025"; 
+
+                    const attemptLogin = () => {
+                        // Comparação simples (Texto direto)
+                        if (input.value === CORRECT_PASSWORD) {
                             container.classList.add('hidden');
                             input.value = '';
                             App.init(); // Inicia o Dashboard
@@ -676,3 +679,4 @@
     </script>
 </body>
 </html>
+
