@@ -159,7 +159,7 @@ const rawProjects = [
         observacoes: null,
         previsaoInicio: "2025-11-03",
         previsaoFim: "2026-08-29",
-        localizacao: { lat: -23.22359379674732, lng: -46.85593132352297 },
+        localizacao: { lat: -23.190272, lng: -46.846775 },
         cronogramas: [
             {
                 nome: "Previsto Inicial",
@@ -440,5 +440,6 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
