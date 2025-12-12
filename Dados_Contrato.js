@@ -231,7 +231,20 @@ const rawProjects = [
                 valoresAcumulados: [84127.17, 187162.49, 343425.89, 659143.45, 1178633.60, 1613353.17, 2114654.73, 3097502.52, 3832551.62, 4532017.74, 5266848.55, 5654210.10]
             }
         ],
-        medicoes: []
+        medicoes: [
+            { id: 1, dataInicio: "2025-09-22", dataFim: "2025-10-21", valor: 232212.42 },
+            { id: 2, dataInicio: "2025-05-22", dataFim: "2025-06-21", valor: 242268.80 },
+            { id: 3, dataInicio: "2025-06-22", dataFim: "2025-07-21", valor: null },
+            { id: 4, dataInicio: "2025-07-22", dataFim: "2025-08-21", valor: null },
+            { id: 5, dataInicio: "2025-08-22", dataFim: "2025-09-21", valor: null },
+            { id: 6, dataInicio: "2025-09-22", dataFim: "2025-10-21", valor: null },
+            { id: 7, dataInicio: "2025-10-22", dataFim: "2025-11-21", valor: null },
+            { id: 8, dataInicio: "2025-11-22", dataFim: "2025-12-21", valor: null },
+            { id: 9, dataInicio: "2025-12-22", dataFim: "2026-01-21", valor: null },
+            { id: 10, dataInicio: "2026-01-22", dataFim: "2026-02-21", valor: null },
+            { id: 11, dataInicio: "2026-02-22", dataFim: "2026-03-21", valor: null },
+            { id: 12, dataInicio: "2026-03-22", dataFim: "2026-04-21", valor: null }
+        ]
     },
     {
         id: "CT 054/25",
@@ -359,6 +372,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
