@@ -307,6 +307,68 @@ const rawProjects = [
         ]
     },
     {
+        id: "CT 097/25",
+        objeto: "CEPA Vila Progresso - remanescente",
+        empresa: "Viva Construções e Serviços Ltda",
+        valorTotal: 4803370.83,
+        observacoes: "Remanescente da Obra, Continuidade do Contrato 001/23",
+        previsaoInicio: "2025-12-01",
+        previsaoFim: "2026-12-31",
+        localizacao: { lat: -23.115577, lng: -46.924531 },
+        cronogramas: [
+            {
+                nome: "Previsto Inicial",
+                valoresAcumulados: [82138.49, 157129.44, 232120.39, 1216355.96, 1968161.70, 3072098.54, 3914259.62, 4439726.60, 4637938.52, 4914306.34, 5316700.21, 5891994.49, 6404494.44]
+            }
+        ],
+        medicoes: [
+            { id: 1, dataInicio: "2025-12-01", dataFim: "2026-12-31", valor: null },
+            { id: 2, dataInicio: "2026-01-01", dataFim: "2026-01-30", valor: null },
+            { id: 3, dataInicio: "2026-02-01", dataFim: "2026-02-28", valor: null },
+            { id: 4, dataInicio: "2026-03-01", dataFim: "2026-04-31", valor: null },
+            { id: 5, dataInicio: "2026-04-01", dataFim: "2026-05-30", valor: null },
+            { id: 6, dataInicio: "2026-05-01", dataFim: "2026-06-31", valor: null },
+            { id: 7, dataInicio: "2026-06-01", dataFim: "2026-07-30", valor: null },
+            { id: 8, dataInicio: "2026-07-01", dataFim: "2026-08-31", valor: null },
+            { id: 9, dataInicio: "2026-08-01", dataFim: "2026-09-30", valor: null },
+            { id: 10, dataInicio: "2026-09-01", dataFim: "2026-10-31", valor: null },
+            { id: 11, dataInicio: "2026-10-01", dataFim: "2026-11-30", valor: null },
+            { id: 12, dataInicio: "2026-12-01", dataFim: "2026-12-31", valor: null }
+        ]
+    },
+    {
+        id: "CT 058/25",
+        objeto: "UBS Rio Acima",
+        empresa: "LBD Engenharia Ltda EPP",
+        valorTotal: 4770000.00,
+        observacoes: null,
+        previsaoInicio: "2025-07-28",
+        previsaoFim: "2026-09-20",
+        localizacao: { lat: -23.115577, lng: -46.924531 },
+        cronogramas: [
+            {
+                nome: "Previsto Inicial",
+                valoresAcumulados: [651465.99, 886921.53, 1101058.16, 1308953.19, 1557227.57, 1921228.42, 2447932.45, 2849561.05, 3282672.65, 3730914.35, 4141572.63, 4429453.57, 4692270.84, 4770000.00]
+            }
+        ],
+        medicoes: [
+            { id: 1, dataInicio: "2025-07-28", dataFim: "2025-08-27", valor: 252392.52 },
+            { id: 2, dataInicio: "2025-08-28", dataFim: "2025-09-27", valor: 0.00 },
+            { id: 3, dataInicio: "2025-09-28", dataFim: "2025-10-27", valor: 263241.65 },
+            { id: 4, dataInicio: "2025-10-28", dataFim: "2025-11-27", valor: 487483.78 },
+            { id: 5, dataInicio: "2025-11-28", dataFim: "2025-12-27", valor: null },
+            { id: 6, dataInicio: "2025-12-28", dataFim: "2026-01-27", valor: null },
+            { id: 7, dataInicio: "2026-01-28", dataFim: "2026-02-27", valor: null },
+            { id: 8, dataInicio: "2026-02-28", dataFim: "2026-03-27", valor: null },
+            { id: 9, dataInicio: "2026-03-28", dataFim: "2026-04-27", valor: null },
+            { id: 10, dataInicio: "2026-04-28", dataFim: "2026-05-27", valor: null },
+            { id: 11, dataInicio: "2026-05-28", dataFim: "2026-06-27", valor: null },
+            { id: 12, dataInicio: "2026-06-28", dataFim: "2026-07-27", valor: null },
+            { id: 13, dataInicio: "2026-07-28", dataFim: "2026-08-27", valor: null },
+            { id: 14, dataInicio: "2026-08-28", dataFim: "2026-09-27", valor: null }
+        ]
+    },
+    {
         id: "CT 048/25",
         objeto: "CECE Romão",
         empresa: "Adriana Rodrigues Belles",
@@ -362,4 +424,5 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
