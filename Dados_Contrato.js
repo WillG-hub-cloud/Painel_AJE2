@@ -336,7 +336,7 @@ const rawProjects = [
     },
     {
         id: "CT 097/25",
-        objeto: "CEPA Vila Progresso - remanescente",
+        objeto: "CEPA Vila Progresso - Remanescente",
         empresa: "Viva Construções e Serviços Ltda",
         valorTotal: 4803370.83,
         observacoes: "Remanescente da Obra, Continuidade do Contrato 001/23",
@@ -365,9 +365,9 @@ const rawProjects = [
         ]
     },
     {
-        id: "CT 058/25",
-        objeto: "UBS Rio Acima",
-        empresa: "LBD Engenharia Ltda EPP",
+        id: "CT 0XX/25",
+        objeto: "Centro POP - Remanescente",
+        empresa: "Viva Construções e Serviços Ltda",
         valorTotal: 4770000.00,
         observacoes: null,
         previsaoInicio: "2025-07-28",
@@ -452,6 +452,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
