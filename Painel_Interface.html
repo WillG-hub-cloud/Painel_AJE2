@@ -291,7 +291,7 @@
             const ICONS = {
                 "EMEB": { type: 'unicode', symbol: '🎓', colorClass: 'emeb-icon' },
                 "CECE": { type: 'unicode', symbol: '🏀', colorClass: 'cece-icon' },
-                "UBS": { type: 'fontawesome', symbol: 'fas fa-clinic-medical', colorClass: 'ubs-icon' },
+                "UBS": { type: 'unicode', symbol: '🏥', colorClass: 'ubs-icon' },
                 "default": { type: 'fontawesome', symbol: 'fas fa-location-dot', colorClass: '' }
             };
 
@@ -453,7 +453,7 @@
                             color: color,
                             align: 'end',
                             anchor: 'end',
-                            font: { weight: 'bold', size: 12, family: 'Poppins' },
+                            font: { weight: 'bold', size: 14, family: 'Poppins' },
                             formatter: (val) => Utils.formatCompactCurrency(val),
                             display: (ctx) => ctx.dataset.data[ctx.dataIndex] !== null
                         }
@@ -806,6 +806,7 @@
     </script>
 </body>
 </html>
+
 
 
 
