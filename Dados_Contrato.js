@@ -312,8 +312,12 @@ const rawProjects = [
         localizacao: { lat: -23.184126, lng: -46.853513 },
         cronogramas: [
             {
-                nome: "Previsto Inicial",
-                valoresAcumulados: [149571.75, 318610.50, 368781.58, 866856.13, 1169484.80, 1333153.20, 1480000.00]
+                nome: "Cronograma Inicial",
+                valoresAcumulados: [149571.75, 730716.85, 1300261.90, 1480000.00, null, null, null]
+            },
+            {
+                nome: "Cronograma Prorrogação I",
+                valoresAcumulados: [null, null, 368781.58, 866856.13, 1169484.80, 1333153.20, 1480000.00]
             }
         ],
         medicoes: [
@@ -355,6 +359,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
