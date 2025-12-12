@@ -381,16 +381,22 @@
                 },
 
                 renderMarkers() {
-                    if (!typeof projectData !== 'undefined' && Array.isArray(projectData)) {
-                        console.error("Dados do projeto não carregados.");
+                    // CORREÇÃO AQUI: Verifica se projectData NÃO existe ou NÃO é um array
+                    if (typeof projectData === 'undefined' || !Array.isArray(projectData)) {
+                        console.error("Dados do projeto não carregados ou inválidos.");
                         return;
                     }
 
                     const bounds = [];
+                    
                     projectData.forEach(p => {
+                        // Proteção extra: garante que location existe e tem lat/lng numéricos
+                        if (!p.location || isNaN(parseFloat(p.location.lat)) || isNaN(parseFloat(p.location.lng))) {
+                            return;
+                        }
+
                         const lat = parseFloat(p.location.lat);
                         const lng = parseFloat(p.location.lng);
-                        if (isNaN(lat) || isNaN(lng)) return;
 
                         let iconConfig = ICONS.default;
                         if (p.objeto.includes("EMEB")) iconConfig = ICONS.EMEB;
@@ -679,5 +685,6 @@
     </script>
 </body>
 </html>
+
 
 
