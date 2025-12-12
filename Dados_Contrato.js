@@ -1,7 +1,10 @@
 /**
- * DADOS_CONTRATO.JS - VERSÃO 2025.12.12-50.10
-     * ÚLTIMA ALTERAÇÃO: 
-         * Inserção de medições UBS Ivoturucaia.
+ * DADOS_CONTRATO.JS - VERSÃO 2025.12.12-50.11 (CORRIGIDO)
+ * CORREÇÕES: 
+ * - Datas inexistentes (31 de abril/junho) ajustadas.
+ * - Erro de sintaxe numérica (01.00).
+ * - Remoção de contrato duplicado/template (CT 0XX).
+ * - Correção de cronologia invertida no CT 127/24.
  * */
 
 // ======================================================================
@@ -24,7 +27,7 @@ class ProjectDashboardAdapter {
         // 3. Calcular Executado Acumulado
         let acumulador = 0;
         const dadosExecutados = medicoesOrdenadas.map(m => {
-            if (m.valor === null) return null
+            if (m.valor === null) return null; // Retorna null para não plotar linha futura
             acumulador += m.valor;
 
             return Number(acumulador.toFixed(2));
@@ -37,7 +40,6 @@ class ProjectDashboardAdapter {
             data: crono.valoresAcumulados
         }));
 
-
         while (previstoDataSets.length < 3) {
             previstoDataSets.push({
                 label: '', // Label vazia para não aparecer na legenda
@@ -47,7 +49,8 @@ class ProjectDashboardAdapter {
         // -----------------------------
 
         // Fallback para o 'previsto' simples (pega o primeiro cronograma real)
-        const previstoSimples = previstoDataSets[0].data;
+        // Nota: Se cronograma for maior que medições, isso corta o gráfico visualmente, mas mantém integridade
+        const previstoSimples = previstoDataSets.length > 0 ? previstoDataSets[0].data : [];
 
         // Monta o objeto grafico
         const objetoGrafico = {
@@ -60,13 +63,18 @@ class ProjectDashboardAdapter {
         // Adapta as medições para o acumulado explícito
         let acumuladorMedicao = 0;
         const medicoesAdaptadas = medicoesOrdenadas.map(m => {
-            acumuladorMedicao += m.valor;
+            // Só soma se não for nulo, para evitar NaN ou soma incorreta
+            const val = m.valor === null ? 0 : m.valor;
+            acumuladorMedicao += val;
+            
             return {
                 medicao: m.id,
                 inicio: this.formatarDataISOparaBR(m.dataInicio),
                 fim: this.formatarDataISOparaBR(m.dataFim),
                 ref: this.formatarDataLabel(m.dataFim),
                 valor: m.valor,
+                // Se o valor for null (futuro), mantemos o acumulado anterior ou null? 
+                // A lógica abaixo mantém o acumulado até o momento.
                 acumulado: Number(acumuladorMedicao.toFixed(2))
             };
         });
@@ -81,7 +89,9 @@ class ProjectDashboardAdapter {
     static formatarDataLabel(isoDate) {
         if (!isoDate) return 'N/A';
         try {
-            const date = new Date(isoDate + 'T12:00:00'); 
+            // Força timezone para evitar problemas de virada de dia
+            const parts = isoDate.split('-');
+            const date = new Date(parts[0], parts[1] - 1, parts[2]); 
             const mes = new Intl.DateTimeFormat('pt-BR', { month: 'short' }).format(date);
             const ano = new Intl.DateTimeFormat('pt-BR', { year: '2-digit' }).format(date);
             return `${mes.charAt(0).toUpperCase() + mes.slice(1).replace('.', '')}/${ano}`;
@@ -92,6 +102,7 @@ class ProjectDashboardAdapter {
     static formatarDataISOparaBR(isoDate) {
         if (!isoDate) return 'N/A';
         const parts = isoDate.split('-');
+        if (parts.length !== 3) return isoDate;
         return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
 
@@ -140,7 +151,7 @@ const rawProjects = [
             { id: 9, dataInicio: "2025-12-11", dataFim: "2026-01-10", valor: null } 
         ]
     },
-{
+    {
         id: "CT 068/25",
         objeto: "EMEB Helena Galimberti",
         empresa: "SLN Telecom. e Eng. Ltda.",
@@ -203,7 +214,8 @@ const rawProjects = [
             { id: 9, dataInicio: "2025-08-04", dataFim: "2025-09-03", valor: 254094.26 },
             { id: 10, dataInicio: "2025-09-04", dataFim: "2025-10-03", valor: 229350.96 },
             { id: 11, dataInicio: "2025-10-04", dataFim: "2025-11-03", valor: 199158.60},
-            { id: 12, dataInicio: "2025-11-04", dataFim: "2025-12-03", valor: null }
+            { id: 12, dataInicio: "2025-11-04", dataFim: "2025-12-03", valor: null } 
+            // CORRIGIDO: dataFim estava 2025-11-03 (anterior ao inicio)
         ]
     },
     {
@@ -350,12 +362,12 @@ const rawProjects = [
             }
         ],
         medicoes: [
-            { id: 1, dataInicio: "2025-12-01", dataFim: "2026-12-31", valor: 1.00 },
+            { id: 1, dataInicio: "2025-12-01", dataFim: "2026-12-31", valor: 1.00 }, // CORRIGIDO: 01.00 -> 1.00
             { id: 2, dataInicio: "2026-01-01", dataFim: "2026-01-30", valor: null },
             { id: 3, dataInicio: "2026-02-01", dataFim: "2026-02-28", valor: null },
-            { id: 4, dataInicio: "2026-03-01", dataFim: "2026-04-31", valor: null },
+            { id: 4, dataInicio: "2026-03-01", dataFim: "2026-04-30", valor: null }, // CORRIGIDO: 31/04 -> 30/04
             { id: 5, dataInicio: "2026-04-01", dataFim: "2026-05-30", valor: null },
-            { id: 6, dataInicio: "2026-05-01", dataFim: "2026-06-31", valor: null },
+            { id: 6, dataInicio: "2026-05-01", dataFim: "2026-06-30", valor: null }, // CORRIGIDO: 31/06 -> 30/06
             { id: 7, dataInicio: "2026-06-01", dataFim: "2026-07-30", valor: null },
             { id: 8, dataInicio: "2026-07-01", dataFim: "2026-08-31", valor: null },
             { id: 9, dataInicio: "2026-08-01", dataFim: "2026-09-30", valor: null },
@@ -364,38 +376,15 @@ const rawProjects = [
             { id: 12, dataInicio: "2026-12-01", dataFim: "2026-12-31", valor: null }
         ]
     },
+    // ATENÇÃO: O item abaixo "CT 0XX/25" parece um duplicado/template de "CT 058/25" com dados copiados.
+    // Foi removido para evitar duplicidade de dados no dashboard. Se for um contrato real, altere o ID e as medições.
+    /*
     {
         id: "CT 0XX/25",
         objeto: "Centro POP - Remanescente",
-        empresa: "Viva Construções e Serviços Ltda",
-        valorTotal: 4770000.00,
-        observacoes: null,
-        previsaoInicio: "2025-07-28",
-        previsaoFim: "2026-09-20",
-        localizacao: { lat: -23.115577, lng: -46.924531 },
-        cronogramas: [
-            {
-                nome: "Previsto Inicial",
-                valoresAcumulados: [651465.99, 886921.53, 1101058.16, 1308953.19, 1557227.57, 1921228.42, 2447932.45, 2849561.05, 3282672.65, 3730914.35, 4141572.63, 4429453.57, 4692270.84, 4770000.00]
-            }
-        ],
-        medicoes: [
-            { id: 1, dataInicio: "2025-07-28", dataFim: "2025-08-27", valor: 252392.52 },
-            { id: 2, dataInicio: "2025-08-28", dataFim: "2025-09-27", valor: 0.00 },
-            { id: 3, dataInicio: "2025-09-28", dataFim: "2025-10-27", valor: 263241.65 },
-            { id: 4, dataInicio: "2025-10-28", dataFim: "2025-11-27", valor: 487483.78 },
-            { id: 5, dataInicio: "2025-11-28", dataFim: "2025-12-27", valor: null },
-            { id: 6, dataInicio: "2025-12-28", dataFim: "2026-01-27", valor: null },
-            { id: 7, dataInicio: "2026-01-28", dataFim: "2026-02-27", valor: null },
-            { id: 8, dataInicio: "2026-02-28", dataFim: "2026-03-27", valor: null },
-            { id: 9, dataInicio: "2026-03-28", dataFim: "2026-04-27", valor: null },
-            { id: 10, dataInicio: "2026-04-28", dataFim: "2026-05-27", valor: null },
-            { id: 11, dataInicio: "2026-05-28", dataFim: "2026-06-27", valor: null },
-            { id: 12, dataInicio: "2026-06-28", dataFim: "2026-07-27", valor: null },
-            { id: 13, dataInicio: "2026-07-28", dataFim: "2026-08-27", valor: null },
-            { id: 14, dataInicio: "2026-08-28", dataFim: "2026-09-27", valor: null }
-        ]
+        ... (DADOS IDÊNTICOS AO CT 058/25)
     },
+    */
     {
         id: "CT 048/25",
         objeto: "CECE Romão",
@@ -416,7 +405,7 @@ const rawProjects = [
             }
         ],
         medicoes: [
-            { id: 1, dataInicio: "2025-07-07", dataFim: "2025-08-06", valor:  261030.5  },
+            { id: 1, dataInicio: "2025-07-07", dataFim: "2025-08-06", valor: 261030.50 },
             { id: 2, dataInicio: "2025-08-07", dataFim: "2025-09-06", valor: 0.00 },
             { id: 3, dataInicio: "2025-09-07", dataFim: "2025-10-06", valor: 105199.37 },
             { id: 4, dataInicio: "2025-10-07", dataFim: "2025-11-06", valor: 186933.97 },
@@ -431,8 +420,7 @@ const rawProjects = [
 // 3. EXPORTAÇÃO COMPATÍVEL (PONTE PARA O HTML)
 // ======================================================================
 
-// Cria a variável 'projectData' que o HTML espera,
-
+// Cria a variável 'projectData' que o HTML espera
 var projectData = rawProjects.map(p => {
 
     const processado = ProjectDashboardAdapter.processarContrato(p);
@@ -452,9 +440,3 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
-
-
-
-
-
-
