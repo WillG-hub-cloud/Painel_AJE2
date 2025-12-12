@@ -140,6 +140,34 @@ const rawProjects = [
             { id: 9, dataInicio: "2025-12-11", dataFim: "2026-01-10", valor: null } 
         ]
     },
+{
+        id: "CT 068/25",
+        objeto: "EMEB Helena Galimberti",
+        empresa: "SLN Telecom. e Eng. Ltda.",
+        valorTotal: 6147641.86,
+        observacoes: null,
+        previsaoInicio: "2025-11-03",
+        previsaoFim: "2026-08-29",
+        localizacao: { lat: -23.22359379674732, lng: -46.85593132352297 },
+        cronogramas: [
+            {
+                nome: "Previsto Inicial",
+                valoresAcumulados: [718820.05, 1383231.27, 2358254.57, 2973815.30, 3455309.34, 4094193.64, 4695529.12, 5432647.44, 5949592.65, 6147641.86]
+            }
+        ],
+        medicoes: [
+            { id: 1, dataInicio: "2025-11-03", dataFim: "2025-12-02", valor: null },
+            { id: 2, dataInicio: "2025-12-03", dataFim: "2026-01-15", valor: null },
+            { id: 3, dataInicio: "2026-01-03", dataFim: "2026-02-16", valor: null },
+            { id: 4, dataInicio: "2026-02-03", dataFim: "2026-03-16", valor: null },
+            { id: 5, dataInicio: "2026-03-03", dataFim: "2026-04-16", valor: null },
+            { id: 6, dataInicio: "2026-04-03", dataFim: "2026-05-17", valor: null },
+            { id: 7, dataInicio: "2026-05-03", dataFim: "2026-06-17", valor: null },
+            { id: 8, dataInicio: "2026-06-03", dataFim: "2026-07-10", valor: null },
+            { id: 9, dataInicio: "2026-07-03", dataFim: "2026-08-10", valor: null },
+            { id: 10, dataInicio: "2026-08-03", dataFim: "2026-09-10", valor: null }
+        ]
+    },
     {
         id: "CT 127/24",
         objeto: "UBS Rio Branco",
@@ -424,5 +452,6 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
