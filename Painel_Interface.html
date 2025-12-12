@@ -431,29 +431,29 @@
 
             // --- Componente: Gráfico (Chart.js) ---
             const ChartComponent = {
-                createDatasetConfig(label, data, color, order, borderDash = [5, 5]) {
+                // Adicionamos os parâmetros 'align' e 'anchor' com valores padrão 'end' (topo)
+                createDatasetConfig(label, data, color, order, borderDash = [5, 5], align = 'end', anchor = 'end') {
                     return {
                         label,
                         data,
                         borderColor: color,
-                        backgroundColor: color, 
+                        backgroundColor: color,
                         pointBackgroundColor: color,
                         pointBorderColor: color,
-                        
-                        // Define que o ponto no gráfico será um CÍRCULO
-                        pointStyle: 'circle', 
-                        pointRadius: 5,       
-                        pointHoverRadius: 7,  
-                        
+                        pointStyle: 'circle',
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
                         borderWidth: 2,
                         borderDash: borderDash,
                         tension: 0.4,
                         order: order,
                         datalabels: {
                             color: color,
-                            align: 'end',
-                            anchor: 'end',
-                            font: { weight: 'bold', size: 12, family: 'Poppins' },
+                            // Usa os parâmetros dinâmicos para posicionar o texto
+                            align: align,   
+                            anchor: anchor, 
+                            offset: 4,      // Pequena distância da bolinha
+                            font: { weight: 'bold', size: 13, family: 'Poppins' },
                             formatter: (val) => Utils.formatCompactCurrency(val),
                             display: (ctx) => ctx.dataset.data[ctx.dataIndex] !== null
                         }
@@ -470,7 +470,8 @@
                     let labels = contract.grafico?.labels || [];
                     let datasets = [];
 
-                    // Configuração dos Datasets Previstos
+                    // --- Configuração dos Datasets Previstos ---
+                    // ESTRATÉGIA: Jogar os rótulos dos previstos para BAIXO ('start')
                     if (contract.grafico?.previstoDataSets) {
                         const dsConfigs = [
                             { color: CONFIG.COLORS.PREV_1 },
@@ -479,18 +480,43 @@
                         ];
                         contract.grafico.previstoDataSets.forEach((ds, idx) => {
                             if (dsConfigs[idx]) {
-                                datasets.push(this.createDatasetConfig(ds.label, ds.data, dsConfigs[idx].color, idx + 1));
+                                datasets.push(this.createDatasetConfig(
+                                    ds.label, 
+                                    ds.data, 
+                                    dsConfigs[idx].color, 
+                                    idx + 1, 
+                                    [5, 5], 
+                                    'start', // ALIGN: Texto inicia no ponto e vai para baixo/esquerda
+                                    'start'  // ANCHOR: Ancora na parte de baixo da bolinha
+                                ));
                             }
                         });
                     } else if (contract.grafico?.previsto) {
-                        datasets.push(this.createDatasetConfig('Previsto', contract.grafico.previsto, CONFIG.COLORS.PREV_3, 1));
+                        datasets.push(this.createDatasetConfig(
+                            'Previsto', 
+                            contract.grafico.previsto, 
+                            CONFIG.COLORS.PREV_3, 
+                            1, 
+                            [5, 5], 
+                            'start', 
+                            'start'
+                        ));
                     }
 
-                    // Configuração do Dataset Executado
+                    // --- Configuração do Dataset Executado ---
+                    // ESTRATÉGIA: Manter o rótulo do executado no TOPO ('end') para destaque
                     if (contract.grafico?.executado?.some(v => v !== null)) {
-                        const execConfig = this.createDatasetConfig('Executado', contract.grafico.executado, CONFIG.COLORS.EXEC, 10, []);
+                        const execConfig = this.createDatasetConfig(
+                            'Executado', 
+                            contract.grafico.executado, 
+                            CONFIG.COLORS.EXEC, 
+                            10, 
+                            [], 
+                            'end', // ALIGN: Vai para cima
+                            'end'  // ANCHOR: Ancora no topo da bolinha
+                        );
                         execConfig.backgroundColor = CONFIG.COLORS.EXEC;
-                        execConfig.borderWidth = 2;
+                        execConfig.borderWidth = 3; // Linha um pouco mais grossa para destaque
                         datasets.push(execConfig);
                         
                         noDataMsg.style.display = 'none';
@@ -508,11 +534,17 @@
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
+                            layout: {
+                                padding: {
+                                    top: 30,    // Mais espaço no topo para não cortar rótulos altos
+                                    bottom: 10
+                                }
+                            },
                             scales: {
                                 y: { 
                                     ticks: { 
                                         callback: (val) => Utils.formatCurrency(val),
-                                        font: { size: 10, family: 'Poppins' }
+                                        font: { size: 12, family: 'Poppins' }
                                     }, 
                                     grid: { color: 'rgba(0,0,0,0.05)' } 
                                 },
@@ -525,13 +557,11 @@
                                 legend: { 
                                     position: 'bottom',
                                     labels: {
-                                        usePointStyle: true, 
-                                        boxWidth: 6,
-                                        // -------------------------------------------
-                                        
+                                        usePointStyle: true,
+                                        boxWidth: 8,
                                         padding: 25,
                                         font: {
-                                            size: 14,
+                                            size: 16,
                                             family: 'Poppins',
                                             weight: 'bold'
                                         },
@@ -541,8 +571,8 @@
                                 tooltip: {
                                     mode: 'index', intersect: false,
                                     backgroundColor: 'rgba(0,0,0,0.8)',
-                                    titleFont: { size: 12, family: 'Poppins' },
-                                    bodyFont: { size: 12, family: 'Poppins' },
+                                    titleFont: { size: 14, family: 'Poppins' },
+                                    bodyFont: { size: 14, family: 'Poppins' },
                                     callbacks: {
                                         label: (ctx) => `${ctx.dataset.label}: ${Utils.formatCurrency(ctx.parsed.y)}`,
                                         labelColor: function(context) {
@@ -806,6 +836,7 @@
     </script>
 </body>
 </html>
+
 
 
 
