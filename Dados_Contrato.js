@@ -285,20 +285,20 @@ const rawProjects = [
             }
         ],
         medicoes: [
-            { id: 1, dataInicio: "2025-07-28", dataFim: "2025-08-27", valor: 651465.99 },
-            { id: 2, dataInicio: "2025-08-28", dataFim: "2025-09-27", valor: 235455.54 },
-            { id: 3, dataInicio: "2025-09-28", dataFim: "2025-10-27", valor: 214136.63 },
-            { id: 4, dataInicio: "2025-10-28", dataFim: "2025-11-27", valor: 207896.03 },
-            { id: 5, dataInicio: "2025-11-28", dataFim: "2025-12-27", valor: 248274.38 },
-            { id: 6, dataInicio: "2025-12-28", dataFim: "2026-01-27", valor: 364000.85 },
-            { id: 7, dataInicio: "2026-01-28", dataFim: "2026-02-27", valor: 526704.03 },
-            { id: 8, dataInicio: "2026-02-28", dataFim: "2026-03-27", valor: 401628.60 },
-            { id: 9, dataInicio: "2026-03-28", dataFim: "2026-04-27", valor: 433111.60 },
-            { id: 10, dataInicio: "2026-04-28", dataFim: "2026-05-27", valor: 448241.70 },
-            { id: 11, dataInicio: "2026-05-28", dataFim: "2026-06-27", valor: 410658.28 },
-            { id: 12, dataInicio: "2026-06-28", dataFim: "2026-07-27", valor: 287880.94 },
-            { id: 13, dataInicio: "2026-07-28", dataFim: "2026-08-27", valor: 262817.27 },
-            { id: 14, dataInicio: "2026-08-28", dataFim: "2026-09-27", valor: 77729.16 }
+            { id: 1, dataInicio: "2025-07-28", dataFim: "2025-08-27", valor: 252392.52 },
+            { id: 2, dataInicio: "2025-08-28", dataFim: "2025-09-27", valor: null },
+            { id: 3, dataInicio: "2025-09-28", dataFim: "2025-10-27", valor: null },
+            { id: 4, dataInicio: "2025-10-28", dataFim: "2025-11-27", valor: null },
+            { id: 5, dataInicio: "2025-11-28", dataFim: "2025-12-27", valor: null },
+            { id: 6, dataInicio: "2025-12-28", dataFim: "2026-01-27", valor: null },
+            { id: 7, dataInicio: "2026-01-28", dataFim: "2026-02-27", valor: null },
+            { id: 8, dataInicio: "2026-02-28", dataFim: "2026-03-27", valor: null },
+            { id: 9, dataInicio: "2026-03-28", dataFim: "2026-04-27", valor: null },
+            { id: 10, dataInicio: "2026-04-28", dataFim: "2026-05-27", valor: null },
+            { id: 11, dataInicio: "2026-05-28", dataFim: "2026-06-27", valor: null },
+            { id: 12, dataInicio: "2026-06-28", dataFim: "2026-07-27", valor: null },
+            { id: 13, dataInicio: "2026-07-28", dataFim: "2026-08-27", valor: null },
+            { id: 14, dataInicio: "2026-08-28", dataFim: "2026-09-27", valor: null }
         ]
     },
     {
@@ -355,6 +355,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
