@@ -431,7 +431,8 @@
 
             // --- Componente: Gráfico (Chart.js) ---
             const ChartComponent = {
-                createDatasetConfig(label, data, color, order, align) {
+                // Adicionamos parâmetros para controlar a posição (anchor/align)
+                createDatasetConfig(label, data, color, order, isExecutado) {
                     return {
                         label,
                         data,
@@ -439,20 +440,30 @@
                         backgroundColor: color,
                         pointBackgroundColor: color,
                         pointBorderColor: color,
+                        
                         pointStyle: 'circle',
                         pointRadius: 5,
                         pointHoverRadius: 7,
-                        borderWidth: 2,
-                        borderDash: [5, 5], // Padrão tracejado
+                        
+                        borderWidth: isExecutado ? 3 : 2,
+                        borderDash: isExecutado ? [] : [5, 5],
                         tension: 0.4,
                         order: order,
                         datalabels: {
                             color: color,
-                            align: align,     // Direção dinâmica (top, bottom, left, right)
-                            anchor: 'center', // Ancora sempre no centro da bolinha
-                            offset: 6,        // Distância segura da bolinha
-                            // Mantendo tamanho 13px conforme solicitado
-                            font: { weight: 'bold', size: 13, family: 'Poppins' }, 
+                            // ESTRATÉGIA ESPELHO:
+                            // Executado -> Texto no topo (end)
+                            // Previstos -> Texto embaixo (start)
+                            align: isExecutado ? 'end' : 'start', 
+                            anchor: isExecutado ? 'end' : 'start',
+                            offset: 4,
+                            
+                            // FUNDO BRANCO PARA LEITURA LIMPA
+                            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                            borderRadius: 4,
+                            padding: { top: 2, bottom: 2, left: 4, right: 4 },
+                            
+                            font: { weight: 'bold', size: 12, family: 'Poppins' }, // Ajustei levemente para 12px para reduzir poluição
                             formatter: (val) => Utils.formatCompactCurrency(val),
                             display: (ctx) => ctx.dataset.data[ctx.dataIndex] !== null
                         }
@@ -469,17 +480,13 @@
                     let labels = contract.grafico?.labels || [];
                     let datasets = [];
 
-                    // --- Datasets Previstos (Distribuição em Leque) ---
+                    // --- Datasets Previstos (Sempre Embaixo) ---
                     if (contract.grafico?.previstoDataSets) {
                         const dsConfigs = [
-                            // Inicial (Roxo) -> Joga texto para BAIXO
-                            { color: CONFIG.COLORS.PREV_1, align: 'bottom' }, 
-                            // Reajuste 1 (Azul) -> Joga texto para ESQUERDA
-                            { color: CONFIG.COLORS.PREV_2, align: 'left' },   
-                            // Reajuste 2 (Laranja) -> Joga texto para DIREITA
-                            { color: CONFIG.COLORS.PREV_3, align: 'right' }   
+                            { color: CONFIG.COLORS.PREV_1 }, // Roxo
+                            { color: CONFIG.COLORS.PREV_2 }, // Azul
+                            { color: CONFIG.COLORS.PREV_3 }  // Laranja
                         ];
-                        
                         contract.grafico.previstoDataSets.forEach((ds, idx) => {
                             if (dsConfigs[idx]) {
                                 datasets.push(this.createDatasetConfig(
@@ -487,33 +494,29 @@
                                     ds.data, 
                                     dsConfigs[idx].color, 
                                     idx + 1, 
-                                    dsConfigs[idx].align
+                                    false // isExecutado = false (Texto vai para baixo)
                                 ));
                             }
                         });
                     } else if (contract.grafico?.previsto) {
-                        // Se tiver só um previsto, joga para baixo
                         datasets.push(this.createDatasetConfig(
                             'Previsto', 
                             contract.grafico.previsto, 
                             CONFIG.COLORS.PREV_3, 
                             1, 
-                            'bottom'
+                            false
                         ));
                     }
 
-                    // --- Dataset Executado (Sempre no Topo) ---
+                    // --- Dataset Executado (Sempre em Cima) ---
                     if (contract.grafico?.executado?.some(v => v !== null)) {
                         const execConfig = this.createDatasetConfig(
                             'Executado', 
                             contract.grafico.executado, 
                             CONFIG.COLORS.EXEC, 
                             10, 
-                            'top' // Joga texto para CIMA
+                            true // isExecutado = true (Texto vai para cima)
                         );
-                        execConfig.backgroundColor = CONFIG.COLORS.EXEC;
-                        execConfig.borderDash = []; // Remove tracejado (linha sólida)
-                        execConfig.borderWidth = 3;
                         datasets.push(execConfig);
                         
                         noDataMsg.style.display = 'none';
@@ -532,8 +535,7 @@
                             responsive: true,
                             maintainAspectRatio: false,
                             layout: {
-                                // Margens extras para os textos laterais não cortarem
-                                padding: { top: 25, left: 20, right: 20, bottom: 10 }
+                                padding: { top: 25, bottom: 10, left: 10, right: 10 }
                             },
                             scales: {
                                 y: { 
@@ -552,10 +554,10 @@
                                 legend: { 
                                     position: 'bottom',
                                     labels: {
-                                        usePointStyle: true, // Bolinha na legenda
+                                        usePointStyle: true,
                                         boxWidth: 8,
                                         padding: 20,
-                                        font: { size: 16, family: 'Poppins', weight: 'bold' },
+                                        font: { size: 14, family: 'Poppins', weight: 'bold' }, // Tamanho equilibrado para a legenda
                                         color: '#333333'
                                     }
                                 },
@@ -819,6 +821,7 @@
     </script>
 </body>
 </html>
+
 
 
 
