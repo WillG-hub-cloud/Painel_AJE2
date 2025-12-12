@@ -431,8 +431,7 @@
 
             // --- Componente: Gráfico (Chart.js) ---
             const ChartComponent = {
-                // Adicionamos os parâmetros 'align' e 'anchor' com valores padrão 'end' (topo)
-                createDatasetConfig(label, data, color, order, borderDash = [5, 5], align = 'end', anchor = 'end') {
+                createDatasetConfig(label, data, color, order, align) {
                     return {
                         label,
                         data,
@@ -444,16 +443,16 @@
                         pointRadius: 5,
                         pointHoverRadius: 7,
                         borderWidth: 2,
-                        borderDash: borderDash,
+                        borderDash: [5, 5], // Padrão tracejado
                         tension: 0.4,
                         order: order,
                         datalabels: {
                             color: color,
-                            // Usa os parâmetros dinâmicos para posicionar o texto
-                            align: align,   
-                            anchor: anchor, 
-                            offset: 4,      // Pequena distância da bolinha
-                            font: { weight: 'bold', size: 13, family: 'Poppins' },
+                            align: align,     // Direção dinâmica (top, bottom, left, right)
+                            anchor: 'center', // Ancora sempre no centro da bolinha
+                            offset: 6,        // Distância segura da bolinha
+                            // Mantendo tamanho 13px conforme solicitado
+                            font: { weight: 'bold', size: 13, family: 'Poppins' }, 
                             formatter: (val) => Utils.formatCompactCurrency(val),
                             display: (ctx) => ctx.dataset.data[ctx.dataIndex] !== null
                         }
@@ -470,14 +469,17 @@
                     let labels = contract.grafico?.labels || [];
                     let datasets = [];
 
-                    // --- Configuração dos Datasets Previstos ---
-                    // ESTRATÉGIA: Jogar os rótulos dos previstos para BAIXO ('start')
+                    // --- Datasets Previstos (Distribuição em Leque) ---
                     if (contract.grafico?.previstoDataSets) {
                         const dsConfigs = [
-                            { color: CONFIG.COLORS.PREV_1 },
-                            { color: CONFIG.COLORS.PREV_2 },
-                            { color: CONFIG.COLORS.PREV_3 }
+                            // Inicial (Roxo) -> Joga texto para BAIXO
+                            { color: CONFIG.COLORS.PREV_1, align: 'bottom' }, 
+                            // Reajuste 1 (Azul) -> Joga texto para ESQUERDA
+                            { color: CONFIG.COLORS.PREV_2, align: 'left' },   
+                            // Reajuste 2 (Laranja) -> Joga texto para DIREITA
+                            { color: CONFIG.COLORS.PREV_3, align: 'right' }   
                         ];
+                        
                         contract.grafico.previstoDataSets.forEach((ds, idx) => {
                             if (dsConfigs[idx]) {
                                 datasets.push(this.createDatasetConfig(
@@ -485,38 +487,33 @@
                                     ds.data, 
                                     dsConfigs[idx].color, 
                                     idx + 1, 
-                                    [5, 5], 
-                                    'start', // ALIGN: Texto inicia no ponto e vai para baixo/esquerda
-                                    'start'  // ANCHOR: Ancora na parte de baixo da bolinha
+                                    dsConfigs[idx].align
                                 ));
                             }
                         });
                     } else if (contract.grafico?.previsto) {
+                        // Se tiver só um previsto, joga para baixo
                         datasets.push(this.createDatasetConfig(
                             'Previsto', 
                             contract.grafico.previsto, 
                             CONFIG.COLORS.PREV_3, 
                             1, 
-                            [5, 5], 
-                            'start', 
-                            'start'
+                            'bottom'
                         ));
                     }
 
-                    // --- Configuração do Dataset Executado ---
-                    // ESTRATÉGIA: Manter o rótulo do executado no TOPO ('end') para destaque
+                    // --- Dataset Executado (Sempre no Topo) ---
                     if (contract.grafico?.executado?.some(v => v !== null)) {
                         const execConfig = this.createDatasetConfig(
                             'Executado', 
                             contract.grafico.executado, 
                             CONFIG.COLORS.EXEC, 
                             10, 
-                            [], 
-                            'end', // ALIGN: Vai para cima
-                            'end'  // ANCHOR: Ancora no topo da bolinha
+                            'top' // Joga texto para CIMA
                         );
                         execConfig.backgroundColor = CONFIG.COLORS.EXEC;
-                        execConfig.borderWidth = 3; // Linha um pouco mais grossa para destaque
+                        execConfig.borderDash = []; // Remove tracejado (linha sólida)
+                        execConfig.borderWidth = 3;
                         datasets.push(execConfig);
                         
                         noDataMsg.style.display = 'none';
@@ -535,10 +532,8 @@
                             responsive: true,
                             maintainAspectRatio: false,
                             layout: {
-                                padding: {
-                                    top: 30,    // Mais espaço no topo para não cortar rótulos altos
-                                    bottom: 10
-                                }
+                                // Margens extras para os textos laterais não cortarem
+                                padding: { top: 25, left: 20, right: 20, bottom: 10 }
                             },
                             scales: {
                                 y: { 
@@ -557,14 +552,10 @@
                                 legend: { 
                                     position: 'bottom',
                                     labels: {
-                                        usePointStyle: true,
+                                        usePointStyle: true, // Bolinha na legenda
                                         boxWidth: 8,
-                                        padding: 25,
-                                        font: {
-                                            size: 16,
-                                            family: 'Poppins',
-                                            weight: 'bold'
-                                        },
+                                        padding: 20,
+                                        font: { size: 16, family: 'Poppins', weight: 'bold' },
                                         color: '#333333'
                                     }
                                 },
@@ -574,15 +565,7 @@
                                     titleFont: { size: 14, family: 'Poppins' },
                                     bodyFont: { size: 14, family: 'Poppins' },
                                     callbacks: {
-                                        label: (ctx) => `${ctx.dataset.label}: ${Utils.formatCurrency(ctx.parsed.y)}`,
-                                        labelColor: function(context) {
-                                            return {
-                                                borderColor: context.dataset.borderColor,
-                                                backgroundColor: context.dataset.borderColor,
-                                                borderWidth: 2,
-                                                borderRadius: 2,
-                                            };
-                                        }
+                                        label: (ctx) => `${ctx.dataset.label}: ${Utils.formatCurrency(ctx.parsed.y)}`
                                     }
                                 }
                             }
@@ -836,6 +819,7 @@
     </script>
 </body>
 </html>
+
 
 
 
