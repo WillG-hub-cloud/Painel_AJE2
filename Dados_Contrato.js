@@ -5,7 +5,7 @@
  * */
 
 // ======================================================================
-// 1. CLASSE ADAPTER (LÓGICA DE NEGÓCIO)
+// 1. CLASSE ADAPTER
 // ======================================================================
 
 class ProjectDashboardAdapter {
@@ -17,8 +17,6 @@ class ProjectDashboardAdapter {
         );
 
         // 2. Gerar Labels (Eixo X)
-        // Se houver medições cadastradas (mesmo futuras), usa as datas delas.
-        // Se não, gera genéricas.
         const labels = medicoesOrdenadas.length > 0 
             ? medicoesOrdenadas.map(m => this.formatarDataLabel(m.dataFim))
             : this.gerarLabelsGenericos(12);
@@ -28,22 +26,18 @@ class ProjectDashboardAdapter {
         const dadosExecutados = medicoesOrdenadas.map(m => {
             if (m.valor === null) return null
             acumulador += m.valor;
-            // Se o valor for 0 ou nulo e for uma data futura distante, poderia ser null, 
-            // mas mantemos a lógica original de somar.
+
             return Number(acumulador.toFixed(2));
         });
 
         // 4. Preparar Datasets de Previsão
-        // Mapeia os cronogramas reais
+        // Mapear os cronogramas reais
         const previstoDataSets = contrato.cronogramas.map(crono => ({
             label: crono.nome,
             data: crono.valoresAcumulados
         }));
 
-        // --- CORREÇÃO CRÍTICA AQUI ---
-        // O HTML tenta acessar indices [1] e [2] cegamente. 
-        // Se o contrato só tem 1 cronograma, isso quebra o painel.
-        // Preenchemos com objetos vazios até ter 3 itens.
+
         while (previstoDataSets.length < 3) {
             previstoDataSets.push({
                 label: '', // Label vazia para não aparecer na legenda
@@ -55,7 +49,7 @@ class ProjectDashboardAdapter {
         // Fallback para o 'previsto' simples (pega o primeiro cronograma real)
         const previstoSimples = previstoDataSets[0].data;
 
-        // Monta o objeto grafico no formato antigo
+        // Monta o objeto grafico
         const objetoGrafico = {
             labels: labels,
             executado: dadosExecutados,
@@ -63,7 +57,7 @@ class ProjectDashboardAdapter {
             previstoDataSets: previstoDataSets
         };
 
-        // Adapta as medições para o formato antigo (com acumulado explícito)
+        // Adapta as medições para o acumulado explícito
         let acumuladorMedicao = 0;
         const medicoesAdaptadas = medicoesOrdenadas.map(m => {
             acumuladorMedicao += m.valor;
@@ -83,7 +77,7 @@ class ProjectDashboardAdapter {
         };
     }
 
-    // Auxiliar: 2025-05-01 -> Mai/25
+    // Converter: 2025-05-01 -> Mai/25
     static formatarDataLabel(isoDate) {
         if (!isoDate) return 'N/A';
         try {
@@ -94,7 +88,7 @@ class ProjectDashboardAdapter {
         } catch (e) { return isoDate; }
     }
 
-    // Auxiliar: 2025-05-01 -> 01/05/2025
+    // Converter: 2025-05-01 -> 01/05/2025
     static formatarDataISOparaBR(isoDate) {
         if (!isoDate) return 'N/A';
         const parts = isoDate.split('-');
@@ -107,7 +101,7 @@ class ProjectDashboardAdapter {
 }
 
 // ======================================================================
-// 2. DADOS BRUTOS (FONTE DA VERDADE LIMPA)
+// 2. DADOS
 // ======================================================================
 
 const rawProjects = [
@@ -344,29 +338,28 @@ const rawProjects = [
 ];
 
 // ======================================================================
-// 3. EXPORTAÇÃO COMPATÍVEL (PONTE PARA O HTML ANTIGO)
+// 3. EXPORTAÇÃO COMPATÍVEL (PONTE PARA O HTML)
 // ======================================================================
 
-// Aqui está a mágica: Criamos a variável 'projectData' que o HTML espera,
-// mas usamos o Adapter para gerar os dados calculados automaticamente.
+// Cria a variável 'projectData' que o HTML espera,
 
 var projectData = rawProjects.map(p => {
-    // Processa os dados brutos usando a lógica do Adapter
+
     const processado = ProjectDashboardAdapter.processarContrato(p);
 
-    // Retorna o objeto no formato EXATO que o HTML antigo exige
+    // Retorna o objeto no formato que o HTML exige
     return {
         id: p.id,
         objeto: p.objeto,
         empresa: p.empresa,
-        valorAtual: p.valorTotal, // HTML usa 'valorAtual', nós mapeamos de 'valorTotal'
+        valorAtual: p.valorTotal, //'valorAtual' mapeado de 'valorTotal'
         observacoes: p.observacoes,
         predicted_start_date: ProjectDashboardAdapter.formatarDataISOparaBR(p.previsaoInicio),
         predicted_end_date: ProjectDashboardAdapter.formatarDataISOparaBR(p.previsaoFim),
         location: p.localizacao,
         
-        // O Adapter já gerou 'medicoes' com acumulados e 'grafico' com arrays prontos
         medicoes: processado.medicoes,
         grafico: processado.grafico
     };
 });
+
