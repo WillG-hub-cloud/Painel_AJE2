@@ -5,24 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel de Controle Financeiro de Projetos</title>
 
-    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
-    <script src="[https://cdn.jsdelivr.net/npm/chart.js](https://cdn.jsdelivr.net/npm/chart.js)"></script>
-    <script src="[https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0](https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0)"></script>
-    <link rel="stylesheet" href="[https://unpkg.com/leaflet@1.9.4/dist/leaflet.css](https://unpkg.com/leaflet@1.9.4/dist/leaflet.css)"/>
-    <script src="[https://unpkg.com/leaflet@1.9.4/dist/leaflet.js](https://unpkg.com/leaflet@1.9.4/dist/leaflet.js)"></script>
-    <link rel="stylesheet" href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css)">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
-    <link href="[https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap](https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap)" rel="stylesheet">
-    <link href="[https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap](https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap)" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 
-    <script src="[https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js](https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js)"></script>
-    <script src="[https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js](https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js)"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: #1a202c;
-            background-image: linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.7)), url('[https://i.imgur.com/oWpnttn.jpeg](https://i.imgur.com/oWpnttn.jpeg)');
+            background-image: linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.7)), url('https://i.imgur.com/oWpnttn.jpeg');
             background-size: cover;
             background-attachment: fixed;
             background-position: center;
@@ -78,7 +78,12 @@
             display: none;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        
+        #map {
+            height: 600px;
+            width: 100%;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
         .custom-pin-icon {
             background-color: transparent !important;
             border: none !important;
@@ -173,6 +178,7 @@
             </div>
         </div>
 
+        ```
         <div id="mapView" class="glass-card p-4 sm:p-6">
             <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Selecione uma Obra no Mapa</h2>
             <div id="map"></div>
@@ -285,12 +291,12 @@
                     PREV_3: '#CC5200'
                 },
                 IMAGES: {
-                    logoCAF: "[https://i.imgur.com/1JpcXBq.png](https://i.imgur.com/1JpcXBq.png)",
-                    logoJundiai: "[https://i.imgur.com/QpfUWkv.png](https://i.imgur.com/QpfUWkv.png)",
-                    logoPOE: "[https://i.imgur.com/67zLDAk.png](https://i.imgur.com/67zLDAk.png)",
-                    logoUBS: "[https://i.imgur.com/syy1cBb.png](https://i.imgur.com/syy1cBb.png)",
-                    logoAtleta: "[https://i.imgur.com/w2G3qli.png](https://i.imgur.com/w2G3qli.png)",
-                    logoEscola: "[https://i.imgur.com/F9Zk9Qt.png](https://i.imgur.com/F9Zk9Qt.png)"
+                    logoCAF: "https://i.imgur.com/1JpcXBq.png",
+                    logoJundiai: "https://i.imgur.com/QpfUWkv.png",
+                    logoPOE: "https://i.imgur.com/67zLDAk.png",
+                    logoUBS: "https://i.imgur.com/syy1cBb.png",
+                    logoAtleta: "https://i.imgur.com/w2G3qli.png",
+                    logoEscola: "https://i.imgur.com/F9Zk9Qt.png"
                 }
             };
 
@@ -380,7 +386,7 @@
             const MapComponent = {
                 init() {
                     state.mapInstance = L.map('map').setView([-23.17, -46.87], 12);
-                    L.tileLayer('[https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/](https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/){z}/{y}/{x}', {
+                    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
                         attribution: 'Tiles © Esri'
                     }).addTo(state.mapInstance);
                     this.renderMarkers();
@@ -436,7 +442,7 @@
 
                     if (bounds.length) state.mapInstance.fitBounds(bounds);
                 }
-            }; // <--- O ERRO ESTAVA AQUI: Faltava fechar o objeto MapComponent
+            };
 
             // --- Componente: Gráfico (Chart.js) ---
             const ChartComponent = {
@@ -830,3 +836,17 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
