@@ -393,7 +393,7 @@
                 },
 
                 renderMarkers() {
-                    // CORREÇÃO AQUI: Verifica se projectData NÃO existe ou NÃO é um array
+                    // Verifica se projectData NÃO existe ou NÃO é um array
                     if (typeof projectData === 'undefined' || !Array.isArray(projectData)) {
                         console.error("Dados do projeto não carregados ou inválidos.");
                         return;
@@ -430,7 +430,10 @@
                         L.marker([lat, lng], { icon })
                             .addTo(state.mapInstance)
                             .bindTooltip(`<b>${p.objeto}</b>`, { 
-                                direction: 'top', permanent: true, className: 'map-label-tooltip', offset: L.point(0, -10) 
+                                direction: 'top', 
+                                permanent: false, // <--- ALTERADO PARA FALSE (Aparece só no hover)
+                                className: 'map-label-tooltip', 
+                                offset: L.point(0, -10) 
                             })
                             .on('click', () => ViewManager.showDashboard(p.id));
 
@@ -438,8 +441,7 @@
                     });
 
                     if (bounds.length) state.mapInstance.fitBounds(bounds);
-                }
-            };
+                };
 
             // --- Componente: Gráfico (Chart.js) ---
             const ChartComponent = {
@@ -833,6 +835,7 @@
     </script>
 </body>
 </html>
+
 
 
 
