@@ -86,20 +86,37 @@
         }
         /* --- ESTILO NOVO DOS ÍCONES (BOLINHAS BRANCAS) --- */
         .custom-pin-icon {
-            background-color: #ffffff !important; /* Fundo Branco */
-            border: 2px solid #ffffff !important; /* Borda Branca */
-            border-radius: 50%; /* Transforma o quadrado em círculo */
-            box-shadow: 0 3px 6px rgba(0,0,0,0.4) !important; /* Sombra para destacar do mapa */
+            /* Remove fundos e bordas de caixa */
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
             
-            /* Centralizar o ícone dentro da bolinha */
+            /* Tamanho um pouco maior para destacar */
+            font-size: 28px; 
+            
+            /* Centralização */
             display: flex !important;
             align-items: center;
             justify-content: center;
             
-            font-size: 18px; /* Ajustei o tamanho para caber bem na bolinha */
-            text-shadow: none !important; /* Remove a sombra antiga do texto */
+            /* O TRUQUE DO CONTORNO: Várias sombras brancas sólidas empilhadas */
+            text-shadow: 
+                 2px  2px 0 #ffffff,
+                -2px -2px 0 #ffffff,
+                 2px -2px 0 #ffffff,
+                -2px  2px 0 #ffffff,
+                 0px  3px 0 #ffffff,
+                 0px -3px 0 #ffffff,
+                 3px  0px 0 #ffffff,
+                -3px  0px 0 #ffffff,
+                /* Uma sombra preta suave mais distante para dar profundidade no mapa 3D */
+                 0 5px 10px rgba(0,0,0,0.6) !important;
+                 
+            /* Ajuste de posição para o ponto ficar no local correto */
+            transform: translate(-50%, -50%) !important; 
         }
 
+        /* Garante que a cor interna do ícone (azul, vermelho, etc.) fique sobre o contorno branco */
         .custom-pin-icon i,
         .custom-pin-icon span {
             position: relative;
@@ -849,6 +866,7 @@
     </script>
 </body>
 </html>
+
 
 
 
