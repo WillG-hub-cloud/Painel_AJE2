@@ -86,41 +86,28 @@
         }
         /* --- ESTILO NOVO DOS ÍCONES (BOLINHAS BRANCAS) --- */
         .custom-pin-icon {
-            /* Remove fundos e bordas de caixa */
+            /* Remove qualquer caixa, fundo ou borda quadrada */
             background-color: transparent !important;
             border: none !important;
             box-shadow: none !important;
             
-            /* Tamanho um pouco maior para destacar */
-            font-size: 28px; 
+            /* Define o tamanho do ícone */
+            font-size: 32px; 
             
-            /* Centralização */
+            /* Centraliza o conteúdo */
             display: flex !important;
             align-items: center;
             justify-content: center;
             
-            /* O TRUQUE DO CONTORNO: Várias sombras brancas sólidas empilhadas */
-            text-shadow: 
-                 2px  2px 0 #ffffff,
-                -2px -2px 0 #ffffff,
-                 2px -2px 0 #ffffff,
-                -2px  2px 0 #ffffff,
-                 0px  3px 0 #ffffff,
-                 0px -3px 0 #ffffff,
-                 3px  0px 0 #ffffff,
-                -3px  0px 0 #ffffff,
-                /* Uma sombra preta suave mais distante para dar profundidade no mapa 3D */
-                 0 5px 10px rgba(0,0,0,0.6) !important;
-                 
-            /* Ajuste de posição para o ponto ficar no local correto */
-            transform: translate(-50%, -50%) !important; 
-        }
-
-        /* Garante que a cor interna do ícone (azul, vermelho, etc.) fique sobre o contorno branco */
-        .custom-pin-icon i,
-        .custom-pin-icon span {
-            position: relative;
-            z-index: 2;
+            /* A MÁGICA: Cria uma borda branca sólida ao redor do desenho */
+            /* Funciona para Emoji e FontAwesome */
+            filter: drop-shadow(0 2px 0 white) 
+                    drop-shadow(0 -2px 0 white) 
+                    drop-shadow(2px 0 0 white) 
+                    drop-shadow(-2px 0 0 white);
+                    
+            /* Garante que o ícone fique acima de outros elementos do mapa */
+            z-index: 1000 !important;
         }
         .custom-pin-icon.emeb-icon { color: #87CEEB; }
         .custom-pin-icon.ubs-icon { color: #f24b4b; }
@@ -866,6 +853,7 @@
     </script>
 </body>
 </html>
+
 
 
 
