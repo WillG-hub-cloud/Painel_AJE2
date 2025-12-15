@@ -354,7 +354,7 @@ const rawProjects = [
         observacoes: "Remanescente da Obra, Continuidade do Contrato 001/23",
         previsaoInicio: "2025-12-01",
         previsaoFim: "2026-12-31",
-        localizacao: { lat: -23.115577, lng: -46.924531 },
+        localizacao: { lat: -23.206561, lng: -46.872850 },
         cronogramas: [
             {
                 nome: "Previsto Inicial",
@@ -440,6 +440,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
