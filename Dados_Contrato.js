@@ -348,7 +348,7 @@ const rawProjects = [
     },
     {
         id: "CT 097/25",
-        objeto: "CEPA Vila Progresso - Remanescente",
+        objeto: "POP Vila Progresso - Remanescente",
         empresa: "Viva Construções e Serviços Ltda",
         valorTotal: 4803370.83,
         observacoes: "Remanescente da Obra, Continuidade do Contrato 001/23",
@@ -440,6 +440,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
