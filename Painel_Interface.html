@@ -256,23 +256,11 @@
         /**
          * Arquitetura do Painel: Padrão Modular (IIFE)
          */
-        O problema é que a API de segurança que usamos antes (crypto.subtle, para o SHA-256) bloqueia a execução se você estiver abrindo o arquivo direto no computador (clicando duas vezes no arquivo HTML), por questões de segurança dos navegadores modernos. Ela exige que seja um site seguro (HTTPS) ou localhost.
-
-Para resolver isso e fazer funcionar imediatamente no seu computador, vamos mudar para Base64. É uma técnica mais simples que funciona em qualquer lugar (mesmo offline) e ainda evita deixar a senha "escancarada" no código.
-
-Aqui está a correção. Substitua o trecho do CONFIG e do Auth dentro do seu <script> por este abaixo:
-
-O que mudar no seu código:
-Procure dentro do seu <script> a parte do DashboardApp e substitua pelo código abaixo. As mudanças principais são no CONFIG (usando o token Base64) e na função Auth (usando btoa em vez de sha256).
-
-JavaScript
-
         const DashboardApp = (() => {
             
             // --- Configurações Centralizadas ---
             const CONFIG = {
-                // TOKEN BASE64 DA SENHA "AVANCA!2025" 
-                // (Isso funciona em arquivo local file:// sem travar o navegador)
+                // TOKEN BASE64 DA SENHA "AVANCA!2025"
                 AUTH_TOKEN: "QVZBTkNBITIwMjU=", 
                 COORDS_PREFEITURA: { lat: -23.1857, lng: -46.8978 },
                 COLORS: {
@@ -350,6 +338,7 @@ JavaScript
                     return `R$ ${abs.toLocaleString('pt-BR')}`;
                 },
 
+                // XSS Protection Helper
                 escapeHTML(str) {
                     if(typeof str !== 'string') return str;
                     return str.replace(/[&<>'"]/g, 
@@ -361,10 +350,9 @@ JavaScript
                             '"': '"'
                         }[tag]));
                 }
-                // Removi a função sha256 pois ela quebra em arquivos locais
             };
 
-            // --- Componente: Autenticação Compatível ---
+            // --- Componente: Autenticação Segura (Base64) ---
             const Auth = {
                 init() {
                     const btn = document.getElementById('login-button');
@@ -373,8 +361,7 @@ JavaScript
                     const errorMsg = document.getElementById('login-error');
 
                     const attemptLogin = () => {
-                        // Usa btoa (Base64) em vez de criptografia pesada
-                        // Senha correta: AVANCA!2025
+                        // Uso de btoa (Base64) para funcionar localmente sem travar o navegador
                         const inputToken = btoa(input.value);
                         
                         if (inputToken === CONFIG.AUTH_TOKEN) {
@@ -767,7 +754,6 @@ JavaScript
                     const id = document.getElementById('contractSelector').value;
                     const data = window.projectData.find(p => p.id === id);
                     if(data && data.location) {
-                        // Correção da URL do Google Maps
                         const url = `https://www.google.com/maps/dir/${CONFIG.COORDS_PREFEITURA.lat},${CONFIG.COORDS_PREFEITURA.lng}/${data.location.lat},${data.location.lng}`;
                         window.open(url, '_blank');
                     } else {
@@ -870,5 +856,3 @@ JavaScript
     </script>
 </body>
 </html>
-
-
