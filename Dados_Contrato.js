@@ -1,5 +1,5 @@
 /**
- * DADOS_CONTRATO.JS - VERSÃO 2025.12.12-50.11 (CORRIGIDO)
+ * DADOS_CONTRATO.JS - VERSÃO 2025.12.17-50.11 (CORRIGIDO)
  * CORREÇÕES: 
  * - Datas inexistentes (31 de abril/junho) ajustadas.
  * - Erro de sintaxe numérica (01.00).
@@ -490,6 +490,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
