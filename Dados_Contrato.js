@@ -195,7 +195,7 @@ const rawProjects = [
             }
         ],
         medicoes: [
-            { id: 1, dataInicio: "2026-01-15", dataFim: "2026-02-14", valor: null },
+            { id: 1, dataInicio: "2026-01-15", dataFim: "2026-02-14", valor: 1.00 },
             { id: 2, dataInicio: "2026-02-15", dataFim: "2026-03-14", valor: null },
             { id: 3, dataInicio: "2026-03-15", dataFim: "2026-04-14", valor: null },
             { id: 4, dataInicio: "2026-04-15", dataFim: "2026-05-14", valor: null },
@@ -462,6 +462,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
