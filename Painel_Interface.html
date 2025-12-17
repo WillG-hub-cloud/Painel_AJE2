@@ -48,21 +48,21 @@
             position: relative;
             height: 45vh;       /* Ocupa 45% da altura da tela */
             min-height: 350px;  /* Altura mínima de segurança */
-            max-height: 500px;  /* Não deixa ficar gigante em telas 4k */
+            max-height: 500px;  /* Altura máxima de segurança */
             width: 100%;
         }
 
         #map {
-            height: 80vh;       /* Mapa um pouco maior na view dedicada */
+            height: 80vh;       
             width: 100%;
             border-radius: 1rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        /* Ajuste fino para telas pequenas (Laptops) */
+        /* Ajuste para telas pequenas */
         @media (max-height: 800px) {
             .chart-container { height: 40vh; } 
-            body { font-size: 0.9rem; } /* Reduz levemente a fonte global */
+            body { font-size: 0.9rem; } /*fonte global */
         }
         .message-box {
             background: linear-gradient(to bottom right, rgba(240, 248, 255, 0.9), rgba(240, 248, 255, 0.7));
@@ -84,30 +84,21 @@
             border-radius: 1rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        /* --- ESTILO NOVO DOS ÍCONES (BOLINHAS BRANCAS) --- */
+        /* --- ESTILO DOS ÍCONES --- */
         .custom-pin-icon {
-            /* Remove qualquer caixa, fundo ou borda quadrada */
             background-color: transparent !important;
             border: none !important;
             box-shadow: none !important;
-            
-            /* Define o tamanho do ícone */
-            font-size: 28px; 
-            
-            /* Centraliza o conteúdo */
-            display: flex !important;
+            font-size: 28px; /* Define o tamanho do ícone */
+            display: flex !important; /* Centraliza o conteúdo */
             align-items: center;
             justify-content: center;
-            
-            /* A MÁGICA: Cria uma borda branca sólida ao redor do desenho */
-            /* Funciona para Emoji e FontAwesome */
+            /* Borda branca sólida ao redor do desenho */
             filter: drop-shadow(0 0.25px 0 black) 
                     drop-shadow(0 -0.25px 0 black) 
                     drop-shadow(0.25px 0 0 black) 
                     drop-shadow(-0.25px 0 0 black);
-                    
-            /* Garante que o ícone fique acima de outros elementos do mapa */
-            z-index: 1000 !important;
+            z-index: 1000 !important; /* Garantir que o ícone fique acima de outros elementos do mapa */
         }
         .custom-pin-icon.emeb-icon { color: #87CEEB; }
         .custom-pin-icon.ubs-icon { color: #f24b4b; }
@@ -132,7 +123,6 @@
         .leaflet-tooltip.map-label-tooltip.leaflet-tooltip-bottom:before {
             border-top-color: transparent !important;
         }
-        /* Color Utilities */
         .text-status-adiantado { color: #0073a1; }
         .text-status-atrasado { color: #b80404; }
         .text-status-diff-blue { color: #0073a1; }
@@ -144,7 +134,6 @@
             background-color: #007B3DFFF !important;
             color: #000000 !important;
         }
-        /* Login Styles */
         #login-container { transition: opacity 0.5s ease-in-out; }
         #login-container.hidden {
             opacity: 0;
@@ -291,14 +280,12 @@
     <script>
         /**
          * Arquitetura do Painel: Padrão Modular (IIFE)
-         * Isola o escopo para evitar poluição global e melhora a organização.
          */
         const DashboardApp = (() => {
             
             // --- Configurações e Constantes ---
             const CONFIG = {
-                // HASH SHA-256 da senha "AVANCA!2025" para evitar texto plano.
-                // Em produção real, a validação deve ser feita no Back-end.
+                // HASH SHA-256 da senha para evitar texto plano.
                 AUTH_HASH: "1b518c7e0c3cc979435a96865239556157835158140402030800366601445763", 
                 COORDS_PREFEITURA: { lat: -23.170850, lng: -46.900323 },
                 COLORS: {
@@ -336,18 +323,13 @@
                 "default": { type: 'image', url: '', colorClass: '' }
             };
 
-            // --- Estado da Aplicação ---
             let state = {
                 mapInstance: null,
                 chartInstance: null,
                 currentData: null
             };
 
-            // --- Utilitários (Helpers) ---
             const Utils = {
-                // ... (mantenha as funções sha256, formatCurrency, etc que já existem) ...
-
-                // Adicione/Atualize estas funções de formatação:
                 parseDate(dateString) {
                     if (!dateString || dateString === 'N/A') return null;
                     const parts = dateString.split('/');
@@ -390,11 +372,9 @@
                     const container = document.getElementById('login-container');
                     const errorMsg = document.getElementById('login-error');
 
-                    // Senha exata em texto (sem hash) para evitar erros
                     const CORRECT_PASSWORD = "AVANCA!2025"; 
 
                     const attemptLogin = () => {
-                        // Verifica se o que foi digitado é exatamente igual à senha
                         if (input.value === CORRECT_PASSWORD) {
                             container.classList.add('hidden'); // Esconde o login
                             input.value = '';
@@ -431,7 +411,7 @@
                     const bounds = [];
                     
                     projectData.forEach(p => {
-                        // Proteção extra: garante que location existe e tem lat/lng numéricos
+                        // Garante que location existe e tem lat/lng numéricos
                         if (!p.location || isNaN(parseFloat(p.location.lat)) || isNaN(parseFloat(p.location.lng))) {
                             return;
                         }
@@ -454,10 +434,10 @@
                             // O estilo garante que ela preencha o container do ícone
                             htmlIcon = `<img src="${iconConfig.url}" alt="ícone" style="width: 100%; height: auto; display: block;">`;
                         } else if (iconConfig.type === 'fontawesome') {
-                            // Lógica antiga para FontAwesome
+                            // Lógica para FontAwesome
                             htmlIcon = `<i class="${iconConfig.symbol}"></i>`;
                         } else {
-                            // Lógica antiga para Unicode/Emojis
+                            // Lógica para Unicode/Emojis
                             htmlIcon = `<span>${iconConfig.symbol}</span>`;
                         }
                         // -------------------------------------------
@@ -968,6 +948,7 @@
     </script>
 </body>
 </html>
+
 
 
 
