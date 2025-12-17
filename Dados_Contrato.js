@@ -7,109 +7,102 @@
  * - Correção de cronologia invertida no CT 127/24.
  * */
 
-// ======================================================================
-// 1. CLASSE ADAPTER
-// ======================================================================
-
-class ProjectDashboardAdapter {
+(function(global) {
     
-    static processarContrato(contrato) {
-        // 1. Ordenar medições por data
-        const medicoesOrdenadas = [...contrato.medicoes].sort((a, b) => 
-            new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime()
-        );
+    // ======================================================================
+    // 1. CLASSE ADAPTER
+    // ======================================================================
 
-        // 2. Gerar Labels (Eixo X)
-        const labels = medicoesOrdenadas.length > 0 
-            ? medicoesOrdenadas.map(m => this.formatarDataLabel(m.dataFim))
-            : this.gerarLabelsGenericos(12);
+    class ProjectDashboardAdapter {
+        
+        static processarContrato(contrato) {
+            // Clona e ordena para não mutar o objeto original
+            const medicoesOrdenadas = [...(contrato.medicoes || [])].sort((a, b) => 
+                new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime()
+            );
 
-        // 3. Calcular Executado Acumulado
-        let acumulador = 0;
-        const dadosExecutados = medicoesOrdenadas.map(m => {
-            if (m.valor === null) return null; // Retorna null para não plotar linha futura
-            acumulador += m.valor;
+            // Gerar Labels (Eixo X)
+            const labels = medicoesOrdenadas.length > 0 
+                ? medicoesOrdenadas.map(m => this.formatarDataLabel(m.dataFim))
+                : this.gerarLabelsGenericos(12);
 
-            return Number(acumulador.toFixed(2));
-        });
-
-        // 4. Preparar Datasets de Previsão
-        // Mapear os cronogramas reais
-        const previstoDataSets = contrato.cronogramas.map(crono => ({
-            label: crono.nome,
-            data: crono.valoresAcumulados
-        }));
-
-        while (previstoDataSets.length < 3) {
-            previstoDataSets.push({
-                label: '', // Label vazia para não aparecer na legenda
-                data: labels.map(() => null) // Array de nulos para não desenhar linha
+            // Calcular Executado Acumulado
+            let acumulador = 0;
+            const dadosExecutados = medicoesOrdenadas.map(m => {
+                if (m.valor === null) return null; 
+                acumulador += m.valor;
+                return Number(acumulador.toFixed(2));
             });
-        }
-        // -----------------------------
 
-        // Fallback para o 'previsto' simples (pega o primeiro cronograma real)
-        // Nota: Se cronograma for maior que medições, isso corta o gráfico visualmente, mas mantém integridade
-        const previstoSimples = previstoDataSets.length > 0 ? previstoDataSets[0].data : [];
+            // Preparar Datasets de Previsão
+            const previstoDataSets = (contrato.cronogramas || []).map(crono => ({
+                label: crono.nome,
+                data: crono.valoresAcumulados
+            }));
 
-        // Monta o objeto grafico
-        const objetoGrafico = {
-            labels: labels,
-            executado: dadosExecutados,
-            previsto: previstoSimples,
-            previstoDataSets: previstoDataSets
-        };
+            // Padding para garantir array mínimo (UI Logic)
+            while (previstoDataSets.length < 3) {
+                previstoDataSets.push({
+                    label: '',
+                    data: labels.map(() => null)
+                });
+            }
 
-        // Adapta as medições para o acumulado explícito
-        let acumuladorMedicao = 0;
-        const medicoesAdaptadas = medicoesOrdenadas.map(m => {
-            // Só soma se não for nulo, para evitar NaN ou soma incorreta
-            const val = m.valor === null ? 0 : m.valor;
-            acumuladorMedicao += val;
-            
-            return {
-                medicao: m.id,
-                inicio: this.formatarDataISOparaBR(m.dataInicio),
-                fim: this.formatarDataISOparaBR(m.dataFim),
-                ref: this.formatarDataLabel(m.dataFim),
-                valor: m.valor,
-                // Se o valor for null (futuro), mantemos o acumulado anterior ou null? 
-                // A lógica abaixo mantém o acumulado até o momento.
-                acumulado: Number(acumuladorMedicao.toFixed(2))
+            const previstoSimples = previstoDataSets.length > 0 ? previstoDataSets[0].data : [];
+
+            const objetoGrafico = {
+                labels: labels,
+                executado: dadosExecutados,
+                previsto: previstoSimples,
+                previstoDataSets: previstoDataSets
             };
-        });
 
-        return {
-            grafico: objetoGrafico,
-            medicoes: medicoesAdaptadas
-        };
-    }
+            let acumuladorMedicao = 0;
+            const medicoesAdaptadas = medicoesOrdenadas.map(m => {
+                const val = m.valor === null ? 0 : m.valor;
+                acumuladorMedicao += val;
+                
+                return {
+                    medicao: m.id,
+                    inicio: this.formatarDataISOparaBR(m.dataInicio),
+                    fim: this.formatarDataISOparaBR(m.dataFim),
+                    ref: this.formatarDataLabel(m.dataFim),
+                    valor: m.valor,
+                    acumulado: Number(acumuladorMedicao.toFixed(2))
+                };
+            });
 
-    // Converter: 2025-05-01 -> Mai/25
-    static formatarDataLabel(isoDate) {
-        if (!isoDate) return 'N/A';
-        try {
-            // Força timezone para evitar problemas de virada de dia
+            return {
+                grafico: objetoGrafico,
+                medicoes: medicoesAdaptadas
+            };
+        }
+
+        static formatarDataLabel(isoDate) {
+            if (!isoDate) return 'N/A';
+            try {
+                // Assegura parsing como UTC para evitar deslocamento de fuso
+                const parts = isoDate.split('-');
+                if(parts.length !== 3) return isoDate;
+                const date = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2], 12, 0, 0));
+                
+                const mes = new Intl.DateTimeFormat('pt-BR', { month: 'short', timeZone: 'UTC' }).format(date);
+                const ano = new Intl.DateTimeFormat('pt-BR', { year: '2-digit', timeZone: 'UTC' }).format(date);
+                return `${mes.charAt(0).toUpperCase() + mes.slice(1).replace('.', '')}/${ano}`;
+            } catch (e) { return isoDate; }
+        }
+
+        static formatarDataISOparaBR(isoDate) {
+            if (!isoDate) return 'N/A';
             const parts = isoDate.split('-');
-            const date = new Date(parts[0], parts[1] - 1, parts[2]); 
-            const mes = new Intl.DateTimeFormat('pt-BR', { month: 'short' }).format(date);
-            const ano = new Intl.DateTimeFormat('pt-BR', { year: '2-digit' }).format(date);
-            return `${mes.charAt(0).toUpperCase() + mes.slice(1).replace('.', '')}/${ano}`;
-        } catch (e) { return isoDate; }
-    }
+            if (parts.length !== 3) return isoDate;
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
 
-    // Converter: 2025-05-01 -> 01/05/2025
-    static formatarDataISOparaBR(isoDate) {
-        if (!isoDate) return 'N/A';
-        const parts = isoDate.split('-');
-        if (parts.length !== 3) return isoDate;
-        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        static gerarLabelsGenericos(qtd) {
+            return Array.from({ length: qtd }, (_, i) => `${i + 1}º Mês`);
+        }
     }
-
-    static gerarLabelsGenericos(qtd) {
-        return Array.from({ length: qtd }, (_, i) => `${i + 1}º Mês`);
-    }
-}
 
 // ======================================================================
 // 2. DADOS
@@ -471,25 +464,27 @@ const rawProjects = [
 // ======================================================================
 
 // Cria a variável 'projectData' que o HTML espera
-var projectData = rawProjects.map(p => {
+const processedData = rawProjects.map(p => {
+        const processado = ProjectDashboardAdapter.processarContrato(p);
+        return {
+            id: p.id,
+            objeto: p.objeto,
+            empresa: p.empresa,
+            valorAtual: p.valorTotal,
+            observacoes: p.observacoes,
+            predicted_start_date: ProjectDashboardAdapter.formatarDataISOparaBR(p.previsaoInicio),
+            predicted_end_date: ProjectDashboardAdapter.formatarDataISOparaBR(p.previsaoFim),
+            location: p.localizacao,
+            medicoes: processado.medicoes,
+            grafico: processado.grafico
+        };
+    });
 
-    const processado = ProjectDashboardAdapter.processarContrato(p);
+    // Expor no escopo global explicitamente
+    global.projectData = processedData;
 
-    // Retorna o objeto no formato que o HTML exige
-    return {
-        id: p.id,
-        objeto: p.objeto,
-        empresa: p.empresa,
-        valorAtual: p.valorTotal, //'valorAtual' mapeado de 'valorTotal'
-        observacoes: p.observacoes,
-        predicted_start_date: ProjectDashboardAdapter.formatarDataISOparaBR(p.previsaoInicio),
-        predicted_end_date: ProjectDashboardAdapter.formatarDataISOparaBR(p.previsaoFim),
-        location: p.localizacao,
-        
-        medicoes: processado.medicoes,
-        grafico: processado.grafico
-    };
-});
+})(window);
+
 
 
 
