@@ -260,9 +260,9 @@
             
             // --- Configurações Centralizadas ---
             const CONFIG = {
-                // HASH SHA-256 DA SENHA "AVANCA!2025"
-                AUTH_HASH: "1b518c7e0c3cc979435a96865239556157835158140402030800366601445763", 
-                COORDS_PREFEITURA: { lat: -23.1857, lng: -46.8978 }, // Ajustado para centro de Jundiaí
+                // TOKEN BASE64 DA SENHA "AVANCA!2025" (Compatível com modo offline/arquivo)
+                AUTH_TOKEN: "QVZBTkNBITIwMjU=", 
+                COORDS_PREFEITURA: { lat: -23.1857, lng: -46.8978 },
                 COLORS: {
                     PRIMARY: '#072380',
                     SUCCESS: '#0073a1',
@@ -368,10 +368,12 @@
                     const container = document.getElementById('login-container');
                     const errorMsg = document.getElementById('login-error');
 
-                    const attemptLogin = async () => {
-                        const inputHash = await Utils.sha256(input.value);
+                    const attemptLogin = () => {
+                        // Converte o input para Base64 e compara (Funciona Offline)
+                        // A senha continua sendo: AVANCA!2025
+                        const inputToken = btoa(input.value);
                         
-                        if (inputHash === CONFIG.AUTH_HASH) {
+                        if (inputToken === CONFIG.AUTH_TOKEN) {
                             container.classList.add('hidden');
                             input.value = '';
                             App.init(); 
@@ -864,3 +866,4 @@
     </script>
 </body>
 </html>
+
