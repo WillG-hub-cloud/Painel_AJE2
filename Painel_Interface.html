@@ -411,7 +411,7 @@
             // --- Componente: Mapa ---
             const MapComponent = {
                 init() {
-                    state.mapInstance = L.map('map').setView([-23.17, -46.87], 12);
+                    state.mapInstance = L.map('map').setView([-23.17, -46.87], 13);
                     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
                         attribution: 'Tiles © Esri'
                     }).addTo(state.mapInstance);
@@ -878,6 +878,7 @@
     </script>
 </body>
 </html>
+
 
 
 
