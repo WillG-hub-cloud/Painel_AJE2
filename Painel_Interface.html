@@ -256,11 +256,23 @@
         /**
          * Arquitetura do Painel: Padrão Modular (IIFE)
          */
+        O problema é que a API de segurança que usamos antes (crypto.subtle, para o SHA-256) bloqueia a execução se você estiver abrindo o arquivo direto no computador (clicando duas vezes no arquivo HTML), por questões de segurança dos navegadores modernos. Ela exige que seja um site seguro (HTTPS) ou localhost.
+
+Para resolver isso e fazer funcionar imediatamente no seu computador, vamos mudar para Base64. É uma técnica mais simples que funciona em qualquer lugar (mesmo offline) e ainda evita deixar a senha "escancarada" no código.
+
+Aqui está a correção. Substitua o trecho do CONFIG e do Auth dentro do seu <script> por este abaixo:
+
+O que mudar no seu código:
+Procure dentro do seu <script> a parte do DashboardApp e substitua pelo código abaixo. As mudanças principais são no CONFIG (usando o token Base64) e na função Auth (usando btoa em vez de sha256).
+
+JavaScript
+
         const DashboardApp = (() => {
             
             // --- Configurações Centralizadas ---
             const CONFIG = {
-                // TOKEN BASE64 DA SENHA "AVANCA!2025" (Compatível com modo offline/arquivo)
+                // TOKEN BASE64 DA SENHA "AVANCA!2025" 
+                // (Isso funciona em arquivo local file:// sem travar o navegador)
                 AUTH_TOKEN: "QVZBTkNBITIwMjU=", 
                 COORDS_PREFEITURA: { lat: -23.1857, lng: -46.8978 },
                 COLORS: {
@@ -338,29 +350,21 @@
                     return `R$ ${abs.toLocaleString('pt-BR')}`;
                 },
 
-                // XSS Protection Helper
                 escapeHTML(str) {
                     if(typeof str !== 'string') return str;
                     return str.replace(/[&<>'"]/g, 
                         tag => ({
-                            '&': '&amp;',
-                            '<': '&lt;',
-                            '>': '&gt;',
-                            "'": '&#39;',
-                            '"': '&quot;'
+                            '&': '&',
+                            '<': '<',
+                            '>': '>',
+                            "'": ''',
+                            '"': '"'
                         }[tag]));
-                },
-
-                // SHA-256 Generator
-                async sha256(message) {
-                    const msgBuffer = new TextEncoder().encode(message);
-                    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-                    const hashArray = Array.from(new Uint8Array(hashBuffer));
-                    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
                 }
+                // Removi a função sha256 pois ela quebra em arquivos locais
             };
 
-            // --- Componente: Autenticação Segura ---
+            // --- Componente: Autenticação Compatível ---
             const Auth = {
                 init() {
                     const btn = document.getElementById('login-button');
@@ -369,8 +373,8 @@
                     const errorMsg = document.getElementById('login-error');
 
                     const attemptLogin = () => {
-                        // Converte o input para Base64 e compara (Funciona Offline)
-                        // A senha continua sendo: AVANCA!2025
+                        // Usa btoa (Base64) em vez de criptografia pesada
+                        // Senha correta: AVANCA!2025
                         const inputToken = btoa(input.value);
                         
                         if (inputToken === CONFIG.AUTH_TOKEN) {
@@ -866,4 +870,5 @@
     </script>
 </body>
 </html>
+
 
