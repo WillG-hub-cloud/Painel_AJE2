@@ -242,7 +242,7 @@ const rawProjects = [
         objeto: "UBS Rio Branco",
         empresa: "CJM Construtora Ltda",
         valorTotal: 2664287.67,
-        observacoes: "Aditivo extendendo término para novembro.",
+        observacoes: "Inauguração da Obra ocorreu em 13/12/2025, aguarda apenas o pagamento final",
         previsaoInicio: "2024-10-07",
         previsaoFim: "2025-11-03",
         localizacao: { lat: -23.17462221037069, lng: -46.88650911818413 },
@@ -490,6 +490,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
