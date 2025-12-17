@@ -180,7 +180,7 @@ const rawProjects = [
         ]
     },
     {
-        id: "CT XXX/25",
+        id: "CT XX/25",
         objeto: "São Camilo - Tarumã",
         empresa: "TDF Ambiental e Comercial",
         valorTotal: 1770082.78,
@@ -492,6 +492,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
