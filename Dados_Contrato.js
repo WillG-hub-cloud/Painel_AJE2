@@ -180,6 +180,36 @@ const rawProjects = [
         ]
     },
     {
+        id: "CT XXX/25",
+        objeto: "Centro POP - Remanescente",
+        empresa: "Viva Construções e Serviços Ltda",
+        valorTotal: 2599735.66,
+        observacoes: null,
+        previsaoInicio: "2026-01-15",
+        previsaoFim: "2027-01-15",
+        localizacao: { lat: -23.191564, lng: -46.875864 },
+        cronogramas: [
+            {
+                nome: "Previsto Inicial",
+                valoresAcumulados: [124967.95, 264725.58, 458665.47, 747556.51, 1031172.00, 1362813.64, 1642562.37, 1916890.80, 2118393.98, 2290500.55, 2457541.08, 2599375.66]
+            }
+        ],
+        medicoes: [
+            { id: 1, dataInicio: "2026-01-15", dataFim: "2026-02-14", valor: null },
+            { id: 2, dataInicio: "2026-02-15", dataFim: "2026-03-14", valor: null },
+            { id: 3, dataInicio: "2026-03-15", dataFim: "2026-04-14", valor: null },
+            { id: 4, dataInicio: "2026-04-15", dataFim: "2026-05-14", valor: null },
+            { id: 5, dataInicio: "2026-05-15", dataFim: "2026-06-14", valor: null },
+            { id: 6, dataInicio: "2026-06-15", dataFim: "2026-07-14", valor: null },
+            { id: 7, dataInicio: "2026-07-15", dataFim: "2026-08-14", valor: null },
+            { id: 8, dataInicio: "2026-08-15", dataFim: "2026-09-14", valor: null },
+            { id: 9, dataInicio: "2026-09-15", dataFim: "2026-10-14", valor: null },
+            { id: 10, dataInicio: "2026-10-15", dataFim: "2026-11-14", valor: null },
+            { iid: 11, dataInicio: "2026-11-15", dataFim: "2026-12-14", valor: null },
+            { id: 12, dataInicio: "2027-12-15", dataFim: "2027-01-14", valor: null }
+        ]
+    },
+    {
         id: "CT 127/24",
         objeto: "UBS Rio Branco",
         empresa: "CJM Construtora Ltda",
@@ -376,15 +406,7 @@ const rawProjects = [
             { id: 12, dataInicio: "2026-12-01", dataFim: "2026-12-31", valor: null }
         ]
     },
-    // ATENÇÃO: O item abaixo "CT 0XX/25" parece um duplicado/template de "CT 058/25" com dados copiados.
-    // Foi removido para evitar duplicidade de dados no dashboard. Se for um contrato real, altere o ID e as medições.
-    /*
-    {
-        id: "CT 0XX/25",
-        objeto: "Centro POP - Remanescente",
-        ... (DADOS IDÊNTICOS AO CT 058/25)
-    },
-    */
+
     {
         id: "CT 048/25",
         objeto: "CECE Romão",
@@ -440,6 +462,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
