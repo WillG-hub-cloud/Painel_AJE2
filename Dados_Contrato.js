@@ -186,7 +186,7 @@ const rawProjects = [
         valorTotal: 1770082.78,
         observacoes: null,
         previsaoInicio: "2026-01-15",
-        previsaoFim: "2027-01-15",
+        previsaoFim: "2026-11-15",
         localizacao: { lat: -23.177839, lng: -46.868153 },
         cronogramas: [
             {
@@ -204,9 +204,7 @@ const rawProjects = [
             { id: 7, dataInicio: "2026-07-15", dataFim: "2026-08-14", valor: null },
             { id: 8, dataInicio: "2026-08-15", dataFim: "2026-09-14", valor: null },
             { id: 9, dataInicio: "2026-09-15", dataFim: "2026-10-14", valor: null },
-            { id: 10, dataInicio: "2026-10-15", dataFim: "2026-11-14", valor: null },
-            { iid: 11, dataInicio: "2026-11-15", dataFim: "2026-12-14", valor: null },
-            { id: 12, dataInicio: "2027-12-15", dataFim: "2027-01-14", valor: null }
+            { id: 10, dataInicio: "2027-10-15", dataFim: "2027-11-14", valor: null }
         ]
     },
     {
@@ -492,6 +490,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
