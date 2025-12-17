@@ -760,33 +760,90 @@
                 },
 
                 renderTables(data) {
-                     // MANTENHA O SEU CÓDIGO ORIGINAL DESTA FUNÇÃO AQUI
-                     // (Estou resumindo para focar nas exportações, mas use a sua lógica completa)
                     const compBody = document.getElementById('comparativeTableBody');
                     const schedBody = document.getElementById('measurementsTableBody');
+                    
+                    // Verifica se existe dado de execução
                     const hasExecuted = data.grafico && data.grafico.executado && data.grafico.executado.some(v => v !== null);
 
                     if (hasExecuted) {
+                        // --- MODO TABELA COMPARATIVA (8 Colunas) ---
                         document.getElementById('comparativeTableContainer').classList.remove('hidden');
                         document.getElementById('predictedScheduleTableContainer').classList.add('hidden');
                         document.getElementById('tab-table').textContent = "Tabela Comparativa";
-                        
-                        // Lógica simplificada de renderização para o exemplo
+
                         let rowsHtml = '';
-                        let prevPrev = 0, prevExec = 0;
-                        data.grafico.labels.forEach((label, idx) => {
-                            let prevAcum = data.grafico.previsto[idx]; // Simplificado
-                            if(data.grafico.previstoDataSets) prevAcum = data.grafico.previstoDataSets[0].data[idx]; // Pega o primeiro dataset
-                            let execAcum = data.grafico.executado[idx];
-                            
-                            rowsHtml += `<tr class="border-b border-slate-200/50"><td class="text-center text-gray-800 p-2">${label}</td><td class="text-center text-gray-800">${Utils.formatCurrency(prevAcum)}</td><td class="text-center text-gray-800">${Utils.formatCurrency(execAcum)}</td></tr>`;
+                        let prevPrevisto = 0;
+                        let prevExecutado = 0;
+
+                        data.grafico.labels.forEach((label, index) => {
+                            // 1. Obter Valor Previsto Acumulado (Lógica original de prioridade de datasets)
+                            let previstoAcum = null;
+                            if (data.grafico.previstoDataSets) {
+                                // Tenta pegar do dataset de reajuste mais recente, senão pega do original
+                                if (data.grafico.previstoDataSets[2]?.data[index] != null) previstoAcum = data.grafico.previstoDataSets[2].data[index];
+                                else if (data.grafico.previstoDataSets[1]?.data[index] != null) previstoAcum = data.grafico.previstoDataSets[1].data[index];
+                                else if (data.grafico.previstoDataSets[0]?.data[index] != null) previstoAcum = data.grafico.previstoDataSets[0].data[index];
+                            } else {
+                                previstoAcum = data.grafico.previsto[index];
+                            }
+
+                            // 2. Obter Valor Executado Acumulado
+                            const executadoAcum = data.grafico.executado[index];
+
+                            // 3. Cálculos do Mês (Diferença do acumulado atual menos o anterior)
+                            const previstoMes = (previstoAcum != null) ? previstoAcum - prevPrevisto : 0;
+                            const executadoMes = (executadoAcum != null) ? executadoAcum - prevExecutado : null;
+
+                            // 4. Cálculo de Diferença e Status
+                            let diffCell = '<td class="px-5 py-3 text-sm text-center"></td>';
+                            let statusCell = '<td class="px-5 py-3 text-sm text-center"></td>';
+
+                            if (previstoAcum != null && executadoAcum != null) {
+                                const diff = executadoAcum - previstoAcum;
+                                const status = diff >= 0 ? 'Adiantado' : 'Atrasado';
+                                const colorClass = diff >= 0 ? 'text-[#0073a1]' : 'text-[#b80404]';
+                                
+                                diffCell = `<td class="px-5 py-3 text-sm text-center font-bold ${colorClass}">${Utils.formatCurrencyAndPercentage(diff, data.valorAtual)}</td>`;
+                                statusCell = `<td class="px-5 py-3 text-sm text-center font-bold ${colorClass}">${status}</td>`;
+                            }
+
+                            // 5. Montagem da Linha (Garante as 8 TDs para alinhar com os 8 THs)
+                            rowsHtml += `
+                                <tr class="border-b border-slate-200/50 hover:bg-white/50 transition-colors">
+                                    <td class="px-5 py-3 text-sm font-medium text-center text-gray-900">${index + 1}</td>
+                                    <td class="px-5 py-3 text-sm text-center text-gray-700 font-bold">${label}</td>
+                                    <td class="px-5 py-3 text-sm text-center text-gray-600">${Utils.formatCurrency(previstoMes)}</td>
+                                    <td class="px-5 py-3 text-sm text-center text-gray-800">${Utils.formatCurrencyAndPercentage(previstoAcum, data.valorAtual)}</td>
+                                    <td class="px-5 py-3 text-sm text-center text-gray-600">${executadoMes != null ? Utils.formatCurrency(executadoMes) : '-'}</td>
+                                    <td class="px-5 py-3 text-sm text-center text-gray-800 font-bold">${executadoAcum != null ? Utils.formatCurrencyAndPercentage(executadoAcum, data.valorAtual) : '-'}</td>
+                                    ${diffCell}
+                                    ${statusCell}
+                                </tr>
+                            `;
+
+                            // Atualiza os acumuladores anteriores para o próximo loop
+                            if (previstoAcum != null) prevPrevisto = previstoAcum;
+                            if (executadoAcum != null) prevExecutado = executadoAcum;
                         });
+
                         compBody.innerHTML = rowsHtml;
+
                     } else {
+                        // --- MODO TABELA CRONOGRAMA SIMPLES ---
                         document.getElementById('comparativeTableContainer').classList.add('hidden');
                         document.getElementById('predictedScheduleTableContainer').classList.remove('hidden');
                         document.getElementById('tab-table').textContent = "Cronograma Previsto";
-                        schedBody.innerHTML = data.medicoes.map(m => `<tr class="border-b border-slate-200/50"><td class="text-center text-gray-800 p-2">${m.medicao}</td><td class="text-center text-gray-800">${Utils.formatCurrency(m.valor)}</td><td class="text-center text-gray-800">${Utils.formatCurrency(m.acumulado)}</td></tr>`).join('');
+                        
+                        schedBody.innerHTML = data.medicoes.map(m => `
+                            <tr class="border-b border-slate-200/50 hover:bg-white/50">
+                                <td class="px-5 py-3 text-sm text-center text-gray-900">${m.medicao}</td>
+                                <td class="px-5 py-3 text-sm text-center text-gray-700">${m.inicio || '-'} a ${m.fim || '-'}</td>
+                                <td class="px-5 py-3 text-sm text-center text-gray-700">${m.ref || '-'}</td>
+                                <td class="px-5 py-3 text-sm text-center text-gray-800">${Utils.formatCurrency(m.valor)}</td>
+                                <td class="px-5 py-3 text-sm text-center text-gray-800 font-bold">${Utils.formatCurrencyAndPercentage(m.acumulado, data.valorAtual)}</td>
+                            </tr>
+                        `).join('');
                     }
                 },
 
@@ -911,6 +968,7 @@
     </script>
 </body>
 </html>
+
 
 
 
