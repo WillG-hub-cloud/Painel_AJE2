@@ -181,6 +181,36 @@ const rawProjects = [
     },
     {
         id: "CT XXX/25",
+        objeto: "São Camilo - Tarumã",
+        empresa: "TDF Ambiental e Comercial",
+        valorTotal: 1770082.78,
+        observacoes: null,
+        previsaoInicio: "2026-01-15",
+        previsaoFim: "2027-01-15",
+        localizacao: { lat: -23.177839, lng: -46.868153 },
+        cronogramas: [
+            {
+                nome: "Previsto Inicial",
+                valoresAcumulados: [69973.48, 130003.37, 187196.75, 266837.17, 374604.97, 609343.03, 942331.21, 1221971.48, 1501467.20, 1770077.06]
+            }
+        ],
+        medicoes: [
+            { id: 1, dataInicio: "2026-01-15", dataFim: "2026-02-14", valor: 1.00 },
+            { id: 2, dataInicio: "2026-02-15", dataFim: "2026-03-14", valor: null },
+            { id: 3, dataInicio: "2026-03-15", dataFim: "2026-04-14", valor: null },
+            { id: 4, dataInicio: "2026-04-15", dataFim: "2026-05-14", valor: null },
+            { id: 5, dataInicio: "2026-05-15", dataFim: "2026-06-14", valor: null },
+            { id: 6, dataInicio: "2026-06-15", dataFim: "2026-07-14", valor: null },
+            { id: 7, dataInicio: "2026-07-15", dataFim: "2026-08-14", valor: null },
+            { id: 8, dataInicio: "2026-08-15", dataFim: "2026-09-14", valor: null },
+            { id: 9, dataInicio: "2026-09-15", dataFim: "2026-10-14", valor: null },
+            { id: 10, dataInicio: "2026-10-15", dataFim: "2026-11-14", valor: null },
+            { iid: 11, dataInicio: "2026-11-15", dataFim: "2026-12-14", valor: null },
+            { id: 12, dataInicio: "2027-12-15", dataFim: "2027-01-14", valor: null }
+        ]
+    },
+    {
+        id: "CT XXX/25",
         objeto: "Centro POP - Remanescente",
         empresa: "Viva Construções e Serviços Ltda",
         valorTotal: 2599735.66,
@@ -462,6 +492,7 @@ var projectData = rawProjects.map(p => {
         grafico: processado.grafico
     };
 });
+
 
 
 
