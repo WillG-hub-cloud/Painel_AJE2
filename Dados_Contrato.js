@@ -520,7 +520,7 @@ const rawProjects = [
 
                 nome: "Cronograma Prorrogação II",
 
-                valoresAcumulados: [null, null, null, null, null, null, 1397234.90, 1918166.99, 2172395.90, 2423619.18, 2664287.67, null]
+                valoresAcumulados: [null, null, null, null, null, null, null, 1918166.99, 2172395.90, 2423619.18, 2664287.67, null]
 
             },
             
@@ -992,6 +992,7 @@ var projectData = rawProjects.map(p => {
     };
 
 });
+
 
 
 
