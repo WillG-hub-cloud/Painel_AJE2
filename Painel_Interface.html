@@ -594,7 +594,9 @@
 
                     PREV_2: '#007BFF',
 
-                    PREV_3: '#CC5200'
+                    PREV_3: '#CC5200',
+
+                    PREV_4: '#ec51ab'
 
                 },
 
@@ -1050,7 +1052,9 @@
 
                             { color: CONFIG.COLORS.PREV_2 }, // Azul
 
-                            { color: CONFIG.COLORS.PREV_3 }  // Laranja
+                            { color: CONFIG.COLORS.PREV_3 }, // Laranja
+                            
+                            { color: CONFIG.COLORS.PREV_4 } // Rosa
 
                         ];
 
@@ -1526,12 +1530,14 @@
 
                                 // Tenta pegar do dataset de reajuste mais recente, senão pega do original
 
-                                if (data.grafico.previstoDataSets[2]?.data[index] != null) previstoAcum = data.grafico.previstoDataSets[2].data[index];
-
+                                if (data.grafico.previstoDataSets[3]?.data[index] != null) previstoAcum = data.grafico.previstoDataSets[3].data[index];
+                                    
+                                else if (data.grafico.previstoDataSets[2]?.data[index] != null) previstoAcum = data.grafico.previstoDataSets[2].data[index];
+                                    
                                 else if (data.grafico.previstoDataSets[1]?.data[index] != null) previstoAcum = data.grafico.previstoDataSets[1].data[index];
-
+                                    
                                 else if (data.grafico.previstoDataSets[0]?.data[index] != null) previstoAcum = data.grafico.previstoDataSets[0].data[index];
-
+                                
                             } else {
 
                                 previstoAcum = data.grafico.previsto[index];
@@ -1899,6 +1905,7 @@
 </body>
 
 </html>
+
 
 
 
