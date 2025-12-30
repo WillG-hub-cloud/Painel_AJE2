@@ -494,7 +494,7 @@ const rawProjects = [
 
         previsaoInicio: "2024-10-07",
 
-        previsaoFim: "2025-11-03",
+        previsaoFim: "2025-12-03",
 
         localizacao: { lat: -23.17462221037069, lng: -46.88650911818413 },
 
@@ -504,7 +504,7 @@ const rawProjects = [
 
                 nome: "Cronograma Inicial",
 
-                valoresAcumulados: [223098.81, 446197.62, 691408.56, 953063.11, 1526040.85, 1840857.74, 2157299.00, null, null, null, null, null, null, null]
+                valoresAcumulados: [223098.81, 446197.62, 691408.56, 953063.11, 1526040.85, 1840857.74, 2157299.00, null, null, null, null, null]
 
             },
 
@@ -512,7 +512,7 @@ const rawProjects = [
 
                 nome: "Cronograma Prorrogação I",
 
-                valoresAcumulados: [null, null, null, null, 865259.02, 1174071.39, 1507373.86, 1755025.46, 1995363.70, 2157299.00, null, null, null, null]
+                valoresAcumulados: [null, null, null, null, 865259.02, 1174071.39, 1507373.86, 1755025.46, 1995363.70, 2157299.00, null, null]
 
             },
 
@@ -520,7 +520,7 @@ const rawProjects = [
 
                 nome: "Cronograma Prorrogação II",
 
-                valoresAcumulados: [null, null, null, null, null, null, 1397234.90, 1918166.99, 2172395.90, 2423619.18, 2664287.67, null, null]
+                valoresAcumulados: [null, null, null, null, null, null, 1397234.90, 1918166.99, 2172395.90, 2423619.18, 2664287.67, null]
 
             },
             
@@ -528,7 +528,7 @@ const rawProjects = [
 
                 nome: "Cronograma Prorrogação III",
 
-                valoresAcumulados: [null, null, null, null, null, null, null, null, null, null, null, null, 2436862.93, 2664287.67]
+                valoresAcumulados: [null, null, null, null, null, null, null, null, null, null, 2436862.93, 2664287.67]
 
             }
 
@@ -558,13 +558,8 @@ const rawProjects = [
 
             { id: 11, dataInicio: "2025-10-04", dataFim: "2025-11-03", valor: 199158.60 },
 
-            { id: 12, dataInicio: "2025-11-04", dataFim: "2025-12-03", valor: null},
+            { id: 12, dataInicio: "2025-11-04", dataFim: "2025-12-03", valor: null } 
 
-            { id: 13, dataInicio: "2025-12-04", dataFim: "2026-01-03", valor: null},
-
-            { id: 14, dataInicio: "2026-01-04", dataFim: "2026-02-03", valor: null } 
-
-            // CORRIGIDO: dataFim estava 2025-11-03 (anterior ao inicio)
 
         ]
 
@@ -997,6 +992,7 @@ var projectData = rawProjects.map(p => {
     };
 
 });
+
 
 
 
