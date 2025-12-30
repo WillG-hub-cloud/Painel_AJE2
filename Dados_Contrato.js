@@ -284,21 +284,25 @@ const rawProjects = [
 
             { id: 1, dataInicio: "2025-04-15", dataFim: "2025-05-14", valor: 107178.95 },
 
-            { id: 2, dataInicio: "2025-05-16", dataFim: "2025-06-15", valor: 17465.29 },
+            { id: 2, dataInicio: "2025-05-15", dataFim: "2025-06-13", valor: 17465.29 },
 
-            { id: 3, dataInicio: "2025-06-16", dataFim: "2025-07-16", valor: 60448.43 },
+            { id: 3, dataInicio: "2025-06-14", dataFim: "2025-07-13", valor: 60448.43 },
 
-            { id: 4, dataInicio: "2025-07-17", dataFim: "2025-08-16", valor: 155336.53 },
+            { id: 4, dataInicio: "2025-07-14", dataFim: "2025-08-12", valor: 155336.53 },
 
-            { id: 5, dataInicio: "2025-08-17", dataFim: "2025-09-16", valor: 233719.93 },
+            { id: 5, dataInicio: "2025-08-13", dataFim: "2025-09-11", valor: 233719.93 },
 
-            { id: 6, dataInicio: "2025-09-17", dataFim: "2025-10-17", valor: 231564.64 },
+            { id: 6, dataInicio: "2025-09-12", dataFim: "2025-10-11", valor: 231564.64 },
 
-            { id: 7, dataInicio: "2025-10-18", dataFim: "2025-11-17", valor: 166364.06 },
+            { id: 7, dataInicio: "2025-10-12", dataFim: "2025-11-11", valor: 166364.06 },
 
-            { id: 8, dataInicio: "2025-11-18", dataFim: "2025-12-10", valor: 150236.11 },
+            { id: 8, dataInicio: "2025-11-12", dataFim: "2025-12-10", valor: 150236.11 },
 
-            { id: 9, dataInicio: "2025-12-11", dataFim: "2026-01-10", valor: null } 
+            { id: 9, dataInicio: "2025-12-11", dataFim: "2025-01-10", valor: null },
+
+            { id: 10, dataInicio: "2025-01-11", dataFim: "2025-02-10", valor: null },
+            
+            { id: 11, dataInicio: "2025-02-11", dataFim: "2026-03-10", valor: null } 
 
         ]
 
@@ -981,6 +985,7 @@ var projectData = rawProjects.map(p => {
     };
 
 });
+
 
 
 
