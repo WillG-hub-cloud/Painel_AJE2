@@ -725,7 +725,7 @@ const rawProjects = [
 
         medicoes: [
 
-            { id: 1, dataInicio: "2025-06-16", dataFim: "2025-07-15", valor: 236656.05 },
+            { id: 1, dataInicio: "2025-06-16", dataFim: "2025-07-15", valor: 311389.54 },
 
             { id: 2, dataInicio: "2025-07-16", dataFim: "2025-08-15", valor: 0.00 },
 
@@ -992,6 +992,7 @@ var projectData = rawProjects.map(p => {
     };
 
 });
+
 
 
 
