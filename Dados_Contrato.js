@@ -422,7 +422,7 @@ const rawProjects = [
 
     {
 
-        id: "CT XXX/25",
+        id: "CT 003/26",
 
         objeto: "Centro POP - Remanescente",
 
@@ -992,6 +992,7 @@ var projectData = rawProjects.map(p => {
     };
 
 });
+
 
 
 
