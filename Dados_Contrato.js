@@ -720,6 +720,13 @@ const rawProjects = [
                 valoresAcumulados: [null, null, null, 453476.70, 682448.69, 1005437.35, 1308972.20, 1665743.54, 2226698.41, 2584618.50, 3011727.49, 3401989.43, 3592627.37, 3625286.12]
 
             }
+            {
+
+                nome: "Cronograma Prorrogação II",
+
+                valoresAcumulados: [null, null, null, null, null, null, null, 1065232.49, 1520212.37, 1929610.92, 2469012.55, 2936455.12, 3325356.37, 3629613.36]
+
+            }
 
         ],
 
@@ -735,9 +742,9 @@ const rawProjects = [
 
             { id: 5, dataInicio: "2025-10-16", dataFim: "2025-11-15", valor: 82641.51 },
 
-            { id: 6, dataInicio: "2025-11-16", dataFim: "2025-12-15", valor: null },
+            { id: 6, dataInicio: "2025-11-16", dataFim: "2025-12-15", valor: 0.00 },
 
-            { id: 7, dataInicio: "2025-12-16", dataFim: "2026-01-15", valor: null },
+            { id: 7, dataInicio: "2025-12-16", dataFim: "2026-01-15", valor: 297178.41 },
 
             { id: 8, dataInicio: "2026-01-16", dataFim: "2026-02-15", valor: null },
 
