@@ -719,7 +719,7 @@ const rawProjects = [
 
                 valoresAcumulados: [null, null, null, 453476.70, 682448.69, 1005437.35, 1308972.20, 1665743.54, 2226698.41, 2584618.50, 3011727.49, 3401989.43, 3592627.37, 3625286.12]
 
-            }
+            },
             {
 
                 nome: "Cronograma Prorrogação II",
@@ -772,7 +772,7 @@ const rawProjects = [
 
         empresa: "LBD Engenharia Ltda EPP",
 
-        valorTotal: 4770000.00,
+        valorTotal: 5592569.16,
 
         observacoes: null,
 
@@ -999,6 +999,7 @@ var projectData = rawProjects.map(p => {
     };
 
 });
+
 
 
 
