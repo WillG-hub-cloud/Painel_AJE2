@@ -774,7 +774,7 @@ const rawProjects = [
 
         valorTotal: 5592569.16,
 
-        observacoes: null,
+        observacoes: "Falta novo Cronograma, apenas aditivo de valor foi aprovado e aceito",
 
         previsaoInicio: "2025-07-28",
 
@@ -999,6 +999,7 @@ var projectData = rawProjects.map(p => {
     };
 
 });
+
 
 
 
