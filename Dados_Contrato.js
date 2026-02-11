@@ -744,7 +744,7 @@ const rawProjects = [
 
             { id: 6, dataInicio: "2025-11-16", dataFim: "2025-12-15", valor: 0.00 },
 
-            { id: 7, dataInicio: "2025-12-16", dataFim: "2026-01-15", valor: 297178.41 },
+            { id: 7, dataInicio: "2025-12-16", dataFim: "2026-01-15", valor: 297178.40 },
 
             { id: 8, dataInicio: "2026-01-16", dataFim: "2026-02-15", valor: null },
 
@@ -804,9 +804,9 @@ const rawProjects = [
 
             { id: 4, dataInicio: "2025-10-28", dataFim: "2025-11-27", valor: 487483.78 },
 
-            { id: 5, dataInicio: "2025-11-28", dataFim: "2025-12-27", valor: null },
+            { id: 5, dataInicio: "2025-11-28", dataFim: "2025-12-27", valor: 0.00 },
 
-            { id: 6, dataInicio: "2025-12-28", dataFim: "2026-01-27", valor: null },
+            { id: 6, dataInicio: "2025-12-28", dataFim: "2026-01-27", valor: 181444.94 },
 
             { id: 7, dataInicio: "2026-01-28", dataFim: "2026-02-27", valor: null },
 
@@ -1013,6 +1013,7 @@ var projectData = rawProjects.map(p => {
     };
 
 });
+
 
 
 
