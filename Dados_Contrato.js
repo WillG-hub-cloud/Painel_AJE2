@@ -914,7 +914,7 @@ const rawProjects = [
 
                 nome: "Cronograma Inicial",
 
-                valoresAcumulados: [149571.75, 730716.85, 1300261.90, 1480000.00, null, null, null]
+                valoresAcumulados: [149571.75, 730716.85, 1300261.90, 1480000.00, null, null, null, null, null, null]
 
             },
 
@@ -922,7 +922,15 @@ const rawProjects = [
 
                 nome: "Cronograma Prorrogação I",
 
-                valoresAcumulados: [null, null, 368781.58, 866856.13, 1169484.80, 1333153.20, 1480000.00]
+                valoresAcumulados: [null, null, 368781.58, 866856.13, 1169484.80, 1333153.20, 1480000.00, null, null, null]
+
+            },
+
+             {
+
+                nome: "Cronograma Prorrogação II",
+
+                valoresAcumulados: [null, null, null, null, null, null, 704416.75, 833484.36, 1160994.10, 1480000.00]
 
             }
 
@@ -941,8 +949,14 @@ const rawProjects = [
             { id: 5, dataInicio: "2025-11-07", dataFim: "2025-12-06", valor: null },
 
             { id: 6, dataInicio: "2025-12-07", dataFim: "2026-01-06", valor: null },
+            
+            { id: 7, dataInicio: "2026-01-07", dataFim: "2026-02-06", valor: null },
 
-            { id: 7, dataInicio: "2026-01-07", dataFim: "2026-02-06", valor: null }
+            { id: 8, dataInicio: "2026-01-07", dataFim: "2026-02-06", valor: null },
+            
+            { id: 9, dataInicio: "2026-02-07", dataFim: "2026-03-06", valor: null },
+            
+            { id: 10, dataInicio: "2026-03-07", dataFim: "2026-04-06", valor: null }
 
         ]
 
@@ -999,6 +1013,7 @@ var projectData = rawProjects.map(p => {
     };
 
 });
+
 
 
 
