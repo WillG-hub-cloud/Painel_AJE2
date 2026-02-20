@@ -746,7 +746,7 @@ const rawProjects = [
 
             { id: 7, dataInicio: "2025-12-16", dataFim: "2026-01-15", valor: 297178.40 },
 
-            { id: 8, dataInicio: "2026-01-16", dataFim: "2026-02-15", valor: null },
+            { id: 8, dataInicio: "2026-01-16", dataFim: "2026-02-15", valor: 187853.25 },
 
             { id: 9, dataInicio: "2026-02-16", dataFim: "2026-03-15", valor: null },
 
@@ -1013,6 +1013,7 @@ var projectData = rawProjects.map(p => {
     };
 
 });
+
 
 
 
