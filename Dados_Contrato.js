@@ -575,7 +575,7 @@ const rawProjects = [
 
         valorTotal: 6598840.00,
 
-        observacoes: null,
+        observacoes: "Novo Cronograma Adotado após aprovação do Termo Aditivo de Prazo I",
 
         previsaoInicio: "2025-04-22",
 
@@ -587,9 +587,17 @@ const rawProjects = [
 
             {
 
-                nome: "Previsto Inicial",
+                nome: "Cronograma Inicial",
 
-                valoresAcumulados: [321595.91, 975559.72, 1329606.69, 1603339.23, 2437385.26, 3264248.65, 4446317.27, 5419662.56, 6006782.35, 6347449.86, 6598840.00]
+                valoresAcumulados: [321595.91, 975559.72, 1329606.69, 1603339.23, 2437385.26, 3264248.65, 4446317.27, 5419662.56, 6006782.35, 6347449.86, 6598840.00, null, null, null, null, null]
+
+            },
+
+            {
+
+                nome: "Cronograma Prorrogação I",
+
+                valoresAcumulados: [null, null, null, null, null, null, null, null, null, 5204130.32, 5942988.42, 6196876.56, 6625874.76, 6924467.12, 6992582.64, 7117245.86]
 
             }
 
@@ -619,7 +627,15 @@ const rawProjects = [
 
             { id: 11, dataInicio: "2026-02-22", dataFim: "2026-03-21", valor: null },
 
-            { id: 12, dataInicio: "2026-03-22", dataFim: "2026-04-21", valor: null }
+            { id: 12, dataInicio: "2026-03-22", dataFim: "2026-04-21", valor: null },
+            
+            { id: 13, dataInicio: "2026-04-22", dataFim: "2026-05-21", valor: null },
+
+            { id: 14, dataInicio: "2026-05-22", dataFim: "2026-06-21", valor: null },
+
+            { id: 15, dataInicio: "2026-06-22", dataFim: "2026-07-21", valor: null },
+
+            { id: 16, dataInicio: "2026-07-22", dataFim: "2026-08-21", valor: null }
 
         ]
 
@@ -1013,6 +1029,7 @@ var projectData = rawProjects.map(p => {
     };
 
 });
+
 
 
 
