@@ -366,7 +366,7 @@ const rawProjects = [
 
     {
 
-        id: "CT XX/25",
+        id: "CT 023/25",
 
         objeto: "São Camilo - Tarumã",
 
@@ -558,7 +558,7 @@ const rawProjects = [
 
             { id: 11, dataInicio: "2025-10-04", dataFim: "2025-11-03", valor: 199158.60 },
 
-            { id: 12, dataInicio: "2025-11-04", dataFim: "2025-12-03", valor: null } 
+            { id: 12, dataInicio: "2025-11-04", dataFim: "2025-12-03", valor: 155547.70 } 
 
 
         ]
@@ -1029,6 +1029,7 @@ var projectData = rawProjects.map(p => {
     };
 
 });
+
 
 
 
