@@ -488,7 +488,7 @@ const rawProjects = [
 
         empresa: "CJM Construtora Ltda",
 
-        valorTotal: 2664287.67,
+        valorTotal: 2664178.35,
 
         observacoes: "Inauguração da Obra ocorreu em 13/12/2025, aguarda apenas o pagamento final",
 
@@ -1029,6 +1029,7 @@ var projectData = rawProjects.map(p => {
     };
 
 });
+
 
 
 
