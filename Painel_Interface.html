@@ -765,7 +765,7 @@
     </div>
 </div>
 
-<script src="Dados_Contrato.js?v=atualizado"></script>
+<script src="Dados_Contrato.js?v=20260321b"></script>
 
 <script>
 // ── API CONFIG ────────────────────────────────────────────────────────
@@ -879,7 +879,7 @@ const DashboardApp = (() => {
                 eyeIcon.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
             });
 
-            const attempt = async () => {
+            const attempt = () => {
                 if (state.lockedUntil && Date.now() < state.lockedUntil) {
                     const secs = Math.ceil((state.lockedUntil - Date.now()) / 1000);
                     attemptsMsg.textContent = `Muitas tentativas. Aguarde ${secs}s.`;
@@ -889,13 +889,11 @@ const DashboardApp = (() => {
                     return;
                 }
 
-                const hash = await Utils.sha256(input.value);
-
-                if (hash === CONFIG.AUTH_HASH) {
+                if (input.value === "AVANCA!2025") {
                     state.loginAttempts = 0;
                     container.classList.add('hidden');
                     input.value = '';
-                    App.init(); // async — não bloqueia o login
+                    App.init();
                 } else {
                     state.loginAttempts++;
                     errorMsg.classList.remove('hidden');
