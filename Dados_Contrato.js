@@ -4,7 +4,7 @@
  * - AUTH: senha removida do fonte; autenticação agora usa apenas hash SHA-256 via SubtleCrypto
  * - ADAPTER: cálculo real de multiMes e diasCobertos em cada medição
  * - ADAPTER: campo statusFinanceiro calculado (adiantado/atrasado/neutro/concluido) por contrato
- * - ADAPTER: campo percentualExecutado calculado por contrato
+ * - ADAPTER: campo percentualExecutado calculado por contrato 
  * - ESTRUTURA: responsabilidades separadas em seções claras (auth / utils / adapter / dados / export)
  */
 
