@@ -386,14 +386,14 @@
                 <table class="min-w-full">
                     <thead>
                         <tr>
-                            <th class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Medição</th>
-                            <th class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Mês</th>
-                            <th class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Prev. Mês</th>
-                            <th class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Prev. Acum.</th>
-                            <th class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Exec. Mês</th>
-                            <th class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Exec. Acum.</th>
-                            <th class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Diferença</th>
-                            <th class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Status</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Nº</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Período</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Ref.</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Prev. Acum.</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Exec. Mês</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Exec. Acum.</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Diferença</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Status</th>
                         </tr>
                     </thead>
                     <tbody id="comparativeTableBody"></tbody>
@@ -898,57 +898,107 @@ const DashboardApp = (() => {
             const schedBody = document.getElementById('measurementsTableBody');
             const hasExec   = data.grafico?.executado?.some(v => v !== null);
 
+            // Badge visual para medições que cobrem mais de um mês
+            const badgeMultiMes = (m) => m.multiMes
+                ? `<span title="${m.diasCobertos} dias" style="
+                        display:inline-block;margin-left:5px;padding:1px 6px;
+                        border-radius:99px;font-size:0.65rem;font-weight:700;
+                        background:rgba(147,51,234,0.15);color:#7c3aed;
+                        vertical-align:middle;white-space:nowrap;">
+                        ${m.diasCobertos}d
+                   </span>`
+                : '';
+
             if (hasExec) {
+                // ── MODO COMPARATIVO ──────────────────────────────────
+                // A tabela agora é por MEDIÇÃO REAL (não por mês do gráfico),
+                // pois o usuário quer ver "uma linha por medição entregue".
+                // A comparação com o previsto usa o acumulado previsto no mês
+                // de FIM da medição, que é o ponto de referência natural.
+
                 document.getElementById('comparativeTableContainer').classList.remove('hidden');
                 document.getElementById('predictedScheduleTableContainer').classList.add('hidden');
                 document.getElementById('tab-table').textContent = "Tabela Comparativa";
 
-                let rows = '', prevPrev = 0, prevExec = 0;
+                // Monta índice: chave-mês → índice no array do gráfico
+                const labelToIdx = {};
+                data.grafico.labels.forEach((lbl, i) => labelToIdx[lbl] = i);
 
-                data.grafico.labels.forEach((label, i) => {
-                    let prevAcum = null;
+                // Função: dado o mês-fim de uma medição, pega o previsto acumulado mais recente
+                const getPrevAcumNoMes = (refLabel) => {
+                    const idx = labelToIdx[refLabel];
+                    if (idx == null) return null;
                     const ds = data.grafico.previstoDataSets;
                     if (ds) {
                         for (let j = 3; j >= 0; j--) {
-                            if (ds[j]?.data[i] != null) { prevAcum = ds[j].data[i]; break; }
+                            if (ds[j]?.data[idx] != null) return ds[j].data[idx];
                         }
-                    } else {
-                        prevAcum = data.grafico.previsto[i];
                     }
+                    return data.grafico.previsto?.[idx] ?? null;
+                };
 
-                    const execAcum  = data.grafico.executado[i];
-                    const prevMes   = prevAcum != null ? prevAcum - prevPrev : 0;
-                    const execMes   = execAcum != null ? execAcum - prevExec : null;
+                // Identificar a última medição com valor (para destacar)
+                const medicoesExec = data.medicoes.filter(m => m.valor !== null);
+                const ultimaExecId = medicoesExec.length
+                    ? medicoesExec[medicoesExec.length - 1].medicao : null;
 
-                    let diffCell = '<td class="px-5 py-3 text-sm text-center"></td>';
-                    let statCell = '<td class="px-5 py-3 text-sm text-center"></td>';
+                let rows = '';
+                data.medicoes.forEach(m => {
+                    const isUltima   = m.medicao === ultimaExecId;
+                    const isExec     = m.valor !== null;
+                    const refLabel   = isExec
+                        // Para multi-mês, usa o label do mês final
+                        ? (m.multiMes
+                            ? m.ref.split('–').pop().trim()
+                            : m.ref)
+                        : null;
+
+                    const prevAcum   = refLabel ? getPrevAcumNoMes(refLabel) : null;
+                    const execAcum   = isExec ? m.acumulado : null;
+
+                    let diffCell = '<td class="px-4 py-3 text-sm text-center text-gray-400">–</td>';
+                    let statCell = '<td class="px-4 py-3 text-sm text-center text-gray-400">–</td>';
 
                     if (prevAcum != null && execAcum != null) {
-                        const diff  = execAcum - prevAcum;
-                        const color = diff >= 0 ? 'text-[#0073a1]' : 'text-[#b80404]';
-                        const label2 = diff >= 0 ? 'Adiantado' : 'Atrasado';
-                        diffCell = `<td class="px-5 py-3 text-sm text-center font-bold ${color}">${Utils.formatCurrencyAndPercentage(diff, data.valorAtual)}</td>`;
-                        statCell = `<td class="px-5 py-3 text-sm text-center font-bold ${color}">${label2}</td>`;
+                        const diff   = execAcum - prevAcum;
+                        const color  = diff >= 0 ? 'text-[#0073a1]' : 'text-[#b80404]';
+                        const status = diff >= 0 ? '▲ Adiantado' : '▼ Atrasado';
+                        diffCell = `<td class="px-4 py-3 text-sm text-center font-bold ${color}">${Utils.formatCurrencyAndPercentage(diff, data.valorAtual)}</td>`;
+                        statCell = `<td class="px-4 py-3 text-sm text-center font-bold ${color}">${status}</td>`;
                     }
 
+                    // Separador visual: linha tracejada antes dos meses futuros
+                    const separador = (!isExec && m.medicao === (ultimaExecId != null ? ultimaExecId + 1 : null))
+                        ? 'border-t-2 border-dashed border-slate-400/60'
+                        : 'border-b border-slate-200/50';
+
+                    // Highlight da última medição executada
+                    const highlight = isUltima
+                        ? 'bg-[rgba(0,123,61,0.08)]'
+                        : isExec ? '' : 'opacity-60';
+
                     rows += `
-                        <tr class="border-b border-slate-200/50 hover:bg-white/50 transition-colors">
-                            <td class="px-5 py-3 text-sm font-medium text-center text-gray-900">${i+1}</td>
-                            <td class="px-5 py-3 text-sm text-center text-gray-700 font-bold">${label}</td>
-                            <td class="px-5 py-3 text-sm text-center text-gray-600">${Utils.formatCurrency(prevMes)}</td>
-                            <td class="px-5 py-3 text-sm text-center text-gray-800">${Utils.formatCurrencyAndPercentage(prevAcum, data.valorAtual)}</td>
-                            <td class="px-5 py-3 text-sm text-center text-gray-600">${execMes != null ? Utils.formatCurrency(execMes) : '-'}</td>
-                            <td class="px-5 py-3 text-sm text-center text-gray-800 font-bold">${execAcum != null ? Utils.formatCurrencyAndPercentage(execAcum, data.valorAtual) : '-'}</td>
+                        <tr class="${separador} ${highlight} hover:bg-white/50 transition-colors">
+                            <td class="px-4 py-3 text-sm font-bold text-center text-gray-900">
+                                ${m.medicao}
+                                ${isUltima ? '<span style="font-size:0.6rem;color:#007B3D;display:block;font-weight:600;">← última</span>' : ''}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-700 font-semibold">
+                                ${m.inicio} a ${m.fim}
+                                ${badgeMultiMes(m)}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-700">${m.ref}</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-600">${prevAcum != null ? Utils.formatCurrencyAndPercentage(prevAcum, data.valorAtual) : '–'}</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-600">${isExec ? Utils.formatCurrency(m.valor) : '–'}</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-800 font-bold">${execAcum != null ? Utils.formatCurrencyAndPercentage(execAcum, data.valorAtual) : '–'}</td>
                             ${diffCell}${statCell}
                         </tr>`;
-
-                    if (prevAcum != null) prevPrev = prevAcum;
-                    if (execAcum != null) prevExec = execAcum;
                 });
 
                 compBody.innerHTML = rows;
 
             } else {
+                // ── MODO CRONOGRAMA SIMPLES ───────────────────────────
                 document.getElementById('comparativeTableContainer').classList.add('hidden');
                 document.getElementById('predictedScheduleTableContainer').classList.remove('hidden');
                 document.getElementById('tab-table').textContent = "Cronograma Previsto";
@@ -956,8 +1006,11 @@ const DashboardApp = (() => {
                 schedBody.innerHTML = data.medicoes.map(m => `
                     <tr class="border-b border-slate-200/50 hover:bg-white/50">
                         <td class="px-5 py-3 text-sm text-center text-gray-900">${m.medicao}</td>
-                        <td class="px-5 py-3 text-sm text-center text-gray-700">${m.inicio || '-'} a ${m.fim || '-'}</td>
-                        <td class="px-5 py-3 text-sm text-center text-gray-700">${m.ref || '-'}</td>
+                        <td class="px-5 py-3 text-sm text-center text-gray-700">
+                            ${m.inicio || '–'} a ${m.fim || '–'}
+                            ${badgeMultiMes(m)}
+                        </td>
+                        <td class="px-5 py-3 text-sm text-center text-gray-700">${m.ref || '–'}</td>
                         <td class="px-5 py-3 text-sm text-center text-gray-800">${Utils.formatCurrency(m.valor)}</td>
                         <td class="px-5 py-3 text-sm text-center text-gray-800 font-bold">${Utils.formatCurrencyAndPercentage(m.acumulado, data.valorAtual)}</td>
                     </tr>`).join('');
@@ -1028,39 +1081,68 @@ const DashboardApp = (() => {
 
             overlay.classList.add('active');
 
-            try {
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const PW  = pdf.internal.pageSize.getWidth();   // 210 mm
-                const PH  = pdf.internal.pageSize.getHeight();  // 297 mm
+            // Helper: fetch image → base64
+            const toBase64 = async (url) => {
+                try {
+                    const res  = await fetch(url);
+                    const blob = await res.blob();
+                    return await new Promise(r => {
+                        const rd = new FileReader();
+                        rd.onload = () => r(rd.result);
+                        rd.readAsDataURL(blob);
+                    });
+                } catch (_) { return null; }
+            };
 
-                // ── PAGE 1: COVER ──────────────────────────────────────
-                pdf.setFillColor(7, 35, 128); // #072380
+            // Helper: draw a landscape page header strip (logo bar + title bar)
+            const drawLandscapeHeader = (pdf, LW, title) => {
+                // White logo bar
+                pdf.setFillColor(255, 255, 255);
+                pdf.rect(0, 0, LW, 18, 'F');
+                // Blue title bar
+                pdf.setFillColor(7, 35, 128);
+                pdf.rect(0, 18, LW, 10, 'F');
+                pdf.setTextColor(255, 255, 255);
+                pdf.setFont('helvetica', 'bold');
+                pdf.setFontSize(9);
+                pdf.text(title, LW / 2, 24.5, { align: 'center' });
+                // Contract subtitle
+                pdf.setFontSize(7);
+                pdf.setTextColor(180, 210, 255);
+                pdf.text(`${contractId} · ${data.objeto} · ${data.empresa}`, LW / 2, 30, { align: 'center' });
+            };
+
+            // Helper: draw footer
+            const drawFooter = (pdf, LW, LH) => {
+                pdf.setFontSize(7);
+                pdf.setTextColor(160, 160, 180);
+                const stamp = `Gerado em: ${new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' })}  ·  Programa Avança Jundiaí - Etapa 2`;
+                pdf.text(stamp, LW / 2, LH - 4, { align: 'center' });
+            };
+
+            try {
+                // ── PAGE 1: COVER (retrato A4) ─────────────────────────
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const PW  = pdf.internal.pageSize.getWidth();
+                const PH  = pdf.internal.pageSize.getHeight();
+
+                pdf.setFillColor(7, 35, 128);
                 pdf.rect(0, 0, PW, PH, 'F');
 
                 // Logo bar
                 pdf.setFillColor(255, 255, 255);
                 pdf.rect(0, 0, PW, 28, 'F');
 
-                // Logos via image fetch helper
-                const addImgFromUrl = async (url, x, y, w, h) => {
-                    try {
-                        const res  = await fetch(url);
-                        const blob = await res.blob();
-                        const b64  = await new Promise(r => {
-                            const rd = new FileReader();
-                            rd.onload = () => r(rd.result);
-                            rd.readAsDataURL(blob);
-                        });
-                        const fmt = url.toLowerCase().includes('.png') ? 'PNG' : 'JPEG';
-                        pdf.addImage(b64, fmt, x, y, w, h);
-                    } catch (_) { /* silently skip if CORS fails */ }
-                };
+                // Load logos in parallel
+                const [b64POE, b64Jundiai, b64CAF] = await Promise.all([
+                    toBase64(CONFIG.IMAGES.logoPOE),
+                    toBase64(CONFIG.IMAGES.logoJundiai),
+                    toBase64(CONFIG.IMAGES.logoCAF)
+                ]);
+                if (b64POE)     pdf.addImage(b64POE,     'PNG', 8,       4, 30, 18);
+                if (b64Jundiai) pdf.addImage(b64Jundiai, 'PNG', PW/2-18, 2, 36, 24);
+                if (b64CAF)     pdf.addImage(b64CAF,     'PNG', PW-46,   4, 38, 20);
 
-                await addImgFromUrl(CONFIG.IMAGES.logoPOE,     8,  4, 30, 18);
-                await addImgFromUrl(CONFIG.IMAGES.logoJundiai, PW/2-18, 2, 36, 24);
-                await addImgFromUrl(CONFIG.IMAGES.logoCAF,     PW-46, 4, 38, 20);
-
-                // Cover title
                 pdf.setTextColor(255, 255, 255);
                 pdf.setFont('helvetica', 'bold');
                 pdf.setFontSize(18);
@@ -1071,70 +1153,84 @@ const DashboardApp = (() => {
                 pdf.text('Relatório de Performance Contratual', PW/2, 65, { align:'center' });
 
                 // Contract info box
-                pdf.setFillColor(255, 255, 255, 0.08);
                 pdf.setDrawColor(255, 255, 255);
                 pdf.setLineWidth(0.4);
-                pdf.roundedRect(14, 80, PW-28, 60, 4, 4, 'FD');
+                pdf.setFillColor(20, 50, 140);
+                pdf.roundedRect(14, 78, PW-28, 68, 4, 4, 'FD');
 
                 pdf.setTextColor(255, 255, 255);
                 pdf.setFont('helvetica', 'bold');
                 pdf.setFontSize(12);
-                pdf.text(`Contrato: ${contractId}`, 20, 94);
-                pdf.text(`Objeto: ${data.objeto}`, 20, 104);
-
+                pdf.text(`Contrato: ${contractId}`, 20, 92);
+                pdf.text(`Objeto: ${data.objeto}`, 20, 102);
                 pdf.setFont('helvetica', 'normal');
                 pdf.setFontSize(10);
-                pdf.text(`Empresa: ${data.empresa}`, 20, 114);
-                pdf.text(`Valor Total: ${Utils.formatCurrency(data.valorAtual)}`, 20, 122);
+                pdf.text(`Empresa: ${data.empresa}`, 20, 112);
+                pdf.text(`Valor Total: ${Utils.formatCurrency(data.valorAtual)}`, 20, 120);
                 if (data.predicted_start_date && data.predicted_start_date !== 'N/A') {
-                    pdf.text(`Início: ${data.predicted_start_date}   Fim: ${data.predicted_end_date}`, 20, 130);
+                    pdf.text(`Início: ${data.predicted_start_date}   ·   Fim: ${data.predicted_end_date}`, 20, 128);
                 }
 
-                // Progress bar on cover
+                // Progress bar
                 const execValues = (data.grafico?.executado || []).filter(v => v !== null);
                 if (execValues.length) {
-                    const pct = Math.min(100, (execValues[execValues.length-1] / data.valorAtual) * 100);
-                    pdf.setFontSize(10);
+                    const pct      = Math.min(100, (execValues[execValues.length-1] / data.valorAtual) * 100);
+                    const barRGB   = pct >= 80 ? [0,123,61] : pct >= 40 ? [230,139,0] : [184,4,4];
+                    pdf.setFontSize(9);
                     pdf.setTextColor(180, 210, 255);
-                    pdf.text(`Progresso financeiro: ${pct.toFixed(1)}%`, 20, 145);
-                    pdf.setFillColor(255, 255, 255, 0.15);
-                    pdf.roundedRect(20, 149, PW-40, 5, 2, 2, 'F');
-                    const barColor = pct >= 80 ? [0,123,61] : pct >= 40 ? [230,139,0] : [184,4,4];
-                    pdf.setFillColor(...barColor);
-                    pdf.roundedRect(20, 149, (PW-40) * pct/100, 5, 2, 2, 'F');
+                    pdf.text(`Progresso financeiro: ${pct.toFixed(1)}%`, 20, 139);
+                    pdf.setFillColor(255,255,255,0.15);
+                    pdf.roundedRect(20, 142, PW-40, 5, 2, 2, 'F');
+                    pdf.setFillColor(...barRGB);
+                    pdf.roundedRect(20, 142, (PW-40)*pct/100, 5, 2, 2, 'F');
                 }
 
                 if (data.observacoes) {
-                    pdf.setFontSize(9);
+                    pdf.setFontSize(8);
                     pdf.setTextColor(255, 220, 100);
-                    const lines = pdf.splitTextToSize(`Obs: ${data.observacoes}`, PW - 40);
-                    pdf.text(lines, 20, 162);
+                    const lines = pdf.splitTextToSize(`⚠ ${data.observacoes}`, PW-40);
+                    pdf.text(lines, 20, 152);
                 }
 
-                // Date stamp
                 pdf.setFontSize(8);
                 pdf.setTextColor(140, 170, 220);
-                pdf.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'})}`, PW/2, PH - 12, { align:'center' });
+                pdf.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'})}`, PW/2, PH-12, { align:'center' });
 
-                // ── PAGE 2: CHART ──────────────────────────────────────
+
+                // ── PAGE 2: CHART (paisagem A4) ────────────────────────
                 if (state.chartInstance) {
-                    pdf.addPage();
+                    pdf.addPage('a4', 'landscape');   // 297 × 210 mm
+                    const LW = pdf.internal.pageSize.getWidth();   // 297
+                    const LH = pdf.internal.pageSize.getHeight();  // 210
+
                     pdf.setFillColor(245, 248, 255);
-                    pdf.rect(0, 0, PW, PH, 'F');
+                    pdf.rect(0, 0, LW, LH, 'F');
 
-                    pdf.setTextColor(7, 35, 128);
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.setFontSize(13);
-                    pdf.text('Gráfico Comparativo: Previsto vs Executado', PW/2, 16, { align:'center' });
+                    // Logos no header paisagem (reutiliza as base64 já carregadas)
+                    pdf.setFillColor(255, 255, 255);
+                    pdf.rect(0, 0, LW, 18, 'F');
+                    if (b64POE)     pdf.addImage(b64POE,     'PNG', 6,       1, 22, 14);
+                    if (b64Jundiai) pdf.addImage(b64Jundiai, 'PNG', LW/2-14, 0, 28, 18);
+                    if (b64CAF)     pdf.addImage(b64CAF,     'PNG', LW-36,   1, 30, 15);
 
+                    drawLandscapeHeader(pdf, LW, 'Gráfico Comparativo · Previsto vs Executado');
+
+                    // Chart image — ocupa quase toda a página
                     const chartCanvas = document.getElementById('mainChart');
                     const chartImg    = state.chartInstance.toBase64Image('image/png', 1.0);
-                    const imgW        = PW - 20;
-                    const imgH        = (chartCanvas.height * imgW) / chartCanvas.width;
-                    pdf.addImage(chartImg, 'PNG', 10, 24, imgW, Math.min(imgH, 120));
+                    const maxW        = LW - 20;
+                    const maxH        = LH - 42;  // deixa espaço para header + footer
+                    const ratio       = chartCanvas.width / chartCanvas.height;
+                    const imgW        = Math.min(maxW, maxH * ratio);
+                    const imgH        = imgW / ratio;
+                    const imgX        = (LW - imgW) / 2;
+
+                    pdf.addImage(chartImg, 'PNG', imgX, 33, imgW, imgH);
+                    drawFooter(pdf, LW, LH);
                 }
 
-                // ── PAGE 3: TABLE ──────────────────────────────────────
+
+                // ── PAGE 3+: TABLE (paisagem A4) ──────────────────────
                 let table = null;
                 if (!document.getElementById('comparativeTableContainer').classList.contains('hidden')) {
                     table = document.querySelector('#comparativeTableContainer table');
@@ -1143,53 +1239,79 @@ const DashboardApp = (() => {
                 }
 
                 if (table) {
-                    pdf.addPage();
-                    pdf.setFillColor(245, 248, 255);
-                    pdf.rect(0, 0, PW, PH, 'F');
-
-                    pdf.setTextColor(7, 35, 128);
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.setFontSize(13);
-                    pdf.text('Tabela de Medições', PW/2, 14, { align:'center' });
-
-                    // Header row
-                    const headers = [...table.querySelectorAll('thead th')].map(th => th.innerText.trim());
-                    const rows    = [...table.querySelectorAll('tbody tr')].map(tr =>
+                    const headers  = [...table.querySelectorAll('thead th')].map(th => th.innerText.trim());
+                    const dataRows = [...table.querySelectorAll('tbody tr')].map(tr =>
                         [...tr.querySelectorAll('td')].map(td => td.innerText.trim())
                     );
 
-                    const colW    = (PW - 20) / headers.length;
-                    let   curY    = 22;
-                    const rowH    = 8;
-                    const fontSize = Math.max(6, Math.min(8, 60 / headers.length));
+                    pdf.addPage('a4', 'landscape');
+                    const LW = pdf.internal.pageSize.getWidth();
+                    const LH = pdf.internal.pageSize.getHeight();
 
-                    // Header bg
-                    pdf.setFillColor(7, 35, 128);
-                    pdf.rect(10, curY, PW-20, rowH, 'F');
-                    pdf.setTextColor(255, 255, 255);
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.setFontSize(fontSize);
-                    headers.forEach((h, i) => {
-                        pdf.text(h, 10 + colW*i + colW/2, curY + 5.5, { align:'center', maxWidth: colW - 2 });
-                    });
-                    curY += rowH;
+                    const startNewTablePage = () => {
+                        pdf.setFillColor(245, 248, 255);
+                        pdf.rect(0, 0, LW, LH, 'F');
+                        if (b64POE)     pdf.addImage(b64POE,     'PNG', 6,       1, 22, 14);
+                        if (b64Jundiai) pdf.addImage(b64Jundiai, 'PNG', LW/2-14, 0, 28, 18);
+                        if (b64CAF)     pdf.addImage(b64CAF,     'PNG', LW-36,   1, 30, 15);
+                        drawLandscapeHeader(pdf, LW, 'Tabela de Medições');
+                        drawFooter(pdf, LW, LH);
+                    };
+
+                    startNewTablePage();
+
+                    const MARGIN   = 10;
+                    const tableW   = LW - MARGIN * 2;
+                    const colW     = tableW / headers.length;
+                    const rowH     = 9;
+                    const fontSize = Math.max(6.5, Math.min(8.5, 58 / headers.length));
+                    let curY       = 34;
+
+                    // Draw header row
+                    const drawTableHeader = () => {
+                        pdf.setFillColor(7, 35, 128);
+                        pdf.rect(MARGIN, curY, tableW, rowH, 'F');
+                        pdf.setTextColor(255, 255, 255);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setFontSize(fontSize);
+                        headers.forEach((h, i) => {
+                            pdf.text(h, MARGIN + colW*i + colW/2, curY + 6, { align:'center', maxWidth: colW - 2 });
+                        });
+                        curY += rowH;
+                    };
+                    drawTableHeader();
 
                     pdf.setFont('helvetica', 'normal');
-                    rows.forEach((row, ri) => {
-                        if (curY + rowH > PH - 15) {
-                            pdf.addPage();
-                            pdf.setFillColor(245, 248, 255);
-                            pdf.rect(0, 0, PW, PH, 'F');
-                            curY = 12;
+                    dataRows.forEach((row, ri) => {
+                        // Quebra de página — guarda espaço para footer
+                        if (curY + rowH > LH - 12) {
+                            pdf.addPage('a4', 'landscape');
+                            startNewTablePage();
+                            curY = 34;
+                            drawTableHeader();
                         }
-                        pdf.setFillColor(ri % 2 === 0 ? 240 : 250, ri % 2 === 0 ? 244 : 252, 255);
-                        pdf.rect(10, curY, PW-20, rowH, 'F');
-                        pdf.setTextColor(50, 50, 80);
+
+                        // Zebra striping
+                        pdf.setFillColor(ri % 2 === 0 ? 235 : 248, ri % 2 === 0 ? 240 : 250, ri % 2 === 0 ? 255 : 255);
+                        pdf.rect(MARGIN, curY, tableW, rowH, 'F');
+
+                        // Light border between rows
+                        pdf.setDrawColor(210, 215, 230);
+                        pdf.setLineWidth(0.2);
+                        pdf.line(MARGIN, curY + rowH, MARGIN + tableW, curY + rowH);
+
+                        pdf.setTextColor(40, 45, 80);
+                        pdf.setFontSize(fontSize);
                         row.forEach((cell, ci) => {
-                            pdf.text(cell, 10 + colW*ci + colW/2, curY + 5.5, { align:'center', maxWidth: colW - 2 });
+                            pdf.text(cell, MARGIN + colW*ci + colW/2, curY + 6, { align:'center', maxWidth: colW - 2 });
                         });
                         curY += rowH;
                     });
+
+                    // Bottom border of last row
+                    pdf.setDrawColor(7, 35, 128);
+                    pdf.setLineWidth(0.5);
+                    pdf.line(MARGIN, curY, MARGIN + tableW, curY);
                 }
 
                 pdf.save(`Relatorio_${contractId.replace(/\s/g,'_')}.pdf`);
