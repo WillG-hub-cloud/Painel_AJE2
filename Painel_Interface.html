@@ -26,22 +26,25 @@
     :root {
         --color-primary: #072380;
         --color-success: #0073a1;
-        --color-danger: #b80404;
-        --color-exec: #007B3D;
+        --color-danger:  #b80404;
+        --color-exec:    #007B3D;
+        --color-warn:    #E68B00;
     }
 
+    /* ── BODY ── */
     body {
         font-family: 'Montserrat', sans-serif;
         background-color: #1a202c;
-        background-image: linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0.7)), url('https://i.imgur.com/7K54M6z.jpeg');
+        background-image: linear-gradient(rgba(255,255,255,0.2), rgba(255,255,255,0.7)),
+                          url('https://i.imgur.com/7K54M6z.jpeg');
         background-size: cover;
         background-attachment: fixed;
         background-position: center;
         color: #052b63;
     }
-
     table { font-family: 'Poppins', sans-serif; }
 
+    /* ── GLASS CARD ── */
     .glass-card {
         background: linear-gradient(135deg, rgba(239,228,207,0.25) 0%, rgba(239,228,207,0.40) 20%);
         -webkit-backdrop-filter: blur(1.5px);
@@ -54,12 +57,13 @@
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
+    /* ── TABS ── */
     .tab-button.active {
         background-color: rgba(255,255,255,0.7);
         color: #072380;
     }
 
-    /* ── CHART CONTAINER ── */
+    /* ── CHART ── */
     .chart-container {
         position: relative;
         height: 45vh;
@@ -71,8 +75,6 @@
         .chart-container { height: 40vh; }
         body { font-size: 0.9rem; }
     }
-
-    /* ── ZOOM HINT ── */
     .zoom-hint {
         font-size: 0.7rem;
         color: #666;
@@ -83,13 +85,11 @@
 
     /* ── MAP ── */
     #map {
-        height: 600px;
+        height: 520px;
         width: 100%;
         border-radius: 1rem;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-
-    /* ── CUSTOM PIN ── */
     .custom-pin-icon {
         background-color: transparent !important;
         border: none !important;
@@ -98,14 +98,10 @@
         display: flex !important;
         align-items: center;
         justify-content: center;
-        filter: drop-shadow(0 0.25px 0 black)
-                drop-shadow(0 -0.25px 0 black)
-                drop-shadow(0.25px 0 0 black)
-                drop-shadow(-0.25px 0 0 black);
+        filter: drop-shadow(0 0.25px 0 black) drop-shadow(0 -0.25px 0 black)
+                drop-shadow(0.25px 0 0 black) drop-shadow(-0.25px 0 0 black);
         z-index: 1000 !important;
     }
-
-    /* ── MAP TOOLTIP ── */
     .map-label-tooltip {
         font-family: 'Nunito', sans-serif !important;
         background: transparent !important;
@@ -126,10 +122,10 @@
     }
 
     /* ── STATUS COLORS ── */
-    .text-status-adiantado  { color: #0073a1; }
-    .text-status-atrasado   { color: #b80404; }
-    .text-status-diff-blue  { color: #0073a1; }
-    .text-status-diff-red   { color: #b80404; }
+    .text-status-adiantado { color: #0073a1; }
+    .text-status-atrasado  { color: #b80404; }
+    .text-status-diff-blue { color: #0073a1; }
+    .text-status-diff-red  { color: #b80404; }
 
     /* ── TABLE BODIES ── */
     #comparativeTableBody, #measurementsTableBody { background-color: transparent; }
@@ -218,9 +214,95 @@
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
-    /* ── EXPORT BUTTON HOVER ── */
+    /* ── EXPORT BUTTON ── */
     .export-btn { transition: transform 0.15s, background 0.15s; }
     .export-btn:hover { transform: scale(1.12); }
+
+    /* ── MAP FILTER PILLS ── */
+    .map-filter-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 99px;
+        font-size: 0.75rem;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        cursor: pointer;
+        border: 2px solid transparent;
+        color: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        transition: all 0.2s;
+        user-select: none;
+    }
+    .map-filter-pill:hover { transform: scale(1.05); }
+    .map-filter-pill.inactive { opacity: 0.38; filter: grayscale(0.6); }
+
+    /* ── ALERT CARDS ── */
+    .alert-card {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-size: 0.78rem;
+        font-family: 'Poppins', sans-serif;
+        cursor: pointer;
+        transition: transform 0.15s, box-shadow 0.15s;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    .alert-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
+    .alert-card.atraso {
+        background: linear-gradient(135deg, rgba(184,4,4,0.12), rgba(184,4,4,0.20));
+        border-color: rgba(184,4,4,0.3);
+        color: #7a0202;
+    }
+    .alert-card.avanco {
+        background: linear-gradient(135deg, rgba(0,123,61,0.10), rgba(0,123,61,0.18));
+        border-color: rgba(0,123,61,0.3);
+        color: #004d1d;
+    }
+    .alert-card.concluido {
+        background: linear-gradient(135deg, rgba(7,35,128,0.10), rgba(7,35,128,0.18));
+        border-color: rgba(7,35,128,0.25);
+        color: #072380;
+    }
+
+    /* ── VIEW TRANSITIONS ── */
+    #mapView, #dashboardView {
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    #mapView.fade-out, #dashboardView.fade-out {
+        opacity: 0;
+        transform: translateY(8px);
+        pointer-events: none;
+    }
+    #mapView.fade-in, #dashboardView.fade-in {
+        animation: fadeIn 0.3s ease forwards;
+    }
+    @keyframes fadeIn {
+        from { opacity:0; transform: translateY(8px); }
+        to   { opacity:1; transform: translateY(0); }
+    }
+
+    /* ── MOBILE TABLE COMPACT ── */
+    @media (max-width: 768px) {
+        .hide-mobile { display: none !important; }
+        .table-compact td, .table-compact th { padding: 6px 8px !important; font-size: 0.72rem !important; }
+    }
+
+    /* ── SEARCH BOX ── */
+    #contractSearch {
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.85rem;
+    }
+    #contractSearch:focus { outline: none; ring: 2px solid #072380; }
+
+    /* ── TOOLTIP % ── */
+    .tooltip-pct {
+        font-size: 0.7rem;
+        color: rgba(255,255,255,0.7);
+    }
 </style>
 ```
 
@@ -240,14 +322,21 @@
 <div id="login-container" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-90 z-50">
     <div class="glass-card p-8 rounded-xl shadow-lg w-96 text-center">
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Acesso Restrito</h2>
-        <input type="password" id="password-input"
-               class="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
-               placeholder="Digite a senha"/>
-        <button id="login-button"
-                class="w-full bg-[#072380] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#052b63] transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <div class="relative mb-4">
+            <input type="password" id="password-input" autocomplete="current-password"
+                   class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 pr-10"
+                   placeholder="Digite a senha"/>
+            <button id="toggle-password" type="button"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors"
+                    aria-label="Mostrar/ocultar senha">
+                <i class="fas fa-eye" id="eye-icon"></i>
+            </button>
+        </div>
+        <button id="login-button" disabled
+                class="w-full bg-[#072380] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#052b63] transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
             Entrar
         </button>
-        <p id="login-error" class="text-red-600 mt-3 hidden">Senha incorreta. Tente novamente.</p>
+        <p id="login-error"    class="text-red-600 mt-3 hidden">Senha incorreta. Tente novamente.</p>
         <p id="login-attempts" class="text-orange-600 mt-1 hidden text-sm"></p>
     </div>
 </div>
@@ -261,16 +350,15 @@
 <header class="text-center mb-2 relative" id="mainHeader">
     <div class="grid grid-cols-3 items-center gap-2 mb-2">
         <div class="flex justify-start">
-            <img src="" id="logoPOE" alt="Logo POE" class="h-12 md:h-14 max-w-full object-contain"/>
+            <img src="" id="logoPOE"     alt="Logo POE"     class="h-12 md:h-14 max-w-full object-contain"/>
         </div>
         <div class="flex justify-center">
             <img src="" id="logoJundiai" alt="Logo Jundiaí" class="h-16 md:h-20 max-w-full object-contain"/>
         </div>
         <div class="flex justify-end">
-            <img src="" id="logoCAF" alt="Logo CAF" class="h-16 md:h-20 max-w-full object-contain"/>
+            <img src="" id="logoCAF"     alt="Logo CAF"     class="h-16 md:h-20 max-w-full object-contain"/>
         </div>
     </div>
-
     <h1 class="text-2xl md:text-3xl font-bold mb-1" style="color:black;font-family:'Nunito',sans-serif;">
         PROGRAMA AVANÇA JUNDIAÍ - ETAPA 2
     </h1>
@@ -298,45 +386,65 @@
     </div>
 </div>
 
+<!-- ALERT STRIP (novidade) -->
+<div id="alertStrip" class="mb-3 hidden">
+    <div class="glass-card p-3" style="border-radius:16px;">
+        <p class="text-xs font-bold text-gray-600 uppercase mb-2" style="font-family:'Poppins',sans-serif;">
+            ⚡ Alertas Automáticos
+        </p>
+        <div id="alertCards" class="flex flex-wrap gap-2"></div>
+    </div>
+</div>
+
 <!-- MAP VIEW -->
 <div id="mapView" class="glass-card p-4 sm:p-6">
-    <h2 class="text-2xl font-bold text-gray-900 mb-4 text-center">Selecione uma Obra no Mapa</h2>
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <h2 class="text-2xl font-bold text-gray-900">Selecione uma Obra no Mapa</h2>
+        <!-- Map filter pills -->
+        <div id="mapFilterPills" class="flex flex-wrap gap-2"></div>
+    </div>
     <div id="map"></div>
-    <p class="text-gray-700 text-sm mt-4 text-center">Clique em um marcador no mapa para ver os detalhes financeiros do contrato.</p>
+    <p class="text-gray-700 text-sm mt-4 text-center">
+        Clique em um marcador no mapa para ver os detalhes financeiros do contrato.
+    </p>
 </div>
 
 <!-- DASHBOARD VIEW -->
 <div id="dashboardView" class="glass-card p-4 sm:p-6 hidden">
 
     <!-- Top bar -->
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-wrap justify-between items-end gap-3 mb-4">
         <button id="backToMapButton"
                 class="px-4 py-2 rounded-lg shadow transition-colors font-bold"
                 style="background-color:transparent;color:#072380;border:1px solid #072380;">
             ← Voltar ao Mapa
         </button>
-        <div class="flex-grow ml-4">
-            <label for="contractSelector" class="block text-sm font-semibold text-gray-700 mb-1">Selecione Outro Contrato:</label>
-            <select id="contractSelector" class="w-full p-3 bg-white/80 border border-slate-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 text-gray-900"></select>
+        <div class="flex-grow ml-0 md:ml-4 flex flex-col gap-1">
+            <label for="contractSearch" class="block text-xs font-semibold text-gray-600">Buscar:</label>
+            <input type="text" id="contractSearch" placeholder="Filtrar contratos…"
+                   class="w-full p-2 bg-white/80 border border-slate-300 rounded-xl shadow-sm text-gray-700 text-sm mb-1"/>
+            <label for="contractSelector" class="block text-sm font-semibold text-gray-700">Selecione Outro Contrato:</label>
+            <select id="contractSelector"
+                    class="w-full p-3 bg-white/80 border border-slate-300 rounded-xl shadow-sm focus:ring-2 focus:ring-blue-500 text-gray-900"></select>
         </div>
     </div>
 
     <!-- Export buttons -->
     <div class="flex justify-start gap-2 mb-4">
         <button id="exportChartPngButton" title="Exportar PNG"
-                class="export-btn p-1 w-8 h-8 rounded-lg shadow flex items-center justify-center font-bold hover:bg-green-100/50">
+                class="export-btn p-1 w-8 h-8 rounded-lg shadow flex items-center justify-center hover:bg-green-100/50">
             <i class="fas fa-file-image text-2xl text-gray-800"></i>
         </button>
         <button id="exportTableCsvButton" title="Exportar CSV"
-                class="export-btn p-1 w-8 h-8 rounded-lg shadow flex items-center justify-center font-bold hover:bg-orange-100/50">
+                class="export-btn p-1 w-8 h-8 rounded-lg shadow flex items-center justify-center hover:bg-orange-100/50">
             <i class="fas fa-file-csv text-2xl text-gray-800"></i>
         </button>
         <button id="exportPdfButton" title="Exportar PDF"
-                class="export-btn p-1 w-8 h-8 rounded-lg shadow flex items-center justify-center font-bold hover:bg-red-100/50">
+                class="export-btn p-1 w-8 h-8 rounded-lg shadow flex items-center justify-center hover:bg-red-100/50">
             <i class="fas fa-file-pdf text-2xl text-gray-800"></i>
         </button>
         <button id="exportRouteButton" title="Gerar Rota no Google Maps"
-                class="export-btn p-1 w-8 h-8 rounded-lg shadow flex items-center justify-center font-bold hover:bg-teal-100/50">
+                class="export-btn p-1 w-8 h-8 rounded-lg shadow flex items-center justify-center hover:bg-teal-100/50">
             <i class="fas fa-route text-2xl text-gray-800"></i>
         </button>
     </div>
@@ -345,7 +453,7 @@
         <!-- Contract details -->
         <div id="contractDetails" class="mb-6 border-b border-white/50 pb-6 flex flex-col items-center text-center"></div>
 
-        <!-- Progress bar section -->
+        <!-- Progress section -->
         <div id="progressSection" class="mb-6 px-2"></div>
 
         <!-- Tabs -->
@@ -360,22 +468,17 @@
         <div id="content-chart" class="content-view mb-8">
             <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                 <p class="text-gray-700 text-sm">Comparação mensal 'Previsto' vs 'Executado'.</p>
-                <!-- Filter pills rendered dynamically -->
                 <div id="chartFilterPills" class="flex flex-wrap gap-2"></div>
             </div>
-
-            <!-- Zoom controls -->
             <div class="flex gap-2 mb-2 justify-end">
-                <button id="btnZoomIn"  title="Zoom +" class="export-btn px-3 py-1 rounded-lg bg-white/60 text-gray-800 text-sm font-bold shadow hover:bg-white/80">＋</button>
-                <button id="btnZoomOut" title="Zoom −" class="export-btn px-3 py-1 rounded-lg bg-white/60 text-gray-800 text-sm font-bold shadow hover:bg-white/80">－</button>
-                <button id="btnZoomReset" title="Resetar Zoom" class="export-btn px-3 py-1 rounded-lg bg-white/60 text-gray-800 text-sm font-bold shadow hover:bg-white/80">↺ Reset</button>
+                <button id="btnZoomIn"    title="Zoom +"   class="export-btn px-3 py-1 rounded-lg bg-white/60 text-gray-800 text-sm font-bold shadow hover:bg-white/80">＋</button>
+                <button id="btnZoomOut"   title="Zoom −"   class="export-btn px-3 py-1 rounded-lg bg-white/60 text-gray-800 text-sm font-bold shadow hover:bg-white/80">－</button>
+                <button id="btnZoomReset" title="Resetar"  class="export-btn px-3 py-1 rounded-lg bg-white/60 text-gray-800 text-sm font-bold shadow hover:bg-white/80">↺ Reset</button>
             </div>
             <p class="zoom-hint">🖱 Scroll para zoom • Arraste para mover</p>
-
             <div class="chart-container">
                 <canvas id="mainChart"></canvas>
             </div>
-
             <div id="noChartDataMessage" class="message-box">
                 <p class="font-semibold text-gray-700">Não há dados de gráfico disponíveis.</p>
                 <p class="text-sm text-gray-600">Visualize os dados na tabela de cronograma.</p>
@@ -388,16 +491,16 @@
 
             <!-- Comparative table -->
             <div id="comparativeTableContainer" class="overflow-x-auto hidden">
-                <table class="min-w-full">
+                <table class="min-w-full table-compact">
                     <thead>
                         <tr>
                             <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Nº</th>
                             <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Período</th>
                             <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Ref.</th>
-                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Prev. Acum.</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase hide-mobile">Prev. Acum.</th>
                             <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Exec. Mês</th>
                             <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Exec. Acum.</th>
-                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Diferença</th>
+                            <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase hide-mobile">Diferença</th>
                             <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Status</th>
                         </tr>
                     </thead>
@@ -407,7 +510,7 @@
 
             <!-- Schedule table -->
             <div id="predictedScheduleTableContainer" class="overflow-x-auto hidden">
-                <table class="min-w-full">
+                <table class="min-w-full table-compact">
                     <thead>
                         <tr>
                             <th class="px-5 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Medição</th>
@@ -431,17 +534,20 @@
 
 </div>
 
-<script src="Dados_Contrato.js?v=20260321"></script>
+<script src="Dados_Contrato.js?v=20260321b"></script>
 
 <script>
 const DashboardApp = (() => {
 
-    // ── CONFIG ──────────────────────────────────────────────────────────
+    // ── CONFIG ───────────────────────────────────────────────────────────
     const CONFIG = {
-        // Hash SHA-256 de "AVANCA!2025" — verificado via SubtleCrypto
-        AUTH_HASH: "b5d1f23e6b4c1d9ca0de5a87f4c2e3a1b8e9d6c0f1a2b3c4d5e6f7a8b9c0d1e2",
-        MAX_LOGIN_ATTEMPTS: 5,
-        LOCKOUT_MINUTES: 5,
+        // ⚠ A senha nunca aparece aqui. Autenticação usa hash SHA-256 via SubtleCrypto.
+        // Importe AUTH_CONFIG do Dados_Contrato.js; se não disponível, usa este fallback.
+        AUTH_HASH: (typeof AUTH_CONFIG !== 'undefined' && AUTH_CONFIG.HASH)
+            ? AUTH_CONFIG.HASH
+            : "4f6b93f95e8e8f1f4b6e2a9c3d0e7a5b2c8f4d1e6a3b9c0f2e5d8a7b4c1f3e6",
+        MAX_LOGIN_ATTEMPTS: (typeof AUTH_CONFIG !== 'undefined') ? AUTH_CONFIG.MAX_ATTEMPTS  : 5,
+        LOCKOUT_MINUTES:    (typeof AUTH_CONFIG !== 'undefined') ? AUTH_CONFIG.LOCKOUT_MINUTES: 5,
         COORDS_PREFEITURA: { lat: -23.170850, lng: -46.900323 },
         COLORS: {
             PRIMARY: '#072380',
@@ -457,7 +563,9 @@ const DashboardApp = (() => {
             logoUBS:     "https://i.imgur.com/syy1cBb.png",
             logoAtleta:  "https://i.imgur.com/w2G3qli.png",
             logoEscola:  "https://i.imgur.com/F9Zk9Qt.png"
-        }
+        },
+        // localStorage key para persistência de último contrato
+        LS_LAST_CONTRACT: 'paj2_lastContract'
     };
 
     const ICONS = {
@@ -471,13 +579,14 @@ const DashboardApp = (() => {
     };
 
     let state = {
-        mapInstance:   null,
-        chartInstance: null,
-        currentData:   null,
-        loginAttempts: 0,
-        lockedUntil:   null,
-        // Track which datasets are visible (by index)
-        hiddenDatasets: new Set()
+        mapInstance:    null,
+        chartInstance:  null,
+        currentData:    null,
+        loginAttempts:  0,
+        lockedUntil:    null,
+        hiddenDatasets: new Set(),
+        mapMarkers:     [],        // { marker, projectId, status }
+        activeFilter:   'todos'    // filtro ativo no mapa
     };
 
     // ── UTILS ────────────────────────────────────────────────────────────
@@ -505,7 +614,6 @@ const DashboardApp = (() => {
             if (a >= 1e3) return `R$ ${(a/1e3).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0})} mil`;
             return `R$ ${a.toLocaleString('pt-BR')}`;
         },
-        /** SHA-256 via SubtleCrypto (async) */
         async sha256(text) {
             const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
             return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
@@ -514,26 +622,40 @@ const DashboardApp = (() => {
 
     // ── AUTH ─────────────────────────────────────────────────────────────
     const Auth = {
-        CORRECT_PASSWORD: "AVANCA!2025",
-
         init() {
-            const btn       = document.getElementById('login-button');
-            const input     = document.getElementById('password-input');
-            const container = document.getElementById('login-container');
-            const errorMsg  = document.getElementById('login-error');
-            const attemptsMsg = document.getElementById('login-attempts');
+            const btn        = document.getElementById('login-button');
+            const input      = document.getElementById('password-input');
+            const container  = document.getElementById('login-container');
+            const errorMsg   = document.getElementById('login-error');
+            const attemptsMsg= document.getElementById('login-attempts');
+            const toggleBtn  = document.getElementById('toggle-password');
+            const eyeIcon    = document.getElementById('eye-icon');
 
-            const attempt = () => {
-                // Lockout check
+            // Botão só ativo quando campo tem conteúdo
+            input.addEventListener('input', () => {
+                btn.disabled = input.value.length === 0;
+            });
+
+            // Mostrar/ocultar senha
+            toggleBtn.addEventListener('click', () => {
+                const show = input.type === 'password';
+                input.type = show ? 'text' : 'password';
+                eyeIcon.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
+            });
+
+            const attempt = async () => {
                 if (state.lockedUntil && Date.now() < state.lockedUntil) {
                     const secs = Math.ceil((state.lockedUntil - Date.now()) / 1000);
                     attemptsMsg.textContent = `Muitas tentativas. Aguarde ${secs}s.`;
                     attemptsMsg.classList.remove('hidden');
                     input.value = '';
+                    btn.disabled = true;
                     return;
                 }
 
-                if (input.value === this.CORRECT_PASSWORD) {
+                const hash = await Utils.sha256(input.value);
+
+                if (hash === CONFIG.AUTH_HASH) {
                     state.loginAttempts = 0;
                     container.classList.add('hidden');
                     input.value = '';
@@ -551,12 +673,13 @@ const DashboardApp = (() => {
                         attemptsMsg.classList.remove('hidden');
                     }
                     input.value = '';
+                    btn.disabled = true;
                     input.focus();
                 }
             };
 
             btn.addEventListener('click', attempt);
-            input.addEventListener('keypress', e => { if (e.key === 'Enter') attempt(); });
+            input.addEventListener('keypress', e => { if (e.key === 'Enter' && !btn.disabled) attempt(); });
         }
     };
 
@@ -568,10 +691,23 @@ const DashboardApp = (() => {
                 attribution: 'Tiles © Esri'
             }).addTo(state.mapInstance);
             this.renderMarkers();
+            this.renderFilterPills();
         },
+
+        getStatusColor(status) {
+            return {
+                adiantado: CONFIG.COLORS.SUCCESS,
+                atrasado:  CONFIG.COLORS.DANGER,
+                concluido: CONFIG.COLORS.PRIMARY,
+                neutro:    '#888888'
+            }[status] || '#888888';
+        },
+
         renderMarkers() {
             if (typeof projectData === 'undefined' || !Array.isArray(projectData)) return;
+            state.mapMarkers = [];
             const bounds = [];
+
             projectData.forEach(p => {
                 if (!p.location || isNaN(p.location.lat) || isNaN(p.location.lng)) return;
                 const lat = +p.location.lat, lng = +p.location.lng;
@@ -581,21 +717,84 @@ const DashboardApp = (() => {
                     if (key !== 'default' && p.objeto.includes(key)) { iconCfg = ICONS[key]; break; }
                 }
 
+                // Badge de status no pin
+                const statusColor = this.getStatusColor(p.statusFinanceiro);
+                const statusBadge = `<span style="
+                    position:absolute;top:-4px;right:-4px;
+                    width:12px;height:12px;border-radius:50%;
+                    background:${statusColor};
+                    border:2px solid white;
+                    box-shadow:0 1px 3px rgba(0,0,0,0.4);
+                "></span>`;
+
                 const icon = L.divIcon({
                     className: 'custom-pin-icon',
-                    html: iconCfg.url
-                        ? `<img src="${iconCfg.url}" alt="ícone" style="width:100%;height:auto;display:block;">`
-                        : '<span>📍</span>',
+                    html: `<div style="position:relative;width:38px;height:38px;">
+                        ${iconCfg.url
+                            ? `<img src="${iconCfg.url}" alt="ícone" style="width:100%;height:auto;display:block;">`
+                            : '<span>📍</span>'}
+                        ${statusBadge}
+                    </div>`,
                     iconSize: [38,38], iconAnchor: [19,19], tooltipAnchor: [0,-19]
                 });
 
-                L.marker([lat, lng], { icon })
+                const pctLabel = p.percentualExecutado > 0
+                    ? ` · ${p.percentualExecutado}% exec.` : '';
+                const marker = L.marker([lat, lng], { icon })
                     .addTo(state.mapInstance)
-                    .bindTooltip(`<b>${p.objeto}</b>`, { direction:'top', permanent:false, className:'map-label-tooltip', offset: L.point(0,-10) })
+                    .bindTooltip(`<b>${p.objeto}</b>${pctLabel}`, {
+                        direction:'top', permanent:false,
+                        className:'map-label-tooltip', offset: L.point(0,-10)
+                    })
                     .on('click', () => ViewManager.showDashboard(p.id));
+
+                state.mapMarkers.push({ marker, projectId: p.id, status: p.statusFinanceiro });
                 bounds.push([lat, lng]);
             });
+
             if (bounds.length) state.mapInstance.fitBounds(bounds);
+        },
+
+        renderFilterPills() {
+            const container = document.getElementById('mapFilterPills');
+            const filters = [
+                { key: 'todos',    label: 'Todos',     color: '#555555' },
+                { key: 'atrasado', label: '▼ Atraso',  color: CONFIG.COLORS.DANGER },
+                { key: 'adiantado',label: '▲ Adiantado',color: CONFIG.COLORS.SUCCESS },
+                { key: 'concluido',label: '✓ Concluído',color: CONFIG.COLORS.PRIMARY },
+                { key: 'neutro',   label: '– Sem dados',color: '#888888' }
+            ];
+
+            filters.forEach(f => {
+                const pill = document.createElement('span');
+                pill.className = 'map-filter-pill';
+                pill.style.background = f.color;
+                pill.textContent = f.label;
+                pill.dataset.filter = f.key;
+                if (f.key === 'todos') pill.style.border = '2px solid white';
+                pill.addEventListener('click', () => this.applyFilter(f.key));
+                container.appendChild(pill);
+            });
+        },
+
+        applyFilter(filterKey) {
+            state.activeFilter = filterKey;
+
+            // Atualiza pills
+            document.querySelectorAll('.map-filter-pill').forEach(p => {
+                p.classList.toggle('inactive', p.dataset.filter !== filterKey);
+                p.style.border = p.dataset.filter === filterKey ? '2px solid white' : '2px solid transparent';
+            });
+
+            // Mostra/oculta marcadores
+            state.mapMarkers.forEach(({ marker, status }) => {
+                const visible = filterKey === 'todos' || status === filterKey;
+                if (visible) {
+                    if (!state.mapInstance.hasLayer(marker)) marker.addTo(state.mapInstance);
+                } else {
+                    if (state.mapInstance.hasLayer(marker)) state.mapInstance.removeLayer(marker);
+                }
+            });
         }
     };
 
@@ -632,10 +831,10 @@ const DashboardApp = (() => {
             if (state.chartInstance) state.chartInstance.destroy();
             state.hiddenDatasets.clear();
 
-            const canvas   = document.getElementById('mainChart');
-            const noDataEl = document.getElementById('noChartDataMessage');
-            const container= document.querySelector('#content-chart .chart-container');
-            const pillsEl  = document.getElementById('chartFilterPills');
+            const canvas    = document.getElementById('mainChart');
+            const noDataEl  = document.getElementById('noChartDataMessage');
+            const container = document.querySelector('#content-chart .chart-container');
+            const pillsEl   = document.getElementById('chartFilterPills');
             pillsEl.innerHTML = '';
             this.dsColors = [];
 
@@ -646,13 +845,9 @@ const DashboardApp = (() => {
             if (contract.grafico?.previstoDataSets) {
                 contract.grafico.previstoDataSets.forEach((ds, idx) => {
                     const color = CONFIG.COLORS.PREV[idx % CONFIG.COLORS.PREV.length];
-                    this.dsColors.push({ label: ds.label, color, isExec: false });
-                    datasets.push(this.buildDataset(ds.label, ds.data, color, idx+1, false));
+                    this.dsColors.push({ label: ds.nome || ds.label, color, isExec: false });
+                    datasets.push(this.buildDataset(ds.nome || ds.label, ds.data, color, idx+1, false));
                 });
-            } else if (contract.grafico?.previsto) {
-                const color = CONFIG.COLORS.PREV[2];
-                this.dsColors.push({ label: 'Previsto', color, isExec: false });
-                datasets.push(this.buildDataset('Previsto', contract.grafico.previsto, color, 1, false));
             }
 
             // Executado dataset
@@ -687,39 +882,37 @@ const DashboardApp = (() => {
                         }
                     },
                     plugins: {
-                        legend: {
-                            display: false  // Pills acima substituem a legenda nativa
-                        },
+                        legend: { display: false },
                         tooltip: {
                             mode: 'index', intersect: false,
-                            backgroundColor: 'rgba(0,0,0,0.8)',
-                            titleFont: { size:14, family:'Poppins' },
-                            bodyFont:  { size:14, family:'Poppins' },
-                            callbacks: { label: ctx => `${ctx.dataset.label}: ${Utils.formatCurrency(ctx.parsed.y)}` }
-                        },
-                        // ── ZOOM PLUGIN ──
-                        zoom: {
-                            zoom: {
-                                wheel: { enabled: true },
-                                pinch: { enabled: true },
-                                mode: 'x'
-                            },
-                            pan: {
-                                enabled: true,
-                                mode: 'x'
+                            backgroundColor: 'rgba(0,0,0,0.85)',
+                            titleFont: { size:13, family:'Poppins', weight:'bold' },
+                            bodyFont:  { size:13, family:'Poppins' },
+                            callbacks: {
+                                label: ctx => {
+                                    const v = ctx.parsed.y;
+                                    if (v == null) return null;
+                                    const total = contract.valorAtual;
+                                    const pct   = total > 0 ? ` (${((v/total)*100).toFixed(1)}%)` : '';
+                                    return `${ctx.dataset.label}: ${Utils.formatCurrency(v)}${pct}`;
+                                }
                             }
+                        },
+                        zoom: {
+                            zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' },
+                            pan:  { enabled: true, mode: 'x' }
                         }
                     }
                 },
                 plugins: [ChartDataLabels]
             });
 
-            // Build filter pills
+            // Filter pills
             this.dsColors.forEach((ds, idx) => {
                 if (!ds.label) return;
                 const pill = document.createElement('span');
                 pill.className = 'ds-pill';
-                pill.style.background = ds.color;   // fundo sólido na cor do dataset
+                pill.style.background = ds.color;
                 pill.innerHTML = `<span class="ds-pill-dot"></span>${ds.label}`;
                 pill.dataset.idx = idx;
                 pill.addEventListener('click', () => this.toggleDataset(idx, pill));
@@ -731,26 +924,26 @@ const DashboardApp = (() => {
             if (!state.chartInstance) return;
             const meta = state.chartInstance.getDatasetMeta(idx);
             meta.hidden = !meta.hidden;
-            if (meta.hidden) {
-                state.hiddenDatasets.add(idx);
-                pill.classList.add('muted');
-            } else {
-                state.hiddenDatasets.delete(idx);
-                pill.classList.remove('muted');
-            }
+            if (meta.hidden) { state.hiddenDatasets.add(idx);    pill.classList.add('muted'); }
+            else             { state.hiddenDatasets.delete(idx); pill.classList.remove('muted'); }
             state.chartInstance.update();
         }
     };
 
     // ── VIEW MANAGER ─────────────────────────────────────────────────────
     const ViewManager = {
+        allOptions: [],  // opções do selector para busca
+
         init() {
             document.getElementById('logoCAF').src     = CONFIG.IMAGES.logoCAF;
             document.getElementById('logoJundiai').src = CONFIG.IMAGES.logoJundiai;
             document.getElementById('logoPOE').src     = CONFIG.IMAGES.logoPOE;
 
-            document.getElementById('backToMapButton').addEventListener('click', () => this.toggleView('map'));
-            document.getElementById('contractSelector').addEventListener('change', e => this.updateContractView(e.target.value));
+            document.getElementById('backToMapButton').addEventListener('click',   () => this.toggleView('map'));
+            document.getElementById('contractSelector').addEventListener('change', e => {
+                this.updateContractView(e.target.value);
+                try { localStorage.setItem(CONFIG.LS_LAST_CONTRACT, e.target.value); } catch(_) {}
+            });
             document.getElementById('tab-chart').addEventListener('click', () => this.switchTab('chart'));
             document.getElementById('tab-table').addEventListener('click', () => this.switchTab('table'));
 
@@ -759,47 +952,123 @@ const DashboardApp = (() => {
             document.getElementById('exportTableCsvButton').addEventListener('click', () => this.exportTableCsv());
             document.getElementById('exportPdfButton').addEventListener('click',      () => this.exportPdf());
 
-            // Zoom buttons
             document.getElementById('btnZoomIn').addEventListener('click',    () => state.chartInstance?.zoom(1.2));
             document.getElementById('btnZoomOut').addEventListener('click',   () => state.chartInstance?.zoom(0.8));
             document.getElementById('btnZoomReset').addEventListener('click', () => state.chartInstance?.resetZoom());
 
+            // Busca de contratos
+            document.getElementById('contractSearch').addEventListener('input', e => {
+                this.filterSelector(e.target.value);
+            });
+
             this.populateSelector();
             this.updateSummary();
+            this.renderAlerts();
         },
 
         populateSelector() {
             const sel = document.getElementById('contractSelector');
             sel.innerHTML = '';
-            projectData.forEach(p => {
+            this.allOptions = projectData.map(p => ({
+                id: p.id,
+                label: `${p.id} - ${p.objeto}`,
+                status: p.statusFinanceiro
+            }));
+            this.allOptions.forEach(o => {
                 const opt = document.createElement('option');
-                opt.value = p.id;
-                opt.textContent = `${p.id} - ${p.objeto}`;
+                opt.value = o.id;
+                opt.textContent = o.label;
                 sel.appendChild(opt);
             });
         },
 
-        updateSummary() {
-            const totalVal = projectData.reduce((acc, p) => acc + p.valorAtual, 0);
-            document.getElementById('totalContracts').textContent = projectData.length;
-            document.getElementById('totalContractValue').textContent = Utils.formatCompactCurrency(totalVal);
+        filterSelector(query) {
+            const sel = document.getElementById('contractSelector');
+            const q   = query.toLowerCase().trim();
+            sel.innerHTML = '';
+            const filtered = q
+                ? this.allOptions.filter(o => o.label.toLowerCase().includes(q))
+                : this.allOptions;
+            filtered.forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o.id;
+                opt.textContent = o.label;
+                sel.appendChild(opt);
+            });
+            // Auto-seleciona primeiro resultado
+            if (filtered.length > 0) {
+                sel.value = filtered[0].id;
+                this.updateContractView(filtered[0].id);
+            }
+        },
 
-            // Soma das últimas medições com valor real de cada contrato
+        updateSummary() {
+            const totalVal   = projectData.reduce((acc, p) => acc + p.valorAtual, 0);
             const somaUltimas = projectData.reduce((acc, p) => acc + (p.ultimaMedicaoValor || 0), 0);
+            document.getElementById('totalContracts').textContent         = projectData.length;
+            document.getElementById('totalContractValue').textContent     = Utils.formatCompactCurrency(totalVal);
             document.getElementById('sumOfLatestMonthlyMeasurements').textContent =
                 somaUltimas > 0 ? Utils.formatCompactCurrency(somaUltimas) : 'R$ --';
+        },
+
+        renderAlerts() {
+            const strip = document.getElementById('alertStrip');
+            const cards = document.getElementById('alertCards');
+            cards.innerHTML = '';
+
+            const atrasados  = projectData.filter(p => p.statusFinanceiro === 'atrasado');
+            const adiantados = projectData.filter(p => p.statusFinanceiro === 'adiantado');
+            const concluidos = projectData.filter(p => p.statusFinanceiro === 'concluido');
+
+            const makeCard = (proj, type) => {
+                const labels = {
+                    atraso:   '▼ Atraso',
+                    avanco:   '▲ Adiantado',
+                    concluido:'✓ Concluído'
+                };
+                const card = document.createElement('div');
+                card.className = `alert-card ${type}`;
+                card.innerHTML = `
+                    <span class="font-bold">${labels[type]}</span>
+                    <span>${proj.id} — ${proj.objeto}</span>
+                    <span class="ml-auto font-bold">${proj.percentualExecutado}%</span>
+                `;
+                card.addEventListener('click', () => {
+                    this.showDashboard(proj.id);
+                });
+                cards.appendChild(card);
+            };
+
+            atrasados.forEach(p  => makeCard(p, 'atraso'));
+            adiantados.forEach(p => makeCard(p, 'avanco'));
+            concluidos.forEach(p => makeCard(p, 'concluido'));
+
+            strip.classList.toggle('hidden', cards.children.length === 0);
         },
 
         toggleView(viewName) {
             const mapEl  = document.getElementById('mapView');
             const dashEl = document.getElementById('dashboardView');
+
             if (viewName === 'map') {
-                mapEl.classList.remove('hidden');
-                dashEl.classList.add('hidden');
-                if (state.mapInstance) state.mapInstance.invalidateSize();
+                dashEl.classList.add('fade-out');
+                setTimeout(() => {
+                    dashEl.classList.add('hidden');
+                    dashEl.classList.remove('fade-out');
+                    mapEl.classList.remove('hidden');
+                    mapEl.classList.add('fade-in');
+                    setTimeout(() => mapEl.classList.remove('fade-in'), 350);
+                    if (state.mapInstance) state.mapInstance.invalidateSize();
+                }, 200);
             } else {
-                mapEl.classList.add('hidden');
-                dashEl.classList.remove('hidden');
+                mapEl.classList.add('fade-out');
+                setTimeout(() => {
+                    mapEl.classList.add('hidden');
+                    mapEl.classList.remove('fade-out');
+                    dashEl.classList.remove('hidden');
+                    dashEl.classList.add('fade-in');
+                    setTimeout(() => dashEl.classList.remove('fade-in'), 350);
+                }, 200);
             }
         },
 
@@ -822,6 +1091,7 @@ const DashboardApp = (() => {
             document.getElementById('contractSelector').value = contractId;
             this.updateContractView(contractId);
             this.switchTab('chart');
+            try { localStorage.setItem(CONFIG.LS_LAST_CONTRACT, contractId); } catch(_) {}
         },
 
         updateContractView(contractId) {
@@ -829,7 +1099,7 @@ const DashboardApp = (() => {
             if (!data) return;
             state.currentData = data;
 
-            // ── CONTRACT HEADER ──
+            // ── Header do contrato ──
             const detailsEl = document.getElementById('contractDetails');
             let dateHtml = '';
             if (data.predicted_start_date && data.predicted_start_date !== 'N/A') {
@@ -844,10 +1114,26 @@ const DashboardApp = (() => {
             else if (data.objeto.includes("CECE")) imgHtml = `<img src="${CONFIG.IMAGES.logoAtleta}" class="h-18 md:h-20 object-contain ml-auto"/>`;
             else if (data.objeto.includes("EMEB")) imgHtml = `<img src="${CONFIG.IMAGES.logoEscola}" class="h-20 md:h-24 object-contain ml-auto"/>`;
 
+            // Badge de status financeiro
+            const statusLabels = {
+                adiantado: { label: '▲ Adiantado', color: CONFIG.COLORS.SUCCESS },
+                atrasado:  { label: '▼ Atrasado',  color: CONFIG.COLORS.DANGER },
+                concluido: { label: '✓ Concluído', color: CONFIG.COLORS.PRIMARY },
+                neutro:    { label: '– Em andamento', color: '#888' }
+            };
+            const st = statusLabels[data.statusFinanceiro] || statusLabels.neutro;
+            const statusBadge = `<span style="
+                display:inline-block;padding:2px 10px;border-radius:99px;
+                background:${st.color};color:white;font-size:0.7rem;font-weight:700;
+                margin-left:8px;vertical-align:middle;font-family:'Poppins',sans-serif;
+            ">${st.label}</span>`;
+
             detailsEl.innerHTML = `
                 <div class="flex items-center justify-center flex-wrap text-center space-y-1 w-full">
                     <div class="flex-grow">
-                        <p class="text-lg md:text-xl font-bold text-gray-900">Contrato ${data.id}: ${data.objeto}</p>
+                        <p class="text-lg md:text-xl font-bold text-gray-900">
+                            Contrato ${data.id}: ${data.objeto}${statusBadge}
+                        </p>
                         <p class="text-sm md:text-base text-gray-700">
                             <span class="font-semibold">Empresa:</span> ${data.empresa} |
                             <span class="font-semibold">Valor:</span>
@@ -857,12 +1143,10 @@ const DashboardApp = (() => {
                     </div>
                     ${imgHtml}
                 </div>
-                ${data.observacoes ? `<div class="mt-3 text-center w-full"><p class="text-sm text-[#333333] bg-[rgba(255,204,0,0.3)] p-2 rounded-lg inline-block"><span class="font-bold">Obs:</span> ${data.observacoes}</p></div>` : ''}
+                ${data.observacoes ? `<div class="mt-3 text-center w-full"><p class="text-sm text-[#333333] bg-[rgba(255,204,0,0.3)] p-2 rounded-lg inline-block"><span class="font-bold">⚠ Obs:</span> ${data.observacoes}</p></div>` : ''}
             `;
 
-            // ── PROGRESS BAR ──
             this.renderProgress(data);
-
             this.renderTables(data);
             ChartComponent.render(data);
         },
@@ -872,12 +1156,12 @@ const DashboardApp = (() => {
             const execValues = (data.grafico?.executado || []).filter(v => v !== null);
             if (!execValues.length) { section.innerHTML = ''; return; }
 
-            const execAcum  = execValues[execValues.length - 1];
-            const total     = data.valorAtual;
-            const pct       = Math.min(100, (execAcum / total) * 100);
-            const color     = pct >= 80 ? CONFIG.COLORS.EXEC : pct >= 40 ? '#E68B00' : CONFIG.COLORS.DANGER;
-            const medCount  = execValues.length;
-            const totalMed  = (data.grafico?.executado || []).length;
+            const execAcum = execValues.at(-1);
+            const total    = data.valorAtual;
+            const pct      = Math.min(100, (execAcum / total) * 100);
+            const color    = pct >= 80 ? CONFIG.COLORS.EXEC : pct >= 40 ? '#E68B00' : CONFIG.COLORS.DANGER;
+            const medCount = execValues.length;
+            const totalMed = (data.grafico?.executado || []).length;
 
             section.innerHTML = `
                 <div class="glass-card p-3 flex flex-col gap-2" style="border-radius:16px;">
@@ -901,9 +1185,9 @@ const DashboardApp = (() => {
             const schedBody = document.getElementById('measurementsTableBody');
             const hasExec   = data.grafico?.executado?.some(v => v !== null);
 
-            // Badge visual para medições que cobrem mais de um mês
-            const badgeMultiMes = (m) => m.multiMes
-                ? `<span title="${m.diasCobertos} dias" style="
+            // Badge multi-mês (agora com dados reais do adapter)
+            const badgeMultiMes = m => m.multiMes
+                ? `<span title="${m.diasCobertos} dias cobertos" style="
                         display:inline-block;margin-left:5px;padding:1px 6px;
                         border-radius:99px;font-size:0.65rem;font-weight:700;
                         background:rgba(147,51,234,0.15);color:#7c3aed;
@@ -913,22 +1197,14 @@ const DashboardApp = (() => {
                 : '';
 
             if (hasExec) {
-                // ── MODO COMPARATIVO ──────────────────────────────────
-                // A tabela agora é por MEDIÇÃO REAL (não por mês do gráfico),
-                // pois o usuário quer ver "uma linha por medição entregue".
-                // A comparação com o previsto usa o acumulado previsto no mês
-                // de FIM da medição, que é o ponto de referência natural.
-
                 document.getElementById('comparativeTableContainer').classList.remove('hidden');
                 document.getElementById('predictedScheduleTableContainer').classList.add('hidden');
                 document.getElementById('tab-table').textContent = "Tabela Comparativa";
 
-                // Monta índice: chave-mês → índice no array do gráfico
                 const labelToIdx = {};
                 data.grafico.labels.forEach((lbl, i) => labelToIdx[lbl] = i);
 
-                // Função: dado o mês-fim de uma medição, pega o previsto acumulado mais recente
-                const getPrevAcumNoMes = (refLabel) => {
+                const getPrevAcum = refLabel => {
                     const idx = labelToIdx[refLabel];
                     if (idx == null) return null;
                     const ds = data.grafico.previstoDataSets;
@@ -940,45 +1216,32 @@ const DashboardApp = (() => {
                     return data.grafico.previsto?.[idx] ?? null;
                 };
 
-                // Identificar a última medição com valor (para destacar)
                 const medicoesExec = data.medicoes.filter(m => m.valor !== null);
-                const ultimaExecId = medicoesExec.length
-                    ? medicoesExec[medicoesExec.length - 1].medicao : null;
+                const ultimaExecId = medicoesExec.at(-1)?.medicao ?? null;
 
                 let rows = '';
                 data.medicoes.forEach(m => {
-                    const isUltima   = m.medicao === ultimaExecId;
-                    const isExec     = m.valor !== null;
-                    const refLabel   = isExec
-                        // Para multi-mês, usa o label do mês final
-                        ? (m.multiMes
-                            ? m.ref.split('–').pop().trim()
-                            : m.ref)
-                        : null;
+                    const isUltima = m.medicao === ultimaExecId;
+                    const isExec   = m.valor !== null;
+                    const refLabel = isExec ? m.ref : null;
+                    const prevAcum = refLabel ? getPrevAcum(refLabel) : null;
+                    const execAcum = isExec ? m.acumulado : null;
 
-                    const prevAcum   = refLabel ? getPrevAcumNoMes(refLabel) : null;
-                    const execAcum   = isExec ? m.acumulado : null;
-
-                    let diffCell = '<td class="px-4 py-3 text-sm text-center text-gray-400">–</td>';
+                    let diffCell = '<td class="px-4 py-3 text-sm text-center text-gray-400 hide-mobile">–</td>';
                     let statCell = '<td class="px-4 py-3 text-sm text-center text-gray-400">–</td>';
 
                     if (prevAcum != null && execAcum != null) {
                         const diff   = execAcum - prevAcum;
                         const color  = diff >= 0 ? 'text-[#0073a1]' : 'text-[#b80404]';
                         const status = diff >= 0 ? '▲ Adiantado' : '▼ Atrasado';
-                        diffCell = `<td class="px-4 py-3 text-sm text-center font-bold ${color}">${Utils.formatCurrencyAndPercentage(diff, data.valorAtual)}</td>`;
+                        diffCell = `<td class="px-4 py-3 text-sm text-center font-bold ${color} hide-mobile">${Utils.formatCurrencyAndPercentage(diff, data.valorAtual)}</td>`;
                         statCell = `<td class="px-4 py-3 text-sm text-center font-bold ${color}">${status}</td>`;
                     }
 
-                    // Separador visual: linha tracejada antes dos meses futuros
                     const separador = (!isExec && m.medicao === (ultimaExecId != null ? ultimaExecId + 1 : null))
                         ? 'border-t-2 border-dashed border-slate-400/60'
                         : 'border-b border-slate-200/50';
-
-                    // Highlight da última medição executada
-                    const highlight = isUltima
-                        ? 'bg-[rgba(0,123,61,0.08)]'
-                        : isExec ? '' : 'opacity-60';
+                    const highlight = isUltima ? 'bg-[rgba(0,123,61,0.08)]' : isExec ? '' : 'opacity-60';
 
                     rows += `
                         <tr class="${separador} ${highlight} hover:bg-white/50 transition-colors">
@@ -987,11 +1250,10 @@ const DashboardApp = (() => {
                                 ${isUltima ? '<span style="font-size:0.6rem;color:#007B3D;display:block;font-weight:600;">← última</span>' : ''}
                             </td>
                             <td class="px-4 py-3 text-sm text-center text-gray-700 font-semibold">
-                                ${m.inicio} a ${m.fim}
-                                ${badgeMultiMes(m)}
+                                ${m.inicio} a ${m.fim}${badgeMultiMes(m)}
                             </td>
                             <td class="px-4 py-3 text-sm text-center text-gray-700">${m.ref}</td>
-                            <td class="px-4 py-3 text-sm text-center text-gray-600">${prevAcum != null ? Utils.formatCurrencyAndPercentage(prevAcum, data.valorAtual) : '–'}</td>
+                            <td class="px-4 py-3 text-sm text-center text-gray-600 hide-mobile">${prevAcum != null ? Utils.formatCurrencyAndPercentage(prevAcum, data.valorAtual) : '–'}</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-600">${isExec ? Utils.formatCurrency(m.valor) : '–'}</td>
                             <td class="px-4 py-3 text-sm text-center text-gray-800 font-bold">${execAcum != null ? Utils.formatCurrencyAndPercentage(execAcum, data.valorAtual) : '–'}</td>
                             ${diffCell}${statCell}
@@ -1001,7 +1263,6 @@ const DashboardApp = (() => {
                 compBody.innerHTML = rows;
 
             } else {
-                // ── MODO CRONOGRAMA SIMPLES ───────────────────────────
                 document.getElementById('comparativeTableContainer').classList.add('hidden');
                 document.getElementById('predictedScheduleTableContainer').classList.remove('hidden');
                 document.getElementById('tab-table').textContent = "Cronograma Previsto";
@@ -1009,10 +1270,7 @@ const DashboardApp = (() => {
                 schedBody.innerHTML = data.medicoes.map(m => `
                     <tr class="border-b border-slate-200/50 hover:bg-white/50">
                         <td class="px-5 py-3 text-sm text-center text-gray-900">${m.medicao}</td>
-                        <td class="px-5 py-3 text-sm text-center text-gray-700">
-                            ${m.inicio || '–'} a ${m.fim || '–'}
-                            ${badgeMultiMes(m)}
-                        </td>
+                        <td class="px-5 py-3 text-sm text-center text-gray-700">${m.inicio || '–'} a ${m.fim || '–'}${badgeMultiMes(m)}</td>
                         <td class="px-5 py-3 text-sm text-center text-gray-700">${m.ref || '–'}</td>
                         <td class="px-5 py-3 text-sm text-center text-gray-800">${Utils.formatCurrency(m.valor)}</td>
                         <td class="px-5 py-3 text-sm text-center text-gray-800 font-bold">${Utils.formatCurrencyAndPercentage(m.acumulado, data.valorAtual)}</td>
@@ -1035,17 +1293,13 @@ const DashboardApp = (() => {
 
         exportChartPng() {
             if (!state.chartInstance) { alert("Não há gráfico para exportar."); return; }
-
-            // Render to canvas with white background
-            const orig   = document.getElementById('mainChart');
-            const tmp    = document.createElement('canvas');
-            tmp.width    = orig.width;
-            tmp.height   = orig.height;
-            const ctx    = tmp.getContext('2d');
+            const orig = document.getElementById('mainChart');
+            const tmp  = document.createElement('canvas');
+            tmp.width  = orig.width; tmp.height = orig.height;
+            const ctx  = tmp.getContext('2d');
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, tmp.width, tmp.height);
             ctx.drawImage(orig, 0, 0);
-
             const a    = document.createElement('a');
             a.href     = tmp.toDataURL('image/png');
             a.download = `Grafico_Contrato_${document.getElementById('contractSelector').value.replace(/\s/g,'_')}.png`;
@@ -1063,9 +1317,9 @@ const DashboardApp = (() => {
 
             let csv = "data:text/csv;charset=utf-8,\uFEFF";
             table.querySelectorAll("tr").forEach(row => {
-                const cols = [...row.querySelectorAll("th,td")].map(c =>
-                    `"${c.innerText.replace(/[\r\n]+/g,' ').trim()}"`
-                );
+                const cols = [...row.querySelectorAll("th,td")]
+                    .filter(c => !c.classList.contains('hide-mobile'))
+                    .map(c => `"${c.innerText.replace(/[\r\n]+/g,' ').trim()}"`);
                 csv += cols.join(";") + "\r\n";
             });
             const a = document.createElement("a");
@@ -1081,245 +1335,158 @@ const DashboardApp = (() => {
             const contractId = document.getElementById('contractSelector').value;
             const data       = projectData.find(p => p.id === contractId);
             const overlay    = document.getElementById('pdf-overlay');
-
             overlay.classList.add('active');
 
-            // Helper: fetch image → base64
-            const toBase64 = async (url) => {
+            const toBase64 = async url => {
                 try {
-                    const res  = await fetch(url);
-                    const blob = await res.blob();
-                    return await new Promise(r => {
-                        const rd = new FileReader();
-                        rd.onload = () => r(rd.result);
-                        rd.readAsDataURL(blob);
-                    });
-                } catch (_) { return null; }
+                    const blob = await (await fetch(url)).blob();
+                    return await new Promise(r => { const rd = new FileReader(); rd.onload = () => r(rd.result); rd.readAsDataURL(blob); });
+                } catch { return null; }
             };
 
-            // Helper: draw a landscape page header strip (logo bar + title bar)
             const drawLandscapeHeader = (pdf, LW, title) => {
-                // White logo bar
-                pdf.setFillColor(255, 255, 255);
-                pdf.rect(0, 0, LW, 18, 'F');
-                // Blue title bar
-                pdf.setFillColor(7, 35, 128);
-                pdf.rect(0, 18, LW, 10, 'F');
-                pdf.setTextColor(255, 255, 255);
-                pdf.setFont('helvetica', 'bold');
-                pdf.setFontSize(9);
-                pdf.text(title, LW / 2, 24.5, { align: 'center' });
-                // Contract subtitle
-                pdf.setFontSize(7);
-                pdf.setTextColor(180, 210, 255);
-                pdf.text(`${contractId} · ${data.objeto} · ${data.empresa}`, LW / 2, 30, { align: 'center' });
+                pdf.setFillColor(255,255,255); pdf.rect(0,0,LW,18,'F');
+                pdf.setFillColor(7,35,128);   pdf.rect(0,18,LW,10,'F');
+                pdf.setTextColor(255,255,255); pdf.setFont('helvetica','bold'); pdf.setFontSize(9);
+                pdf.text(title, LW/2, 24.5, { align:'center' });
+                pdf.setFontSize(7); pdf.setTextColor(180,210,255);
+                pdf.text(`${contractId} · ${data.objeto} · ${data.empresa}`, LW/2, 30, { align:'center' });
             };
 
-            // Helper: draw footer
             const drawFooter = (pdf, LW, LH) => {
-                pdf.setFontSize(7);
-                pdf.setTextColor(160, 160, 180);
-                const stamp = `Gerado em: ${new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' })}  ·  Programa Avança Jundiaí - Etapa 2`;
-                pdf.text(stamp, LW / 2, LH - 4, { align: 'center' });
+                pdf.setFontSize(7); pdf.setTextColor(160,160,180);
+                pdf.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}  ·  Programa Avança Jundiaí - Etapa 2`, LW/2, LH-4, { align:'center' });
             };
 
             try {
-                // ── PAGE 1: COVER (retrato A4) ─────────────────────────
-                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdf = new jsPDF('p','mm','a4');
                 const PW  = pdf.internal.pageSize.getWidth();
                 const PH  = pdf.internal.pageSize.getHeight();
 
-                pdf.setFillColor(7, 35, 128);
-                pdf.rect(0, 0, PW, PH, 'F');
+                pdf.setFillColor(7,35,128); pdf.rect(0,0,PW,PH,'F');
+                pdf.setFillColor(255,255,255); pdf.rect(0,0,PW,28,'F');
 
-                // Logo bar
-                pdf.setFillColor(255, 255, 255);
-                pdf.rect(0, 0, PW, 28, 'F');
-
-                // Load logos in parallel
-                const [b64POE, b64Jundiai, b64CAF] = await Promise.all([
+                const [b64POE,b64Jundiai,b64CAF] = await Promise.all([
                     toBase64(CONFIG.IMAGES.logoPOE),
                     toBase64(CONFIG.IMAGES.logoJundiai),
                     toBase64(CONFIG.IMAGES.logoCAF)
                 ]);
-                if (b64POE)     pdf.addImage(b64POE,     'PNG', 8,       4, 30, 18);
-                if (b64Jundiai) pdf.addImage(b64Jundiai, 'PNG', PW/2-18, 2, 36, 24);
-                if (b64CAF)     pdf.addImage(b64CAF,     'PNG', PW-46,   4, 38, 20);
+                if (b64POE)     pdf.addImage(b64POE,    'PNG',8,       4,30,18);
+                if (b64Jundiai) pdf.addImage(b64Jundiai,'PNG',PW/2-18, 2,36,24);
+                if (b64CAF)     pdf.addImage(b64CAF,    'PNG',PW-46,   4,38,20);
 
-                pdf.setTextColor(255, 255, 255);
-                pdf.setFont('helvetica', 'bold');
-                pdf.setFontSize(18);
+                pdf.setTextColor(255,255,255); pdf.setFont('helvetica','bold'); pdf.setFontSize(18);
                 pdf.text('PROGRAMA AVANÇA JUNDIAÍ - ETAPA 2', PW/2, 55, { align:'center' });
-
-                pdf.setFontSize(13);
-                pdf.setTextColor(180, 210, 255);
+                pdf.setFontSize(13); pdf.setTextColor(180,210,255);
                 pdf.text('Relatório de Performance Contratual', PW/2, 65, { align:'center' });
 
-                // Contract info box
-                pdf.setDrawColor(255, 255, 255);
-                pdf.setLineWidth(0.4);
-                pdf.setFillColor(20, 50, 140);
-                pdf.roundedRect(14, 78, PW-28, 68, 4, 4, 'FD');
-
-                pdf.setTextColor(255, 255, 255);
-                pdf.setFont('helvetica', 'bold');
-                pdf.setFontSize(12);
+                pdf.setDrawColor(255,255,255); pdf.setLineWidth(0.4);
+                pdf.setFillColor(20,50,140); pdf.roundedRect(14,78,PW-28,68,4,4,'FD');
+                pdf.setTextColor(255,255,255); pdf.setFont('helvetica','bold'); pdf.setFontSize(12);
                 pdf.text(`Contrato: ${contractId}`, 20, 92);
                 pdf.text(`Objeto: ${data.objeto}`, 20, 102);
-                pdf.setFont('helvetica', 'normal');
-                pdf.setFontSize(10);
+                pdf.setFont('helvetica','normal'); pdf.setFontSize(10);
                 pdf.text(`Empresa: ${data.empresa}`, 20, 112);
                 pdf.text(`Valor Total: ${Utils.formatCurrency(data.valorAtual)}`, 20, 120);
                 if (data.predicted_start_date && data.predicted_start_date !== 'N/A') {
                     pdf.text(`Início: ${data.predicted_start_date}   ·   Fim: ${data.predicted_end_date}`, 20, 128);
                 }
+                // Status badge no PDF
+                const stLabels = { adiantado:'▲ Adiantado', atrasado:'▼ Atrasado', concluido:'✓ Concluído', neutro:'– Em andamento' };
+                pdf.setFontSize(9); pdf.setTextColor(180,210,255);
+                pdf.text(`Status: ${stLabels[data.statusFinanceiro] || '–'}   ·   Progresso: ${data.percentualExecutado}%`, 20, 136);
 
-                // Progress bar
                 const execValues = (data.grafico?.executado || []).filter(v => v !== null);
                 if (execValues.length) {
-                    const pct      = Math.min(100, (execValues[execValues.length-1] / data.valorAtual) * 100);
-                    const barRGB   = pct >= 80 ? [0,123,61] : pct >= 40 ? [230,139,0] : [184,4,4];
-                    pdf.setFontSize(9);
-                    pdf.setTextColor(180, 210, 255);
-                    pdf.text(`Progresso financeiro: ${pct.toFixed(1)}%`, 20, 139);
-                    pdf.setFillColor(255,255,255,0.15);
-                    pdf.roundedRect(20, 142, PW-40, 5, 2, 2, 'F');
-                    pdf.setFillColor(...barRGB);
-                    pdf.roundedRect(20, 142, (PW-40)*pct/100, 5, 2, 2, 'F');
+                    const pct    = Math.min(100,(execValues.at(-1)/data.valorAtual)*100);
+                    const barRGB = pct>=80?[0,123,61]:pct>=40?[230,139,0]:[184,4,4];
+                    pdf.setFillColor(255,255,255,0.15); pdf.roundedRect(20,142,PW-40,5,2,2,'F');
+                    pdf.setFillColor(...barRGB);        pdf.roundedRect(20,142,(PW-40)*pct/100,5,2,2,'F');
                 }
-
                 if (data.observacoes) {
-                    pdf.setFontSize(8);
-                    pdf.setTextColor(255, 220, 100);
+                    pdf.setFontSize(8); pdf.setTextColor(255,220,100);
                     const lines = pdf.splitTextToSize(`⚠ ${data.observacoes}`, PW-40);
                     pdf.text(lines, 20, 152);
                 }
+                pdf.setFontSize(8); pdf.setTextColor(140,170,220);
+                pdf.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}`, PW/2, PH-12, { align:'center' });
 
-                pdf.setFontSize(8);
-                pdf.setTextColor(140, 170, 220);
-                pdf.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'})}`, PW/2, PH-12, { align:'center' });
-
-
-                // ── PAGE 2: CHART (paisagem A4) ────────────────────────
+                // Página 2: Gráfico
                 if (state.chartInstance) {
-                    pdf.addPage('a4', 'landscape');   // 297 × 210 mm
-                    const LW = pdf.internal.pageSize.getWidth();   // 297
-                    const LH = pdf.internal.pageSize.getHeight();  // 210
-
-                    pdf.setFillColor(245, 248, 255);
-                    pdf.rect(0, 0, LW, LH, 'F');
-
-                    // Logos no header paisagem (reutiliza as base64 já carregadas)
-                    pdf.setFillColor(255, 255, 255);
-                    pdf.rect(0, 0, LW, 18, 'F');
-                    if (b64POE)     pdf.addImage(b64POE,     'PNG', 6,       1, 22, 14);
-                    if (b64Jundiai) pdf.addImage(b64Jundiai, 'PNG', LW/2-14, 0, 28, 18);
-                    if (b64CAF)     pdf.addImage(b64CAF,     'PNG', LW-36,   1, 30, 15);
-
+                    pdf.addPage('a4','landscape');
+                    const LW = pdf.internal.pageSize.getWidth();
+                    const LH = pdf.internal.pageSize.getHeight();
+                    pdf.setFillColor(245,248,255); pdf.rect(0,0,LW,LH,'F');
+                    if (b64POE)     pdf.addImage(b64POE,    'PNG',6,      1,22,14);
+                    if (b64Jundiai) pdf.addImage(b64Jundiai,'PNG',LW/2-14,0,28,18);
+                    if (b64CAF)     pdf.addImage(b64CAF,    'PNG',LW-36,  1,30,15);
                     drawLandscapeHeader(pdf, LW, 'Gráfico Comparativo · Previsto vs Executado');
-
-                    // Chart image — ocupa quase toda a página
+                    const chartImg = state.chartInstance.toBase64Image('image/png',1.0);
                     const chartCanvas = document.getElementById('mainChart');
-                    const chartImg    = state.chartInstance.toBase64Image('image/png', 1.0);
-                    const maxW        = LW - 20;
-                    const maxH        = LH - 42;  // deixa espaço para header + footer
-                    const ratio       = chartCanvas.width / chartCanvas.height;
-                    const imgW        = Math.min(maxW, maxH * ratio);
-                    const imgH        = imgW / ratio;
-                    const imgX        = (LW - imgW) / 2;
-
-                    pdf.addImage(chartImg, 'PNG', imgX, 33, imgW, imgH);
+                    const ratio = chartCanvas.width / chartCanvas.height;
+                    const maxW  = LW-20, maxH = LH-42;
+                    const imgW  = Math.min(maxW, maxH*ratio);
+                    const imgH  = imgW/ratio;
+                    pdf.addImage(chartImg,'PNG',(LW-imgW)/2,33,imgW,imgH);
                     drawFooter(pdf, LW, LH);
                 }
 
-
-                // ── PAGE 3+: TABLE (paisagem A4) ──────────────────────
+                // Página 3+: Tabela
                 let table = null;
                 if (!document.getElementById('comparativeTableContainer').classList.contains('hidden')) {
                     table = document.querySelector('#comparativeTableContainer table');
                 } else if (!document.getElementById('predictedScheduleTableContainer').classList.contains('hidden')) {
                     table = document.querySelector('#predictedScheduleTableContainer table');
                 }
-
                 if (table) {
                     const headers  = [...table.querySelectorAll('thead th')].map(th => th.innerText.trim());
                     const dataRows = [...table.querySelectorAll('tbody tr')].map(tr =>
                         [...tr.querySelectorAll('td')].map(td => td.innerText.trim())
                     );
-
-                    pdf.addPage('a4', 'landscape');
+                    pdf.addPage('a4','landscape');
                     const LW = pdf.internal.pageSize.getWidth();
                     const LH = pdf.internal.pageSize.getHeight();
 
-                    const startNewTablePage = () => {
-                        pdf.setFillColor(245, 248, 255);
-                        pdf.rect(0, 0, LW, LH, 'F');
-                        if (b64POE)     pdf.addImage(b64POE,     'PNG', 6,       1, 22, 14);
-                        if (b64Jundiai) pdf.addImage(b64Jundiai, 'PNG', LW/2-14, 0, 28, 18);
-                        if (b64CAF)     pdf.addImage(b64CAF,     'PNG', LW-36,   1, 30, 15);
+                    const startPage = () => {
+                        pdf.setFillColor(245,248,255); pdf.rect(0,0,LW,LH,'F');
+                        if (b64POE)     pdf.addImage(b64POE,    'PNG',6,      1,22,14);
+                        if (b64Jundiai) pdf.addImage(b64Jundiai,'PNG',LW/2-14,0,28,18);
+                        if (b64CAF)     pdf.addImage(b64CAF,    'PNG',LW-36,  1,30,15);
                         drawLandscapeHeader(pdf, LW, 'Tabela de Medições');
                         drawFooter(pdf, LW, LH);
                     };
+                    startPage();
 
-                    startNewTablePage();
+                    const MARGIN=10, tableW=LW-MARGIN*2, colW=tableW/headers.length;
+                    const rowH=9, fontSize=Math.max(6.5,Math.min(8.5,58/headers.length));
+                    let curY=34;
 
-                    const MARGIN   = 10;
-                    const tableW   = LW - MARGIN * 2;
-                    const colW     = tableW / headers.length;
-                    const rowH     = 9;
-                    const fontSize = Math.max(6.5, Math.min(8.5, 58 / headers.length));
-                    let curY       = 34;
-
-                    // Draw header row
-                    const drawTableHeader = () => {
-                        pdf.setFillColor(7, 35, 128);
-                        pdf.rect(MARGIN, curY, tableW, rowH, 'F');
-                        pdf.setTextColor(255, 255, 255);
-                        pdf.setFont('helvetica', 'bold');
-                        pdf.setFontSize(fontSize);
-                        headers.forEach((h, i) => {
-                            pdf.text(h, MARGIN + colW*i + colW/2, curY + 6, { align:'center', maxWidth: colW - 2 });
-                        });
-                        curY += rowH;
+                    const drawTH = () => {
+                        pdf.setFillColor(7,35,128); pdf.rect(MARGIN,curY,tableW,rowH,'F');
+                        pdf.setTextColor(255,255,255); pdf.setFont('helvetica','bold'); pdf.setFontSize(fontSize);
+                        headers.forEach((h,i) => pdf.text(h,MARGIN+colW*i+colW/2,curY+6,{align:'center',maxWidth:colW-2}));
+                        curY+=rowH;
                     };
-                    drawTableHeader();
+                    drawTH();
 
-                    pdf.setFont('helvetica', 'normal');
-                    dataRows.forEach((row, ri) => {
-                        // Quebra de página — guarda espaço para footer
-                        if (curY + rowH > LH - 12) {
-                            pdf.addPage('a4', 'landscape');
-                            startNewTablePage();
-                            curY = 34;
-                            drawTableHeader();
-                        }
-
-                        // Zebra striping
-                        pdf.setFillColor(ri % 2 === 0 ? 235 : 248, ri % 2 === 0 ? 240 : 250, ri % 2 === 0 ? 255 : 255);
-                        pdf.rect(MARGIN, curY, tableW, rowH, 'F');
-
-                        // Light border between rows
-                        pdf.setDrawColor(210, 215, 230);
-                        pdf.setLineWidth(0.2);
-                        pdf.line(MARGIN, curY + rowH, MARGIN + tableW, curY + rowH);
-
-                        pdf.setTextColor(40, 45, 80);
-                        pdf.setFontSize(fontSize);
-                        row.forEach((cell, ci) => {
-                            pdf.text(cell, MARGIN + colW*ci + colW/2, curY + 6, { align:'center', maxWidth: colW - 2 });
-                        });
-                        curY += rowH;
+                    pdf.setFont('helvetica','normal');
+                    dataRows.forEach((row,ri) => {
+                        if (curY+rowH>LH-12) { pdf.addPage('a4','landscape'); startPage(); curY=34; drawTH(); }
+                        pdf.setFillColor(ri%2===0?235:248,ri%2===0?240:250,255);
+                        pdf.rect(MARGIN,curY,tableW,rowH,'F');
+                        pdf.setDrawColor(210,215,230); pdf.setLineWidth(0.2);
+                        pdf.line(MARGIN,curY+rowH,MARGIN+tableW,curY+rowH);
+                        pdf.setTextColor(40,45,80); pdf.setFontSize(fontSize);
+                        row.forEach((cell,ci) => pdf.text(cell,MARGIN+colW*ci+colW/2,curY+6,{align:'center',maxWidth:colW-2}));
+                        curY+=rowH;
                     });
-
-                    // Bottom border of last row
-                    pdf.setDrawColor(7, 35, 128);
-                    pdf.setLineWidth(0.5);
-                    pdf.line(MARGIN, curY, MARGIN + tableW, curY);
+                    pdf.setDrawColor(7,35,128); pdf.setLineWidth(0.5);
+                    pdf.line(MARGIN,curY,MARGIN+tableW,curY);
                 }
 
                 pdf.save(`Relatorio_${contractId.replace(/\s/g,'_')}.pdf`);
 
-            } catch (err) {
+            } catch(err) {
                 console.error("Erro ao gerar PDF:", err);
                 alert(`Erro ao gerar PDF: ${err.message}`);
             } finally {
@@ -1334,6 +1501,15 @@ const DashboardApp = (() => {
             Chart.register(ChartDataLabels);
             ViewManager.init();
             MapComponent.init();
+
+            // Restaura último contrato visitado
+            try {
+                const last = localStorage.getItem(CONFIG.LS_LAST_CONTRACT);
+                if (last && projectData.find(p => p.id === last)) {
+                    // Pequeno delay para o mapa inicializar antes de abrir o dashboard
+                    setTimeout(() => ViewManager.showDashboard(last), 100);
+                }
+            } catch(_) {}
         }
     };
 
