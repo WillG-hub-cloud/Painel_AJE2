@@ -1,4 +1,3 @@
-O conteúdo é gerado pelo usuário e não verificado.
 /**
  * DADOS_CONTRATO.JS - VERSÃO 2026.03.21
  * CORREÇÕES APLICADAS:
