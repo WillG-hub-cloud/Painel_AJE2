@@ -181,20 +181,25 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 3px 10px;
+        padding: 5px 12px;
         border-radius: 99px;
-        font-size: 0.72rem;
+        font-size: 0.73rem;
         font-family: 'Poppins', sans-serif;
-        font-weight: 600;
+        font-weight: 700;
         cursor: pointer;
-        border: 2px solid transparent;
-        transition: opacity 0.2s, filter 0.2s;
+        border: none;
+        color: #ffffff;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+        transition: opacity 0.2s, filter 0.2s, transform 0.15s;
         user-select: none;
     }
-    .ds-pill.muted { opacity: 0.38; filter: grayscale(0.6); }
+    .ds-pill:hover { transform: scale(1.05); }
+    .ds-pill.muted { opacity: 0.35; filter: grayscale(0.7); transform: none; }
     .ds-pill-dot {
-        width: 10px; height: 10px;
+        width: 8px; height: 8px;
         border-radius: 50%;
+        background: rgba(255,255,255,0.7);
         flex-shrink: 0;
     }
 
@@ -683,8 +688,7 @@ const DashboardApp = (() => {
                     },
                     plugins: {
                         legend: {
-                            position: 'bottom',
-                            labels: { usePointStyle:true, boxWidth:8, padding:20, font:{ size:14, family:'Poppins', weight:'bold' }, color:'#333333' }
+                            display: false  // Pills acima substituem a legenda nativa
                         },
                         tooltip: {
                             mode: 'index', intersect: false,
@@ -715,9 +719,8 @@ const DashboardApp = (() => {
                 if (!ds.label) return;
                 const pill = document.createElement('span');
                 pill.className = 'ds-pill';
-                pill.style.borderColor = ds.color;
-                pill.style.background = `${ds.color}18`;
-                pill.innerHTML = `<span class="ds-pill-dot" style="background:${ds.color}"></span>${ds.label}`;
+                pill.style.background = ds.color;   // fundo sólido na cor do dataset
+                pill.innerHTML = `<span class="ds-pill-dot"></span>${ds.label}`;
                 pill.dataset.idx = idx;
                 pill.addEventListener('click', () => this.toggleDataset(idx, pill));
                 pillsEl.appendChild(pill);
