@@ -373,7 +373,7 @@ const rawProjects = [
             { id:6,  dataInicio:"2025-11-16", dataFim:"2025-12-15", valor:0.00 },
             { id:7,  dataInicio:"2025-12-16", dataFim:"2026-01-15", valor:297178.40 },
             { id:8,  dataInicio:"2026-01-16", dataFim:"2026-02-15", valor:187853.25 },
-            { id:9,  dataInicio:"2026-02-16", dataFim:"2026-03-15", valor:null },
+            { id:9,  dataInicio:"2026-02-11", dataFim:"2026-03-12", valor:152493.30 },
             { id:10, dataInicio:"2026-03-16", dataFim:"2026-04-15", valor:null },
             { id:11, dataInicio:"2026-04-16", dataFim:"2026-05-15", valor:null },
             { id:12, dataInicio:"2026-05-16", dataFim:"2026-06-15", valor:null },
