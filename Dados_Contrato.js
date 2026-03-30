@@ -450,6 +450,7 @@ const rawProjects = [
             { nome: "Cronograma Inicial",        valoresAcumulados: [149571.75,730716.85,1300261.90,1480000.00,null,null,null,null,null,null] },
             { nome: "Cronograma Prorrogação I",  valoresAcumulados: [null,null,368781.58,866856.13,1169484.80,1333153.20,1480000.00,null,null,null] },
             { nome: "Cronograma Prorrogação II", valoresAcumulados: [null,null,null,null,null,null,704416.75,833484.36,1160994.10,1480000.00] }
+            { nome: "Cronograma Prorrogação III",  valoresAcumulados: [null,null,null,null,null,null,null,null,970767.33, 1157164.54, 1383700.51, 1480000.00] }
         ],
         medicoes: [
             { id:1, dataInicio:"2025-07-07", dataFim:"2025-08-06", valor:261030.50 },
@@ -459,8 +460,11 @@ const rawProjects = [
             { id:5, dataInicio:"2025-11-04", dataFim:"2025-12-01", valor:0.00 },
             { id:6, dataInicio:"2025-12-02", dataFim:"2026-01-03", valor:0.00 },
             { id:7, dataInicio:"2026-01-07", dataFim:"2026-02-06", valor:55171.33 },
-            { id:8, dataInicio:"2026-02-07", dataFim:"2026-03-06", valor:134803.36 },
-            { id:9, dataInicio:"2026-03-07", dataFim:"2026-04-06", valor:null }
+            { id:8, dataInicio:"2026-02-07", dataFim:"2026-03-06", valor:null },
+            { id:9, dataInicio:"2026-03-07", dataFim:"2026-04-06", valor:null },
+            { id:10, dataInicio:"2026-04-07", dataFim:"2026-05-06", valor:null },
+            { id:11, dataInicio:"2026-02-07", dataFim:"2026-06-06", valor:null },
+            { id:12, dataInicio:"2026-06-07", dataFim:"2026-07-06", valor:null }
         ]
     }
 ];
