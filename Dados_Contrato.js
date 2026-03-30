@@ -425,7 +425,7 @@ const rawProjects = [
         medicoes: [
             { id:1,  dataInicio:"2025-12-01", dataFim:"2025-12-31", valor:95217.08 },
             { id:2,  dataInicio:"2026-01-01", dataFim:"2026-01-30", valor:133211.17 },
-            { id:3,  dataInicio:"2026-02-01", dataFim:"2026-02-28", valor:null },
+            { id:3,  dataInicio:"2026-02-01", dataFim:"2026-02-28", valor:323477.48 },
             { id:4,  dataInicio:"2026-03-01", dataFim:"2026-04-30", valor:null },
             { id:5,  dataInicio:"2026-04-01", dataFim:"2026-05-30", valor:null },
             { id:6,  dataInicio:"2026-05-01", dataFim:"2026-06-30", valor:null },
