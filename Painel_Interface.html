@@ -1531,13 +1531,56 @@ const DashboardApp = (() => {
 
         exportChartPng() {
             if (!state.chartInstance) { alert("Não há gráfico para exportar."); return; }
-            const orig = document.getElementById('mainChart');
-            const tmp  = document.createElement('canvas');
-            tmp.width  = orig.width; tmp.height = orig.height;
-            const ctx  = tmp.getContext('2d');
+            const orig    = document.getElementById('mainChart');
+            const ds      = ChartComponent.dsColors.filter(d => d.label);
+            const LEGEND_H = ds.length ? 36 : 0;
+            const tmp     = document.createElement('canvas');
+            tmp.width     = orig.width;
+            tmp.height    = orig.height + LEGEND_H;
+            const ctx     = tmp.getContext('2d');
+
+            // fundo branco
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, tmp.width, tmp.height);
             ctx.drawImage(orig, 0, 0);
+
+            // legenda
+            if (ds.length) {
+                const PAD    = 16;
+                const DOT_R  = 5;
+                const LINE_W = 22;
+                const GAP    = 6;
+                ctx.font = 'bold 13px Poppins,sans-serif';
+                const itemWidths = ds.map(d => LINE_W + GAP + ctx.measureText(d.label).width + PAD);
+                const totalW     = itemWidths.reduce((a, b) => a + b, 0);
+                let x = (tmp.width - totalW) / 2;
+                const y = orig.height + LEGEND_H / 2;
+
+                ds.forEach((d, i) => {
+                    // linha colorida (tracejada para previsto)
+                    ctx.strokeStyle = d.color;
+                    ctx.lineWidth   = d.isExec ? 3 : 2;
+                    ctx.setLineDash(d.isExec ? [] : [6, 3]);
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x + LINE_W, y);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // ponto central
+                    ctx.fillStyle = d.color;
+                    ctx.beginPath();
+                    ctx.arc(x + LINE_W / 2, y, DOT_R, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // texto
+                    ctx.fillStyle = '#1a202c';
+                    ctx.fillText(d.label, x + LINE_W + GAP, y + 4.5);
+
+                    x += itemWidths[i];
+                });
+            }
+
             const a    = document.createElement('a');
             a.href     = tmp.toDataURL('image/png');
             a.download = `Grafico_Contrato_${document.getElementById('contractSelector').value.replace(/\s/g,'_')}.png`;
@@ -1662,10 +1705,39 @@ const DashboardApp = (() => {
                     const chartImg = state.chartInstance.toBase64Image('image/png',1.0);
                     const chartCanvas = document.getElementById('mainChart');
                     const ratio = chartCanvas.width / chartCanvas.height;
-                    const maxW  = LW-20, maxH = LH-42;
+                    const maxW  = LW-20, maxH = LH-52;
                     const imgW  = Math.min(maxW, maxH*ratio);
                     const imgH  = imgW/ratio;
                     pdf.addImage(chartImg,'PNG',(LW-imgW)/2,33,imgW,imgH);
+
+                    // ── Legenda colorida abaixo do gráfico ──
+                    const legendDs = ChartComponent.dsColors.filter(d => d.label);
+                    if (legendDs.length) {
+                        const hexToRgb = hex => [
+                            parseInt(hex.slice(1,3),16),
+                            parseInt(hex.slice(3,5),16),
+                            parseInt(hex.slice(5,7),16)
+                        ];
+                        const legendY = 33 + imgH + 3;
+                        const itemW   = Math.min(55, (LW - 20) / legendDs.length);
+                        const startX  = (LW - itemW * legendDs.length) / 2;
+                        pdf.setFont('helvetica','bold');
+                        pdf.setFontSize(6.5);
+                        legendDs.forEach((d, i) => {
+                            const lx      = startX + i * itemW;
+                            const [r,g,b] = hexToRgb(d.color);
+                            pdf.setDrawColor(r,g,b);
+                            pdf.setLineWidth(d.isExec ? 0.9 : 0.5);
+                            if (!d.isExec) pdf.setLineDashPattern([1.2,0.8],0);
+                            pdf.line(lx, legendY+1.8, lx+8, legendY+1.8);
+                            pdf.setLineDashPattern([],0);
+                            pdf.setFillColor(r,g,b);
+                            pdf.circle(lx+4, legendY+1.8, 1.2, 'F');
+                            pdf.setTextColor(30,40,80);
+                            pdf.text(d.label, lx+10, legendY+3.2, { maxWidth: itemW-11 });
+                        });
+                    }
+
                     drawFooter(pdf, LW, LH);
                 }
 
