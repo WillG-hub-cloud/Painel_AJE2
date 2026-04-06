@@ -166,9 +166,10 @@ const rawProjects = [
         previsaoFim: "2026-03-10",
         localizacao: { lat: -23.22359379674732, lng: -46.85593132352297 },
         cronogramas: [
-            { nome: "Cronograma Inicial",        valoresAcumulados: [164490.45,336423.85,578404.56,823300.17,1029579.72,1264982.08,1502623.50,1718875.29,null] },
-            { nome: "Cronograma Prorrogação I",  valoresAcumulados: [null,null,200391.22,456648.02,759827.63,1147658.15,1443929.50,1718878.29,null] },
-            { nome: "Cronograma Prorrogação II", valoresAcumulados: [null,null,null,null,null,null,null,1072910.67,1288306.78,1508319.59,1718878.29] }
+            { nome: "Cronograma Inicial",        valoresAcumulados: [164490.45,336423.85,578404.56,823300.17,1029579.72,1264982.08,1502623.50,1718875.29,null,null] },
+            { nome: "Cronograma Prorrogação I",  valoresAcumulados: [null,null,200391.22,456648.02,759827.63,1147658.15,1443929.50,1718878.29,null,null,null] },
+            { nome: "Cronograma Prorrogação II", valoresAcumulados: [null,null,null,null,null,null,null,1072910.67,1288306.78,1508319.59,1718878.29,null,null] },
+            { nome: "Cronograma Prorrogação III", valoresAcumulados: [null,null,null,null,null,null,null,null,null,1585992.13,1718878.29] }
         ],
         medicoes: [
             { id:1,  dataInicio:"2025-04-15", dataFim:"2025-05-14", valor:107178.95 },
@@ -181,7 +182,9 @@ const rawProjects = [
             { id:8,  dataInicio:"2025-11-12", dataFim:"2025-12-10", valor:150236.11 },
             { id:9,  dataInicio:"2025-12-11", dataFim:"2026-01-10", valor:142590.07 },
             { id:10, dataInicio:"2026-01-11", dataFim:"2026-02-10", valor:114319.14 },
-            { id:11, dataInicio:"2026-02-11", dataFim:"2026-03-10", valor:101467.37 }
+            { id:11, dataInicio:"2026-02-11", dataFim:"2026-03-10", valor:101467.37 },
+            { id:12, dataInicio:"2026-03-11", dataFim:"2026-04-10", valor:null },
+            { id:13, dataInicio:"2026-04-11", dataFim:"2026-05-10", valor:null }
         ]
     },
     {
@@ -194,7 +197,7 @@ const rawProjects = [
         previsaoFim: "2026-08-29",
         localizacao: { lat: -23.190272, lng: -46.846775 },
         cronogramas: [
-            { nome: "Previsto Inicial", valoresAcumulados: [718820.05,1383231.27,2358254.57,2973815.30,3455309.34,4094193.64,4695529.12,5432647.44,5949592.65,6147641.86] }
+            { nome: "Cronograma Inicial", valoresAcumulados: [718820.05,1383231.27,2358254.57,2973815.30,3455309.34,4094193.64,4695529.12,5432647.44,5949592.65,6147641.86] }
         ],
         medicoes: [
             { id:1, dataInicio:"2025-11-03", dataFim:"2025-12-02", valor:150057.58 },
