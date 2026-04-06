@@ -466,7 +466,7 @@ const rawProjects = [
             { id:8, dataInicio:"2026-02-07", dataFim:"2026-03-06", valor:null },
             { id:9, dataInicio:"2026-03-07", dataFim:"2026-04-06", valor:null },
             { id:10, dataInicio:"2026-04-07", dataFim:"2026-05-06", valor:null },
-            { id:11, dataInicio:"2026-02-07", dataFim:"2026-06-06", valor:null },
+            { id:11, dataInicio:"2026-05-07", dataFim:"2026-06-06", valor:null },
             { id:12, dataInicio:"2026-06-07", dataFim:"2026-07-06", valor:null }
         ]
     }
