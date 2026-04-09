@@ -250,7 +250,7 @@ const rawProjects = [
             { nome: "Previsto Inicial", valoresAcumulados: [124967.95,264725.58,458665.47,747556.51,1031172.00,1362813.64,1642562.37,1916890.80,2118393.98,2290500.55,2457541.08,2599375.66] }
         ],
         medicoes: [
-            { id:1,  dataInicio:"2026-02-09", dataFim:"2026-03-10", valor:1.00 },
+            { id:1,  dataInicio:"2026-02-09", dataFim:"2026-03-10", valor:53861.56 },
             { id:2,  dataInicio:"2026-03-15", dataFim:"2026-04-14", valor:null },
             { id:3,  dataInicio:"2026-04-15", dataFim:"2026-05-14", valor:null },
             { id:4,  dataInicio:"2026-05-15", dataFim:"2026-06-14", valor:null },
