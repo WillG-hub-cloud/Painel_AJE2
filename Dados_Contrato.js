@@ -168,8 +168,9 @@ const rawProjects = [
         cronogramas: [
             { nome: "Cronograma Inicial",        valoresAcumulados: [164490.45,336423.85,578404.56,823300.17,1029579.72,1264982.08,1502623.50,1718875.29,null,null] },
             { nome: "Cronograma Prorrogação I",  valoresAcumulados: [null,null,200391.22,456648.02,759827.63,1147658.15,1443929.50,1718878.29,null,null,null] },
-            { nome: "Cronograma Prorrogação II", valoresAcumulados: [null,null,null,null,null,null,null,1072910.67,1288306.78,1508319.59,1718878.29,null,null] },
-            { nome: "Cronograma Prorrogação III", valoresAcumulados: [null,null,null,null,null,null,null,null,null,null,1475365.61,1585992.13,1718878.29] }
+            { nome: "Cronograma Prorrogação II", valoresAcumulados: [null,null,null,null,null,null,972079.09,1072910.67,1288306.78,1508319.59,1718878.29,null,null] },
+            { nome: "Cronograma Prorrogação III", valoresAcumulados: [null,null,null,null,null,null,null,null,1264905.27,1434908.78,1604877.45,1718878.29,null,] },
+            { nome: "Cronograma Prorrogação IV", valoresAcumulados: [null,null,null,null,null,null,null,null,null,1379224.41,1475365.61,1585992.13,1718878.29] }
         ],
         medicoes: [
             { id:1,  dataInicio:"2025-04-15", dataFim:"2025-05-14", valor:107178.95 },
