@@ -452,8 +452,8 @@ const rawProjects = [
         localizacao: { lat: -23.184126, lng: -46.853513 },
         cronogramas: [
             { nome: "Cronograma Inicial",        valoresAcumulados: [149571.75,730716.85,1300261.90,1480000.00,null,null,null,null,null,null] },
-            { nome: "Cronograma Prorrogação I",  valoresAcumulados: [null,null,368781.58,866856.13,1169484.80,1333153.20,1480000.00,null,null,null] },
-            { nome: "Cronograma Prorrogação II", valoresAcumulados: [null,null,null,null,null,null,704416.75,833484.36,1160994.10,1480000.00] },
+            { nome: "Cronograma Prorrogação I",  valoresAcumulados: [261030.50,318610.50,368781.58,866856.13,1169484.80,1333153.20,1480000.00,null,null,null] },
+            { nome: "Cronograma Prorrogação II", valoresAcumulados: [null,null,null,null,553163.84,621347.24,704416.75,833484.36,1160994.10,1480000.00] },
             { nome: "Cronograma Prorrogação III",  valoresAcumulados: [null,null,null,null,null,null,null,743137.53,970767.33, 1157164.54, 1383700.51, 1480000.00] }
         ],
         medicoes: [
