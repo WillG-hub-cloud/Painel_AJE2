@@ -299,7 +299,7 @@ const rawProjects = [
         id: "CT 036/25",
         objeto: "UBS Tamoio", 
         empresa: "SLN Telecom. e Eng. Ltda",
-        valorTotal: 6598840.00,
+        valorTotal: 7117245.86,
         observacoes: "Novo Cronograma Adotado após aprovação do Termo Aditivo de Prazo I",
         previsaoInicio: "2025-04-22",
         previsaoFim: "2026-04-21",
