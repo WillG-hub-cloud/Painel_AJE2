@@ -169,7 +169,7 @@ const rawProjects = [
             { nome: "Cronograma Inicial",        valoresAcumulados: [164490.45,336423.85,578404.56,823300.17,1029579.72,1264982.08,1502623.50,1718875.29,null,null] },
             { nome: "Cronograma Prorrogação I",  valoresAcumulados: [null,null,200391.22,456648.02,759827.63,1147658.15,1443929.50,1718878.29,null,null,null] },
             { nome: "Cronograma Prorrogação II", valoresAcumulados: [null,null,null,null,null,null,972079.09,1072910.67,1288306.78,1508319.59,1718878.29,null,null] },
-            { nome: "Cronograma Prorrogação III", valoresAcumulados: [null,null,null,null,null,null,null,null,1264905.27,1434908.78,1604877.45,1718878.29,null,] },
+            { nome: "Cronograma Prorrogação III", valoresAcumulados: [null,null,null,null,null,null,null,null,1264905.27,1434908.78,1604877.45,1718878.29,null] },
             { nome: "Cronograma Prorrogação IV", valoresAcumulados: [null,null,null,null,null,null,null,null,null,1379224.41,1475365.61,1585992.13,1718878.29] }
         ],
         medicoes: [
@@ -205,12 +205,12 @@ const rawProjects = [
             { id:2, dataInicio:"2025-12-03", dataFim:"2026-01-01", valor:195635.76 },
             { id:3, dataInicio:"2026-01-02", dataFim:"2026-02-01", valor:175845.57 },
             { id:4, dataInicio:"2026-02-02", dataFim:"2026-03-02", valor:315829.43 },
-            { id:5, dataInicio:"2026-03-03", dataFim:"2026-04-01", valor:124465,53 },
+            { id:5, dataInicio:"2026-03-03", dataFim:"2026-04-01", valor:124465.53 },
             { id:6, dataInicio:"2026-04-03", dataFim:"2026-05-17", valor:null },
             { id:7, dataInicio:"2026-05-03", dataFim:"2026-06-17", valor:null },
             { id:8, dataInicio:"2026-06-03", dataFim:"2026-07-10", valor:null },
             { id:9, dataInicio:"2026-07-03", dataFim:"2026-08-10", valor:null },
-            { id:10,dataInicio:"2026-08-03", dataFim:"2026-09-10", valor:null }
+            { id:10, dataInicio:"2026-08-03", dataFim:"2026-09-10", valor:null }
         ]
     },
     {
@@ -381,7 +381,7 @@ const rawProjects = [
             { id:9,  dataInicio:"2026-02-11", dataFim:"2026-03-12", valor:152493.30 },
             { id:10, dataInicio:"2026-03-16", dataFim:"2026-04-15", valor:63180.69  },
             { id:11, dataInicio:"2026-04-16", dataFim:"2026-05-20", valor:104406.10 },
-            { id:12, dataInicio:"2026-05-16", dataFim:"2026-06-15", valor:197764,84 },
+            { id:12, dataInicio:"2026-05-16", dataFim:"2026-06-15", valor:197764.84 },
             { id:13, dataInicio:"2026-06-16", dataFim:"2026-07-15", valor:null },
             { id:14, dataInicio:"2026-07-16", dataFim:"2026-08-15", valor:null }
         ]
