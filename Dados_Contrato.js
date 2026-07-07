@@ -204,8 +204,8 @@ const rawProjects = [
             { id:1, dataInicio:"2025-11-03", dataFim:"2025-12-02", valor:150057.58 },
             { id:2, dataInicio:"2025-12-03", dataFim:"2026-01-01", valor:195635.76 },
             { id:3, dataInicio:"2026-01-02", dataFim:"2026-02-01", valor:175845.57 },
-            { id:4, dataInicio:"2026-02-03", dataFim:"2026-03-16", valor:315829.43 },
-            { id:5, dataInicio:"2026-03-03", dataFim:"2026-04-16", valor:null },
+            { id:4, dataInicio:"2026-02-02", dataFim:"2026-03-02", valor:315829.43 },
+            { id:5, dataInicio:"2026-03-03", dataFim:"2026-04-01", valor:124465,53 },
             { id:6, dataInicio:"2026-04-03", dataFim:"2026-05-17", valor:null },
             { id:7, dataInicio:"2026-05-03", dataFim:"2026-06-17", valor:null },
             { id:8, dataInicio:"2026-06-03", dataFim:"2026-07-10", valor:null },
@@ -254,7 +254,7 @@ const rawProjects = [
             { id:1,  dataInicio:"2026-02-09", dataFim:"2026-03-10", valor:53861.56 },
             { id:2,  dataInicio:"2026-03-11", dataFim:"2026-04-09", valor:160499.17 },
             { id:3,  dataInicio:"2026-04-10", dataFim:"2026-05-11", valor:82892.33 },
-            { id:4,  dataInicio:"2026-05-15", dataFim:"2026-06-14", valor:null },
+            { id:4,  dataInicio:"2026-05-12", dataFim:"2026-06-08", valor:86915.60 },
             { id:5,  dataInicio:"2026-06-15", dataFim:"2026-07-14", valor:null },
             { id:6,  dataInicio:"2026-07-15", dataFim:"2026-08-14", valor:null },
             { id:7,  dataInicio:"2026-08-15", dataFim:"2026-09-14", valor:null },
@@ -321,7 +321,7 @@ const rawProjects = [
             { id:10, dataInicio:"2026-01-17", dataFim:"2026-02-15", valor:657842.64 },
             { id:11, dataInicio:"2026-02-22", dataFim:"2026-03-21", valor:531130.71 },
             { id:12, dataInicio:"2026-03-22", dataFim:"2026-04-16", valor:267866.82 },
-            { id:13, dataInicio:"2026-04-22", dataFim:"2026-05-21", valor:null },
+            { id:13, dataInicio:"2026-04-17", dataFim:"2026-05-16", valor:219663.77 },
             { id:14, dataInicio:"2026-05-22", dataFim:"2026-06-21", valor:null },
             { id:15, dataInicio:"2026-06-22", dataFim:"2026-07-21", valor:null },
             { id:16, dataInicio:"2026-07-22", dataFim:"2026-08-21", valor:null }
@@ -347,7 +347,7 @@ const rawProjects = [
             { id:5,  dataInicio:"2026-01-27", dataFim:"2026-02-25", valor:491528.24 },
             { id:6,  dataInicio:"2026-02-22", dataFim:"2026-03-21", valor:322829.27 },
             { id:7,  dataInicio:"2026-03-22", dataFim:"2026-04-26", valor:345158.34 },
-            { id:8,  dataInicio:"2026-04-22", dataFim:"2026-05-21", valor:null },
+            { id:8,  dataInicio:"2026-04-27", dataFim:"2026-05-26", valor:504678.41 },
             { id:9,  dataInicio:"2026-05-22", dataFim:"2026-06-21", valor:null },
             { id:10, dataInicio:"2026-06-22", dataFim:"2026-07-21", valor:null },
             { id:11, dataInicio:"2026-07-22", dataFim:"2026-08-21", valor:null },
@@ -381,7 +381,7 @@ const rawProjects = [
             { id:9,  dataInicio:"2026-02-11", dataFim:"2026-03-12", valor:152493.30 },
             { id:10, dataInicio:"2026-03-16", dataFim:"2026-04-15", valor:63180.69  },
             { id:11, dataInicio:"2026-04-16", dataFim:"2026-05-20", valor:104406.10 },
-            { id:12, dataInicio:"2026-05-16", dataFim:"2026-06-15", valor:null },
+            { id:12, dataInicio:"2026-05-16", dataFim:"2026-06-15", valor:197764,84 },
             { id:13, dataInicio:"2026-06-16", dataFim:"2026-07-15", valor:null },
             { id:14, dataInicio:"2026-07-16", dataFim:"2026-08-15", valor:null }
         ]
@@ -408,7 +408,7 @@ const rawProjects = [
             { id:7,  dataInicio:"2026-01-24", dataFim:"2026-02-22", valor:210689.84 },
             { id:8,  dataInicio:"2026-02-28", dataFim:"2026-03-27", valor:231806.37 },
             { id:9,  dataInicio:"2026-03-28", dataFim:"2026-04-23", valor:332740.10 },
-            { id:10, dataInicio:"2026-04-28", dataFim:"2026-05-27", valor:null },
+            { id:10, dataInicio:"2026-04-28", dataFim:"2026-05-27", valor:238250.13 },
             { id:11, dataInicio:"2026-05-28", dataFim:"2026-06-27", valor:null },
             { id:12, dataInicio:"2026-06-28", dataFim:"2026-07-27", valor:null },
             { id:13, dataInicio:"2026-07-28", dataFim:"2026-08-27", valor:null },
@@ -433,7 +433,7 @@ const rawProjects = [
             { id:3,  dataInicio:"2026-01-30", dataFim:"2026-02-28", valor:323477.48 },
             { id:4,  dataInicio:"2026-02-29", dataFim:"2026-03-30", valor:572197.58 },
             { id:5,  dataInicio:"2026-04-01", dataFim:"2026-05-01", valor:1186179.23 },
-            { id:6,  dataInicio:"2026-05-01", dataFim:"2026-06-01", valor:null },
+            { id:6,  dataInicio:"2026-05-01", dataFim:"2026-06-01", valor:242619.24 },
             { id:7,  dataInicio:"2026-06-01", dataFim:"2026-07-01", valor:null },
             { id:8,  dataInicio:"2026-07-01", dataFim:"2026-08-01", valor:null },
             { id:9,  dataInicio:"2026-08-01", dataFim:"2026-09-01", valor:null },
@@ -452,10 +452,11 @@ const rawProjects = [
         previsaoFim: "2026-04-06",
         localizacao: { lat: -23.184126, lng: -46.853513 },
         cronogramas: [
-            { nome: "Cronograma Inicial",        valoresAcumulados: [149571.75,730716.85,1300261.90,1480000.00,null,null,null,null,null,null] },
-            { nome: "Cronograma Prorrogação I",  valoresAcumulados: [261030.50,318610.50,368781.58,866856.13,1169484.80,1333153.20,1480000.00,null,null,null] },
-            { nome: "Cronograma Prorrogação II", valoresAcumulados: [null,null,null,null,553163.84,621347.24,704416.75,833484.36,1160994.10,1480000.00] },
-            { nome: "Cronograma Prorrogação III",  valoresAcumulados: [null,null,null,null,null,null,null,743137.53,970767.33, 1157164.54, 1383700.51, 1480000.00] }
+            { nome: "Cronograma Inicial",        valoresAcumulados: [149571.75,730716.85,1300261.90,1480000.00,null,null,null,null,null,null,null,null,null,null] },
+            { nome: "Cronograma Prorrogação I",  valoresAcumulados: [261030.50,318610.50,368781.58,866856.13,1169484.80,1333153.20,1480000.00,null,null,null,null,null,null,null] },
+            { nome: "Cronograma Prorrogação II", valoresAcumulados: [null,null,null,null,553163.84,621347.24,704416.75,833484.36,1160994.10,1480000.00,null,null,null,null] },
+            { nome: "Cronograma Prorrogação III",  valoresAcumulados: [null,null,null,null,null,null,null,743137.53,970767.33, 1157164.54, 1383700.51, 1480000.00,null,null] },
+            { nome: "Cronograma Prorrogação IV",  valoresAcumulados: [null,null,null,null,null,null,null,null,null,null,1185535.97,1302084.86,1411249.55,1480000.00] }
         ],
         medicoes: [
             { id:1, dataInicio:"2025-07-07", dataFim:"2025-08-06", valor:261030.50 },
@@ -469,7 +470,9 @@ const rawProjects = [
             { id:9, dataInicio:"2026-03-07", dataFim:"2026-04-06", valor:105255.97 },
             { id:10, dataInicio:"2026-04-07", dataFim:"2026-05-06", valor:108231.34 },
             { id:11, dataInicio:"2026-05-07", dataFim:"2026-06-06", valor:null },
-            { id:12, dataInicio:"2026-06-07", dataFim:"2026-07-06", valor:null }
+            { id:12, dataInicio:"2026-06-07", dataFim:"2026-07-06", valor:null },
+            { id:13, dataInicio:"2026-07-07", dataFim:"2026-08-06", valor:null },
+            { id:14, dataInicio:"2026-08-07", dataFim:"2026-09-06", valor:null }
         ]
     }
 ];
