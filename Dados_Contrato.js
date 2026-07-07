@@ -192,13 +192,14 @@ const rawProjects = [
         id: "CT 068/25",
         objeto: "EMEB Helena Galimberti",
         empresa: "SLN Telecom. e Eng. Ltda.",
-        valorTotal: 6147641.86,
-        observacoes: null,
+        valorTotal: 6656088.29,
+        observacoes: "Cronograma aprovado pela SMISP no Termo de Prorrogação I não contemplam os reais valores medidos",
         previsaoInicio: "2025-11-03",
-        previsaoFim: "2026-08-29",
+        previsaoFim: "2027-02-25",
         localizacao: { lat: -23.190272, lng: -46.846775 },
         cronogramas: [
-            { nome: "Cronograma Inicial", valoresAcumulados: [718820.05,1383231.27,2358254.57,2973815.30,3455309.34,4094193.64,4695529.12,5432647.44,5949592.65,6147641.86] }
+            { nome: "Cronograma Inicial", valoresAcumulados: [718820.05,1383231.27,2358254.57,2973815.30,3455309.34,4094193.64,4695529.12,5432647.44,5949592.65,6147641.86,null,null,null,null,null,null] },
+            { nome: "Termo de Prorrog. I", valoresAcumulados: [139913.12,373159.30,535319.42,776095.67,986012.14,1171304.71,1466503.10,2281489.32,3073733.65,3772213.70,4299850.35,5088954.10,5747298.34,6413642.37,6559907.97,6656088.29] }
         ],
         medicoes: [
             { id:1, dataInicio:"2025-11-03", dataFim:"2025-12-02", valor:150057.58 },
@@ -211,6 +212,12 @@ const rawProjects = [
             { id:8, dataInicio:"2026-06-03", dataFim:"2026-07-10", valor:null },
             { id:9, dataInicio:"2026-07-03", dataFim:"2026-08-10", valor:null },
             { id:10, dataInicio:"2026-08-03", dataFim:"2026-09-10", valor:null }
+            { id:11, dataInicio:"2026-09-03", dataFim:"2026-10-10", valor:null },
+            { id:12, dataInicio:"2026-10-03", dataFim:"2026-11-10", valor:null },
+            { id:13, dataInicio:"2026-11-03", dataFim:"2026-12-10", valor:null },
+            { id:14, dataInicio:"2026-12-03", dataFim:"2027-01-10", valor:null },
+            { id:15, dataInicio:"2027-01-03", dataFim:"2023-02-10", valor:null },
+            { id:16, dataInicio:"2026-02-03", dataFim:"2026-03-10", valor:null }
         ]
     },
     {
